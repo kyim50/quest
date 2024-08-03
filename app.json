@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "quests",
+    "slug": "quests-for-mobile",
+    "version": "1.0.0",
+    "sdkVersion": "51.0.0",
+    "platforms": ["ios", "android", "web"],
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

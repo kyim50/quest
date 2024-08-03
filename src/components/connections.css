@@ -1,0 +1,255 @@
+.connections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px; /* Restrict width for better readability */
+  margin: 0 auto; /* Center the container */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  color: #252422; /* Use a dark color for text for readability */
+}
+
+.friends-section,
+.people-section,
+.pending-requests-section {
+  border: 1px solid #CCC5B9;
+  padding: 15px;
+  border-radius: 12px;
+  background-color: #F9F9F9; /* Light gray background to separate sections */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  position: relative; /* For absolute positioning of buttons */
+}
+
+.friends-section h2,
+.people-section h2,
+.pending-requests-section h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  color: #252422; /* Black or almost black for headings */
+}
+
+.friend-item,
+.people-item,
+.pending-request {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #CCC5B9;
+  position: relative; /* For absolute positioning of buttons */
+}
+
+.friend-item:last-child,
+.people-item:last-child,
+.pending-request:last-child {
+  border-bottom: none; /* Remove border for last item */
+}
+
+.friend-item img,
+.people-item img,
+.pending-request img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover; /* Ensure image covers the container */
+  margin-right: 15px;
+}
+
+.view-profile-btn,
+.remove-friend-btn,
+.accept-btn,
+.decline-btn {
+  background-color: #007BFF; /* New color for buttons */
+  color: #FFFCF2;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px; /* Smaller padding */
+  font-size: 0.8em; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.view-profile-btn:hover,
+.remove-friend-btn:hover,
+.accept-btn:hover,
+.decline-btn:hover {
+  background-color: #0056b3; /* Darken button on hover */
+}
+
+.view-profile-btn,
+.accept-btn,
+.decline-btn {
+  margin-left: auto; /* Push buttons to the right */
+}
+
+.remove-friend-btn {
+  position: absolute;
+  right: 15px; /* Keep a consistent margin from the right edge */
+}
+
+.user-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #FFF;
+  padding: 25px;
+  border: 2px solid #CCC5B9;
+  border-radius: 12px;
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.user-popup .close-popup {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #007BFF; /* Color the close button */
+}
+
+.user-popup img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.user-popup div {
+  margin-bottom: 10px;
+}
+
+.user-popup .view-profile-btn,
+.user-popup .remove-friend-btn {
+  margin-left: 4px;
+}
+
+.search-bar {
+  padding: 10px;
+  background-color: #FFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #CCC5B9;
+  font-size: 16px;
+  color: #252422;
+}
+
+.search-bar input::placeholder {
+  color: #CCC5B9; /* Lighter placeholder color */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .connections-container {
+    padding: 10px;
+    max-width: 100%;
+  }
+
+  .friends-section,
+  .people-section,
+  .pending-requests-section {
+    padding: 10px;
+  }
+
+  .friend-item,
+  .people-item,
+  .pending-request {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 0;
+  }
+
+  .friend-item img,
+  .people-item img,
+  .pending-request img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+
+  .view-profile-btn,
+  .remove-friend-btn,
+  .accept-btn,
+  .decline-btn {
+    font-size: 0.8em;
+    padding: 4px 10px;
+  }
+
+  .remove-friend-btn {
+    position: static;
+    margin-left: auto;
+    margin-top: 8px;
+  }
+
+  .user-popup {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .user-popup img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .connections-container {
+    padding: 5px;
+  }
+
+  .friends-section,
+  .people-section,
+  .pending-requests-section {
+    padding: 8px;
+  }
+
+  .friend-item,
+  .people-item,
+  .pending-request {
+    padding: 6px 0;
+  }
+
+  .friend-item img,
+  .people-item img,
+  .pending-request img {
+    width: 35px;
+    height: 35px;
+    margin-right: 8px;
+  }
+
+  .view-profile-btn,
+  .remove-friend-btn,
+  .accept-btn,
+  .decline-btn {
+    font-size: 0.7em;
+    padding: 3px 8px;
+  }
+
+  .remove-friend-btn {
+    position: static;
+    margin-left: auto;
+    margin-top: 8px;
+  }
+
+  .user-popup {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .user-popup img {
+    width: 50px;
+    height: 50px;
+  }
+}

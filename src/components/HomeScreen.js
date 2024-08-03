@@ -1,0 +1,534 @@
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auth, db, uploadImage, updateUserProfile, fetchAllUserLocations, fetchUserLocations, fetchUserData, updateLastActive, setUserIsActive } from '../firebase';
+import { doc, updateDoc, collection, getDocs, onSnapshot, getDoc } from 'firebase/firestore';
+import L from 'leaflet';
+import '../styles/mapstyles.css';
+import Quests from './Quests.js';
+import Connections from './Connections.js';
+import NotificationDisplay from '../NotificationDisplay.js';
+import { useNotification } from '../NotificationContext';
+import { Privacy } from './Privacy.js';
+import { debounce } from 'lodash';
+
+const HomeScreen = () => {
+  const mapRef = useRef(null);
+  const markersRef = useRef([]);
+  const [address, setAddress] = useState('Loading address...');
+  const [activeSection, setActiveSection] = useState('');
+  const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
+  const [name, setName] = useState('Default Name');
+  const [bio, setBio] = useState('Default Bio');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isQuestWindowOpen, setIsQuestWindowOpen] = useState(false);
+  const [currentUserIds, setCurrentUserIds] = useState([]);
+  const [quests, setQuests] = useState([]);
+  const fileInputRef = useRef(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isPrivate, setIsPrivate] = useState(false);
+
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+
+  const getReceiverId = () => {
+    const user = auth.currentUser;
+    if (!user || !user.uid) {
+      console.error('Current user or receiverId is not defined');
+      return null;
+    }
+    return user.uid;
+  };
+
+  const handlePrivacyModeChange = async (newPrivacyMode) => {
+    setIsPrivate(newPrivacyMode);
+  
+    if (auth.currentUser) {
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      try {
+        await updateDoc(userDocRef, { isPrivate: newPrivacyMode });
+      } catch (error) {
+        console.error('Error updating privacy mode:', error);
+      }
+    }
+  
+    displayAllUserMarkers();
+  };
+  
+
+  const heartbeatInterval = 30000;
+
+  const sendHeartbeat = async () => {
+    if (auth.currentUser) {
+      await updateLastActive(auth.currentUser.uid);
+    }
+  };
+
+  useEffect(() => {
+    const heartbeatTimer = setInterval(() => {
+      sendHeartbeat();
+    }, heartbeatInterval);
+
+    return () => clearInterval(heartbeatTimer);
+  }, []);
+
+  const clearMarkers = () => {
+    markersRef.current.forEach(marker => {
+      mapRef.current.removeLayer(marker);
+    });
+    markersRef.current = [];
+  };
+
+  const addMarker = (latitude, longitude, profilePhotoUrl, popupText) => {
+    const userIcon = L.divIcon({
+      className: '',
+      html: `
+        <div class="marker-container">
+          <img src="${profilePhotoUrl}" alt="Profile Photo" />
+          <div class="marker-dot"></div>
+        </div>
+      `,
+      iconSize: [50, 65],
+      iconAnchor: [25, 50],
+    });
+
+    const marker = L.marker([latitude, longitude], { icon: userIcon })
+      .addTo(mapRef.current)
+      .bindPopup(popupText);
+
+    markersRef.current.push(marker);
+  };
+
+  const debouncedUpdateMarker = useCallback(debounce((profilePhotoUrl, latitude, longitude) => {
+    if (mapRef.current) {
+      mapRef.current.setView([latitude, longitude], 13);
+
+      clearMarkers();
+      addMarker(latitude, longitude, profilePhotoUrl, 'Your current location');
+
+      updateUserLocation(latitude, longitude);
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          const userAddress = data.display_name || 'Address not found';
+          setAddress(userAddress);
+        })
+        .catch(error => {
+          console.error('Error fetching address:', error);
+          setAddress('Error fetching address');
+        });
+    }
+  }, 500), []);
+
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const unsubscribeAuth = auth.onAuthStateChanged(user => {
+        if (user) {
+          setUserIsActive(true);
+          fetchUserDataAndUpdate();
+          setupUserLocationsListener();
+        } else {
+          setUserIsActive(false);
+          navigate('/login');
+        }
+      });
+
+      return () => unsubscribeAuth();
+    };
+
+    const fetchUserDataAndUpdate = async () => {
+      try {
+        const userData = await fetchUserData(auth.currentUser.uid);
+        if (userData) {
+          setName(userData.name || 'Default Name');
+          setProfilePhoto(userData.profilePhoto || 'placeholder.jpg');
+          setBio(userData.bio || 'Default Bio');
+          setIsPrivate(userData.isPrivate || false);
+
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              debouncedUpdateMarker(userData.profilePhoto || 'placeholder.jpg', latitude, longitude);
+            },
+            (error) => {
+              console.error('Error getting user location:', error);
+              setAddress('Unable to retrieve location');
+            }
+          );
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    const fetchQuests = () => {
+      const questsCollection = collection(db, 'quests');
+      const unsubscribe = onSnapshot(questsCollection, (snapshot) => {
+        const questsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setQuests(questsData);
+      }, (error) => {
+        console.error('Error fetching quests:', error);
+      });
+
+      return unsubscribe;
+    };
+
+    if (!mapRef.current) {
+      const map = L.map('map', { zoomControl: false }).setView([51.505, -0.09], 13);
+      mapRef.current = map;
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors © CartoDB'
+      }).addTo(map);
+
+      L.control.zoom({
+        position: 'topleft'
+      }).addTo(map);
+
+      map.attributionControl.remove();
+
+      checkAuthStatus();
+      const unsubscribeQuests = fetchQuests();
+
+      return () => {
+        unsubscribeQuests();
+      };
+    } else {
+      checkAuthStatus();
+    }
+  }, [navigate, debouncedUpdateMarker]);
+
+  const updateUserLocation = async (latitude, longitude) => {
+    if (auth.currentUser) {
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      try {
+        await updateDoc(userDocRef, {
+          location: {
+            latitude,
+            longitude,
+            timestamp: new Date().toISOString()
+          }
+        });
+      } catch (error) {
+        console.error('Error updating location:', error);
+      }
+    }
+  };
+
+  const isUserActive = (lastActive) => {
+    const now = new Date();
+    let lastActiveDate;
+
+    if (typeof lastActive === 'string') {
+      lastActiveDate = new Date(lastActive);
+    } else if (typeof lastActive === 'number') {
+      lastActiveDate = new Date(lastActive);
+    } else {
+      return false;
+    }
+
+    return now - lastActiveDate < heartbeatInterval;
+  };
+
+  const displayAllUserMarkers = async () => {
+    try {
+      const users = await fetchAllUserLocations();
+      const receiverId = getReceiverId();
+      if (!receiverId) return; // Exit if receiverId is not available
+  
+      // Fetch current user's privacy setting and friends list
+      const userDocRef = doc(db, 'users', receiverId);
+      const userDoc = await getDoc(userDocRef);
+      const currentUserIsPrivate = userDoc.data().isPrivate;
+      const friends = userDoc.data().friends || [];
+  
+      const visibleUsers = users.filter(user => {
+        // Always show the current user
+        if (user.receiverId === receiverId) return true;
+  
+        // If the current user is private, only show friends who have the current user in their friends list
+        if (currentUserIsPrivate) {
+          return friends.includes(user.receiverId);
+        }
+  
+        // Show users who are not private, or if the user has the current user in their friends list
+        return !user.isPrivate || friends.includes(user.receiverId);
+      });
+  
+      clearMarkers();
+  
+      const userIds = visibleUsers.map(user => {
+        const { location, profilePhoto, name, lastActive } = user;
+        if (isUserActive(lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
+          addMarker(location.latitude, location.longitude, profilePhoto || 'placeholder.jpg', `${name}'s location`);
+          return user.receiverId;
+        }
+        return null;
+      }).filter(id => id !== null);
+  
+      setCurrentUserIds(userIds);
+    } catch (error) {
+      console.error('Error displaying user markers:', error);
+    }
+  };
+  
+  
+
+  const setUserIsActive = async (isActive) => {
+    if (auth.currentUser) {
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      try {
+        await updateDoc(userDocRef, { isActive });
+      } catch (error) {
+        console.error('Error updating active status:', error);
+      }
+    }
+  };
+
+  const setupUserLocationsListener = () => {
+    const usersCollectionRef = collection(db, 'users');
+  
+    const unsubscribe = onSnapshot(usersCollectionRef, async snapshot => {
+      const users = snapshot.docs.map(doc => doc.data());
+      clearMarkers();
+  
+      const receiverId = getReceiverId();
+      if (!receiverId) return; // Exit if receiverId is not available
+  
+      // Fetch current user's privacy setting and friends list
+      const userDocRef = doc(db, 'users', receiverId);
+      const userDoc = await getDoc(userDocRef);
+      const currentUserIsPrivate = userDoc.data().isPrivate;
+      const friends = userDoc.data().friends || [];
+  
+      const visibleUsers = users.filter(user => {
+        // Always show the current user
+        if (user.receiverId === receiverId) return true;
+  
+        // If the current user is private, only show friends who have the current user in their friends list
+        if (currentUserIsPrivate) {
+          return friends.includes(user.receiverId);
+        }
+  
+        // Show users who are not private, or if the user has the current user in their friends list
+        return !user.isPrivate || friends.includes(user.receiverId);
+      });
+  
+      const userIds = visibleUsers.map(user => {
+        const { location, profilePhoto, name, lastActive } = user;
+        if (isUserActive(lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
+          addMarker(location.latitude, location.longitude, profilePhoto || 'placeholder.jpg', `${name}'s location`);
+          return user.receiverId;
+        }
+        return null;
+      }).filter(id => id !== null);
+  
+      setCurrentUserIds(userIds);
+    });
+  
+    return () => unsubscribe();
+  };
+  
+  
+  
+  
+
+  const editProfile = () => {
+    setIsEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+    setSelectedPhoto(null);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    let newProfilePhotoURL = profilePhoto;
+
+    if (selectedPhoto) {
+      try {
+        newProfilePhotoURL = await uploadImage(selectedPhoto);
+        setProfilePhoto(newProfilePhotoURL);
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        showNotification('Error uploading photo', 'error');
+        return;
+      }
+    }
+
+    const newName = document.getElementById('edit-name').value;
+    const newBio = document.getElementById('edit-bio').value;
+
+    try {
+      await updateUserProfile(auth.currentUser.uid, {
+        profilePhoto: newProfilePhotoURL,
+        name: newName || name,
+        bio: newBio || bio,
+      });
+
+      setName(newName || name);
+      setBio(newBio || bio);
+      setProfilePhoto(newProfilePhotoURL);
+      debouncedUpdateMarker(newProfilePhotoURL);
+
+      showNotification('Profile updated successfully!', 'success');
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      showNotification('Error updating profile', 'error');
+    }
+
+    setIsEditing(false);
+    setSelectedPhoto(null);
+  };
+
+  const showSection = (sectionId) => {
+    if (activeSection === sectionId) {
+      setActiveSection('');
+      setIsQuestWindowOpen(false);
+    } else {
+      setActiveSection(sectionId);
+      if (sectionId === 'quests-section') {
+        setIsQuestWindowOpen(true);
+      } else {
+        setIsQuestWindowOpen(false);
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    if (auth.currentUser) {
+      setUserIsActive(false)
+        .then(() => {
+          localStorage.clear();
+          auth.signOut().then(() => {
+            navigate('/login');
+          }).catch((error) => {
+            console.error('Error signing out:', error);
+            showNotification('Error signing out', 'error');
+          });
+        });
+    } else {
+      localStorage.clear();
+      auth.signOut().then(() => {
+        navigate('/login');
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+        showNotification('Error signing out', 'error');
+      });
+    }
+  };
+
+  const handlePhotoClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedPhoto(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePhoto(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const closeQuestWindow = () => {
+    setIsQuestWindowOpen(false);
+    setActiveSection('profile-section');
+  };
+
+  return (
+    <div className="map-container">
+      <div className="logout-container">
+        <button className="logout-btn" onClick={handleLogout}>
+          <img src="/logout.png" alt="Log Out" />
+        </button>
+      </div>
+      <div id="map" className="map-placeholder"></div>
+      <div className="address-bar" id="address-bar">{address}</div>
+
+      {/* Render Notification Display */}
+      <NotificationDisplay />
+
+      <div className={`rectangular-container ${activeSection ? '' : 'hidden'}`} id="content-container">
+        {activeSection === 'profile-section' && (
+          <section id="profile-section" className={`content-section ${activeSection === 'profile-section' ? 'show-section' : 'hide-section'}`}>
+            <div className="profile-container">
+              <button className="edit-profile-btn" onClick={editProfile}>
+                <img src="/edit.png" alt="Edit Profile" />
+              </button>
+              <div className="profile-photo" onClick={isEditing ? handlePhotoClick : undefined}>
+  <img id="profile-photo" src={profilePhoto} alt="Profile" />
+</div>
+              <div className="profile-info">
+                <div className="profile-name" id="profile-name">{name}</div>
+                <div className="profile-bio" id="profile-bio">{bio}</div>
+              </div>
+              {isEditing && (
+                <form id="profile-form" onSubmit={handleSubmit}>
+                  <input type="text" id="edit-name" placeholder="Enter new name" defaultValue={name} />
+                  <input type="text" id="edit-bio" placeholder="Enter new bio" defaultValue={bio} />
+                  <button type="button" className="uploadpfp" onClick={handlePhotoClick}>Upload Profile Photo</button>
+                  <input
+                    type="file"
+                    id="edit-photo"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+                  <button type="submit" className="save">Save Changes</button>
+                  <button type="button" className="cancel" onClick={cancelEdit}>Cancel</button>
+                </form>
+              )}
+              <Privacy isPrivate={isPrivate} onPrivacyModeChange={handlePrivacyModeChange} />
+            </div>
+          </section>
+        )}
+
+        {activeSection === 'quests-section' && (
+          <div className={`quests-window ${isQuestWindowOpen ? 'show-section' : 'hide-section'}`}>
+            <Quests quests={quests} currentUserIds={currentUserIds} />
+            {/* Pass quests data to Quests component */}
+          </div>
+        )}
+
+        {activeSection === 'connections-section' && (
+          <section id="connections-section" className={`content-section ${activeSection === 'connections-section' ? 'show-section' : 'hide-section'}`}>
+            <Connections currentUserIds={currentUserIds} />
+          </section>
+        )}
+
+        {/* Other sections (e.g., history) */}
+      </div>
+
+      <div className={`nav-bar ${activeSection ? 'hide-nav-bar' : ''}`}>
+        <nav>
+          <button onClick={() => showSection('profile-section')} className="nav-button">
+            <img src="profile.png" alt="Profile Icon" />
+          </button>
+          <button onClick={() => showSection('connections-section')} className="nav-button">
+            <img src="connections.png" alt="Connections Icon" />
+          </button>
+          <button onClick={() => showSection('quests-section')} className="nav-button">
+            <img src="quest.png" alt="Quests Icon" />
+          </button>
+          <button onClick={() => showSection('history-section')} className="nav-button">
+            <img src="history.png" alt="History Icon" />
+          </button>
+        </nav>
+      </div>
+    </div>
+  );
+};
+
+export default HomeScreen;

@@ -1,0 +1,594 @@
+/* General reset and body styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Helvetica, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 0px; /* Set the width of the scrollbar */
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
+  height: 100vh;
+  width: 100vw;
+  background-color: #E5E5E5; /* Light Gray */
+  overflow: hidden;
+}
+
+@keyframes popUp {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  80% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Container for the map */
+.map-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Map styling */
+#map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Location pin styling */
+.location-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.marker-container {
+  position: relative;
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  border: 2px solid rgba(128, 128, 128, 0.7); /* Thin grey outline with transparency */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
+  background-color: white; /* Ensure the background color is white */
+  animation: popUp 0.5s ease-out;
+}
+
+.marker-container img {
+  border-radius: 50%;
+  width: 46px; /* Adjust to fit inside the border */
+  height: 46px;
+  object-fit: cover;
+}
+
+.marker-dot {
+  position: absolute;
+  bottom: -15px; /* Adjust as needed to detach from the marker */
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: darkgrey; /* Change color if needed */
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  transform: translateX(-50%); /* Center the dot horizontally */
+  animation: heartbeat 1.5s infinite; /* Apply heartbeat animation */
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(-50%) scale(2);
+    opacity: 0;
+  }
+}
+
+
+
+
+/* Address bar styling */
+.address-bar {
+  width: 80%;
+  max-width: 500px;
+  height: 50px;
+  padding: 10px;
+  background-color: #FFFFFF; /* White */
+  color: #000000; /* Black */
+  text-align: left;
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  z-index: 3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 20px;
+  font-weight: 550;
+}
+
+/* Rectangular container styling */
+.rectangular-container {
+  width: 90%;
+  max-width: 400px;
+  height: 70%;
+  max-height: 400px;
+  background-color: #FFFFFF; /* White */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: fixed;
+  bottom: 86px;
+  left: 5%;
+  border-radius: 10px;
+  z-index: 10;
+  color: #000000; /* Black */
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hidden class for the rectangular container */
+.rectangular-container.hidden {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.show-section {
+  display: block;
+}
+
+.hide-section {
+  display: none;
+}
+
+/* Navigation bar styling */
+.nav-bar {
+  width: 90%;
+  max-width: 400px;
+  height: 70px;
+  background-color: #FFFFFF; /* White */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 5%;
+  border-radius: 10px;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -4px 8px rgba(0, 0, 0, 0); /* Shadow on bottom and sides */
+}
+
+/* Styling for the nav element to use flexbox for centering buttons */
+.nav-bar nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+/* Button styling for navigation */
+.nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Image (icon) styling */
+img {
+  width: auto;
+  height: 8vw;
+}
+
+/* Media queries for icon sizes */
+@media (max-width: 768px) {
+  img {
+    width: auto;
+    height: 20px;
+  }
+
+  .address-bar {
+    width: 80%;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .rectangular-container {
+    width: 70%;
+    max-width: 350px;
+    height: 60%;
+    max-height: 350px;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  /* Hide the zoom control container */
+  .leaflet-control-zoom {
+    display: none;
+  }
+
+  .nav-bar {
+    width: 70%;
+    max-width: 350px;
+    height: 60px;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  img {
+    width: auto;
+    height: 30px;
+  }
+
+  .address-bar {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  .rectangular-container {
+    width: 80%;
+    max-width: 400px;
+    height: 70%;
+    max-height: 400px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 86px;
+  }
+
+  .nav-bar {
+    width: 80%;
+    max-width: 400px;
+    height: 70px;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1025px) {
+  img {
+    width: auto;
+    height: 30px;
+  }
+
+  .address-bar {
+    width: 100%;
+    max-width: 800px;
+    padding: 12px;
+    font-size: 18px;
+  }
+
+  .rectangular-container {
+    width: 80%;
+    max-width: 400px;
+    height: 70%;
+    max-height: 400px;
+    left: 2%;
+    bottom: 86px;
+  }
+
+  .nav-bar {
+    width: 80%;
+    max-width: 400px;
+    height: 70px;
+    bottom: 5%;
+    left: 2.05%;
+    border-radius: 10px;
+  }
+}
+
+/* Additional styles for content sections */
+.content-section {
+  margin: 10px 0;
+  width: 100%;
+  background-color: #FFFFFF; /* White */
+  border-radius: 10px;
+}
+
+/* Style for the profile container */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  height: auto; /* Adjust height to auto for better responsiveness */
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: normal; /* Ensure text wraps properly */
+}
+
+/* Profile photo marker styling */
+.profile-photo-marker {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #FFFFFF; /* White */
+}
+
+/* Profile photo image styling */
+.profile-photo-marker img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%; /* Ensure the height covers the container */
+  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+  object-position: center; /* Centers the image within the container */
+  transform: translate(-50%, -50%); /* Center the image horizontally and vertically */
+}
+
+/* Profile name and bio styling */
+.profile-info {
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%; /* Ensure profile info takes full width */
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 5px 0;
+  word-wrap: break-word; /* Ensure long words break and wrap */
+  overflow-wrap: break-word; /* Additional property for text wrapping */
+}
+
+.profile-bio {
+  font-size: 1rem;
+  color: #555555; /* Darker Gray */
+  word-wrap: break-word; /* Ensure long words break and wrap */
+  overflow-wrap: break-word; /* Additional property for text wrapping */
+}
+
+/* Style for the profile photo */
+.profile-photo {
+  margin-bottom: 15px;
+}
+
+.profile-photo img {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background-color: gray;
+  color: white;
+  border-radius: 15px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.cancel,
+.uploadpfp {
+  border-radius: 50px;
+  color: #007BFF; /* Blue text color */
+  background-color: #CCC; /* Grey background color */
+  border: none; /* Removes any default border */
+  padding: 10px 20px; /* Adds padding inside the button */
+  font-size: 16px; /* Sets the font size */
+  cursor: pointer; /* Changes cursor to pointer on hover */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
+}
+
+.cancel:hover,
+.uploadpfp:hover {
+  background-color: #B3B3B3; /* Slightly darker grey for hover effect */
+}
+
+.save {
+  border-radius: 50px;
+  color: white; /* White text color */
+  background-color: #007BFF; /* Blue background color */
+  border: none; /* Removes any default border */
+  padding: 10px 20px; /* Adds padding inside the button */
+  font-size: 16px; /* Sets the font size */
+  cursor: pointer; /* Changes cursor to pointer on hover */
+  transition: background-color 0.3s ease; /* Smooth transition for background color change on hover */
+}
+
+.save:hover {
+  background-color: #0056b3; /* Darker blue for hover effect */
+}
+
+/* Styles for the edit profile button */
+.edit-profile-btn {
+  position: absolute; /* Keep it positioned relative to the container */
+  top: 10px; /* Adjust top positioning */
+  left: 10px; /* Adjust left positioning */
+  background: transparent; /* Remove default button background */
+  border: none; /* Remove button border */
+  padding: 0; /* Remove padding */
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.edit-profile-btn img {
+  width: 24px; /* Adjust size as needed */
+  height: 24px; /* Adjust size as needed */
+}
+
+/* Styles for the logout button */
+.logout-btn {
+  background: transparent; /* Remove default button background */
+  border: none; /* Remove button border */
+  padding: 0; /* Remove padding */
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.logout-btn img {
+  width: 24px; /* Adjust size as needed */
+  height: 24px; /* Adjust size as needed */
+}
+
+/* Optional: Add hover effects */
+.edit-profile-btn:hover img,
+.logout-btn:hover img {
+  opacity: 0.8; /* Slightly fade the image on hover */
+}
+
+/* Form styling */
+#profile-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+/* Input styling */
+input[type="text"],
+input[type="file"] {
+  padding: 10px;
+  border: 1px solid #CCCCCC; /* Light Gray */
+  border-radius: 5px;
+}
+
+/* Choose File button styling */
+.custom-file-input {
+  display: inline-block;
+  background-color: #FCA311; /* Orange */
+  color: #FFFFFF; /* White */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.custom-file-input:hover {
+  background-color: #d88e2c; /* Darker Orange */
+}
+
+input[type="file"] {
+  display: none;
+}
+
+/* Logout container styling */
+.logout-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.privacy-settings {
+  position: absolute;
+  top: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  display: flex;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+.privacy-settings label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.privacy-settings input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #ccc;
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
+  position: relative;
+  outline: none;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.privacy-settings input[type="checkbox"]:checked {
+  background-color: #007bff; /* Blue color for the slider when active */
+}
+
+.privacy-settings input[type="checkbox"]:before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+}
+
+.privacy-settings input[type="checkbox"]:checked:before {
+  transform: translateX(16px); /* Moves the slider knob to the right */
+}
+
+label {
+  margin-left: 12px;
+  font-size: 16px;
+}
+
+.marker-profile-photo,
+.popup-profile-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}

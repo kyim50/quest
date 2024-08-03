@@ -27,6 +27,7 @@ const HomeScreen = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [isPrivate, setIsPrivate] = useState(false);
 
+
   const navigate = useNavigate();
   const { showNotification } = useNotification();
 
@@ -38,7 +39,8 @@ const HomeScreen = () => {
     }
     return user.uid;
   };
-
+  
+  
   const handlePrivacyModeChange = async (newPrivacyMode) => {
     setIsPrivate(newPrivacyMode);
   
@@ -53,7 +55,6 @@ const HomeScreen = () => {
   
     displayAllUserMarkers();
   };
-  
 
   const heartbeatInterval = 30000;
 
@@ -78,25 +79,60 @@ const HomeScreen = () => {
     markersRef.current = [];
   };
 
-  const addMarker = (latitude, longitude, profilePhotoUrl, popupText) => {
+  const viewUserProfile = async (receiverId) => {
+    try {
+      const userData = await fetchUserData(receiverId);
+      if (userData) {
+        console.log('User data:', userData);
+        // Add code here to display the user profile details in a larger container
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+  
+  window.viewUserProfile = viewUserProfile; // Add this line
+  
+  const addMarker = (latitude, longitude, profilePhotoUrl, name, bio, isFriend, receiverId) => {
+    const currentUserId = getReceiverId();
+    const isCurrentUser = currentUserId === receiverId;
+  
     const userIcon = L.divIcon({
-      className: '',
+      className: 'user-icon',
       html: `
         <div class="marker-container">
           <img src="${profilePhotoUrl}" alt="Profile Photo" />
-          <div class="marker-dot"></div>
         </div>
       `,
-      iconSize: [50, 65],
-      iconAnchor: [25, 50],
+      iconSize: [70, 70],
+      iconAnchor: [35, 35],
     });
-
+  
+    let viewButton = '';
+    if (receiverId !== getReceiverId()) {
+      viewButton = `<button onclick="viewUserProfile('${receiverId}')">View</button>`;
+    }
+  
+    const popupContent = `
+      <div class="popup-content">
+        <img src="${profilePhotoUrl}" alt="Profile Photo" />
+        <div>
+          <h3>${name}</h3>
+          <p>${bio}</p>
+          ${viewButton}
+        </div>
+      </div>
+    `;
+  
     const marker = L.marker([latitude, longitude], { icon: userIcon })
       .addTo(mapRef.current)
-      .bindPopup(popupText);
-
+      .bindPopup(popupContent);
+  
     markersRef.current.push(marker);
   };
+  
+  
+  
 
   const debouncedUpdateMarker = useCallback(debounce((profilePhotoUrl, latitude, longitude) => {
     if (mapRef.current) {
@@ -240,34 +276,20 @@ const HomeScreen = () => {
     try {
       const users = await fetchAllUserLocations();
       const receiverId = getReceiverId();
-      if (!receiverId) return; // Exit if receiverId is not available
+      if (!receiverId) return;
   
-      // Fetch current user's privacy setting and friends list
-      const userDocRef = doc(db, 'users', receiverId);
-      const userDoc = await getDoc(userDocRef);
-      const currentUserIsPrivate = userDoc.data().isPrivate;
-      const friends = userDoc.data().friends || [];
-  
-      const visibleUsers = users.filter(user => {
-        // Always show the current user
-        if (user.receiverId === receiverId) return true;
-  
-        // If the current user is private, only show friends who have the current user in their friends list
-        if (currentUserIsPrivate) {
-          return friends.includes(user.receiverId);
-        }
-  
-        // Show users who are not private, or if the user has the current user in their friends list
-        return !user.isPrivate || friends.includes(user.receiverId);
-      });
+      const currentUserDocRef = doc(db, 'users', receiverId);
+      const currentUserDoc = await getDoc(currentUserDocRef);
+      const currentUserFriends = currentUserDoc.data().friends || [];
   
       clearMarkers();
   
-      const userIds = visibleUsers.map(user => {
-        const { location, profilePhoto, name, lastActive } = user;
-        if (isUserActive(lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
-          addMarker(location.latitude, location.longitude, profilePhoto || 'placeholder.jpg', `${name}'s location`);
-          return user.receiverId;
+      const userIds = users.map(user => {
+        const { location, profilePhoto, name, bio, receiverId } = user;
+        if (isUserActive(user.lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
+          const isFriend = currentUserFriends.includes(receiverId);
+          addMarker(location.latitude, location.longitude, profilePhoto || 'placeholder.jpg', name, bio, isFriend, receiverId);
+          return receiverId;
         }
         return null;
       }).filter(id => id !== null);
@@ -299,32 +321,18 @@ const HomeScreen = () => {
       clearMarkers();
   
       const receiverId = getReceiverId();
-      if (!receiverId) return; // Exit if receiverId is not available
+      if (!receiverId) return;
   
-      // Fetch current user's privacy setting and friends list
-      const userDocRef = doc(db, 'users', receiverId);
-      const userDoc = await getDoc(userDocRef);
-      const currentUserIsPrivate = userDoc.data().isPrivate;
-      const friends = userDoc.data().friends || [];
+      const currentUserDocRef = doc(db, 'users', receiverId);
+      const currentUserDoc = await getDoc(currentUserDocRef);
+      const currentUserFriends = currentUserDoc.data().friends || [];
   
-      const visibleUsers = users.filter(user => {
-        // Always show the current user
-        if (user.receiverId === receiverId) return true;
-  
-        // If the current user is private, only show friends who have the current user in their friends list
-        if (currentUserIsPrivate) {
-          return friends.includes(user.receiverId);
-        }
-  
-        // Show users who are not private, or if the user has the current user in their friends list
-        return !user.isPrivate || friends.includes(user.receiverId);
-      });
-  
-      const userIds = visibleUsers.map(user => {
-        const { location, profilePhoto, name, lastActive } = user;
-        if (isUserActive(lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
-          addMarker(location.latitude, location.longitude, profilePhoto || 'placeholder.jpg', `${name}'s location`);
-          return user.receiverId;
+      const userIds = users.map(user => {
+        const { location, profilePhoto, name, bio, receiverId } = user;
+        if (isUserActive(user.lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
+          const isFriend = currentUserFriends.includes(receiverId);
+          addMarker(location.latitude, location.longitude, profilePhoto || 'placeholder.jpg', name, bio, isFriend, receiverId);
+          return receiverId;
         }
         return null;
       }).filter(id => id !== null);
@@ -334,9 +342,6 @@ const HomeScreen = () => {
   
     return () => unsubscribe();
   };
-  
-  
-  
   
 
   const editProfile = () => {
@@ -429,6 +434,7 @@ const HomeScreen = () => {
   const handlePhotoClick = () => {
     fileInputRef.current.click();
   };
+  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -456,7 +462,7 @@ const HomeScreen = () => {
       </div>
       <div id="map" className="map-placeholder"></div>
       <div className="address-bar" id="address-bar">{address}</div>
-
+    
       {/* Render Notification Display */}
       <NotificationDisplay />
 

@@ -3,11 +3,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Helvetica, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 ::-webkit-scrollbar {
-  width: 0px; /* Set the width of the scrollbar */
+  width: 0px; /* Hide scrollbar */
 }
 
 body {
@@ -17,7 +17,8 @@ body {
   align-items: center; /* Center content horizontally */
   height: 100vh;
   width: 100vw;
-  background-color: #E5E5E5; /* Light Gray */
+  background-color: #1C1C1E; /* Dark mode background */
+  color: #FFFFFF; /* White text */
   overflow: hidden;
 }
 
@@ -63,13 +64,13 @@ body {
   position: relative;
   width: 50px; /* Adjust size as needed */
   height: 50px; /* Adjust size as needed */
-  border: 2px solid rgba(128, 128, 128, 0.7); /* Thin grey outline with transparency */
+  border: 2px solid rgba(255, 255, 255, 0.7); /* Thin white outline with transparency */
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
-  background-color: white; /* Ensure the background color is white */
+  background-color: #1C1C1E; /* Ensure the background color is dark */
   animation: popUp 0.5s ease-out;
 }
 
@@ -86,7 +87,7 @@ body {
   left: 50%;
   width: 10px;
   height: 10px;
-  background-color: darkgrey; /* Change color if needed */
+  background-color: #FF453A; /* Apple red */
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
   transform: translateX(-50%); /* Center the dot horizontally */
@@ -108,17 +109,14 @@ body {
   }
 }
 
-
-
-
 /* Address bar styling */
 .address-bar {
   width: 80%;
   max-width: 500px;
   height: 50px;
   padding: 10px;
-  background-color: #FFFFFF; /* White */
-  color: #000000; /* Black */
+  background-color: #2C2C2E; /* Darker background */
+  color: #FFFFFF; /* White text */
   text-align: left;
   position: absolute;
   top: 5%;
@@ -142,7 +140,7 @@ body {
   max-width: 400px;
   height: 70%;
   max-height: 400px;
-  background-color: #FFFFFF; /* White */
+  background-color: #2C2C2E; /* Darker background */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -152,7 +150,7 @@ body {
   left: 5%;
   border-radius: 10px;
   z-index: 10;
-  color: #000000; /* Black */
+  color: #FFFFFF; /* White text */
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: auto;
@@ -181,7 +179,7 @@ body {
   width: 90%;
   max-width: 400px;
   height: 70px;
-  background-color: #FFFFFF; /* White */
+  background-color: #2C2C2E; /* Darker background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -190,6 +188,20 @@ body {
   border-radius: 10px;
   z-index: 10;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -4px 8px rgba(0, 0, 0, 0); /* Shadow on bottom and sides */
+}
+
+.current-quest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quest-title {
+  font-weight: bold;
+}
+
+.quest-state {
+  color: #666;
 }
 
 /* Styling for the nav element to use flexbox for centering buttons */
@@ -316,10 +328,11 @@ img {
 }
 
 /* Additional styles for content sections */
+/* Additional styles for content sections */
 .content-section {
   margin: 10px 0;
   width: 100%;
-  background-color: #FFFFFF; /* White */
+  background-color: #2C2C2E; /* Darker background */
   border-radius: 10px;
 }
 
@@ -328,14 +341,7 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  border-radius: 10px;
-  width: 100%;
-  height: auto; /* Adjust height to auto for better responsiveness */
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  white-space: normal; /* Ensure text wraps properly */
+  margin: 20px 0;
 }
 
 /* Profile photo marker styling */
@@ -358,6 +364,7 @@ img {
   left: 50%;
   width: 100%;
   height: 100%; /* Ensure the height covers the container */
+  border-radius: 50%;
   object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
   object-position: center; /* Centers the image within the container */
   transform: translate(-50%, -50%); /* Center the image horizontally and vertically */
@@ -591,4 +598,48 @@ label {
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.playing-status {
+  background-color: #292b2f; /* Slightly darker */
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.playing-status img {
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.status-label {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: #7289da; /* Discord blue */
+  vertical-align: middle;
+}
+
+.loading-animation {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #7289da;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

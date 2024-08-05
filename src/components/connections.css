@@ -1,3 +1,4 @@
+/* General container styling */
 .connections-container {
   display: flex;
   flex-direction: column;
@@ -6,36 +7,40 @@
   margin: 0 auto; /* Center the container */
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-  color: #252422; /* Use a dark color for text for readability */
+  background-color: #1C1C1E; /* Dark background */
+  color: #F0F0F5; /* Light text color for readability */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow for depth */
 }
 
+/* Section styling */
 .friends-section,
 .people-section,
 .pending-requests-section {
-  border: 1px solid #CCC5B9;
+  border: 1px solid #3A3A3C; /* Darker border to match Apple CarPlay theme */
   padding: 15px;
   border-radius: 12px;
-  background-color: #F9F9F9; /* Light gray background to separate sections */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background-color: #2C2C2E; /* Slightly lighter dark gray for sections */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
   position: relative; /* For absolute positioning of buttons */
 }
 
+/* Heading styling */
 .friends-section h2,
 .people-section h2,
 .pending-requests-section h2 {
   font-size: 1.5em;
   margin-bottom: 10px;
-  color: #252422; /* Black or almost black for headings */
+  color: #F0F0F5; /* Light text color */
 }
 
+/* Item styling */
 .friend-item,
 .people-item,
 .pending-request {
   display: flex;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #CCC5B9;
+  border-bottom: 1px solid #3A3A3C; /* Dark border for separation */
   position: relative; /* For absolute positioning of buttons */
 }
 
@@ -45,6 +50,7 @@
   border-bottom: none; /* Remove border for last item */
 }
 
+/* Image styling */
 .friend-item img,
 .people-item img,
 .pending-request img {
@@ -55,16 +61,17 @@
   margin-right: 15px;
 }
 
+/* Button styling */
 .view-profile-btn,
 .remove-friend-btn,
 .accept-btn,
 .decline-btn {
-  background-color: #007BFF; /* New color for buttons */
-  color: #FFFCF2;
+  background-color: #007AFF; /* Apple CarPlay blue color */
+  color: #FFFFFF; /* White text */
   border: none;
   border-radius: 20px;
-  padding: 5px 10px; /* Smaller padding */
-  font-size: 0.8em; /* Smaller font size */
+  padding: 8px 12px; /* Adjusted padding */
+  font-size: 0.9em; /* Slightly larger font size */
   cursor: pointer;
   transition: background-color 0.3s;
 }
@@ -73,7 +80,7 @@
 .remove-friend-btn:hover,
 .accept-btn:hover,
 .decline-btn:hover {
-  background-color: #0056b3; /* Darken button on hover */
+  background-color: #0051A1; /* Darker blue for hover effect */
 }
 
 .view-profile-btn,
@@ -87,22 +94,24 @@
   right: 15px; /* Keep a consistent margin from the right edge */
 }
 
+/* Popup styling */
 .user-popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #FFF;
+  background-color: #1C1C1E; /* Dark background */
   padding: 25px;
-  border: 2px solid #CCC5B9;
+  border: 2px solid #3A3A3C; /* Darker border */
   border-radius: 12px;
   z-index: 1000;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
+/* Close button styling */
 .user-popup .close-popup {
   position: absolute;
   top: 10px;
@@ -111,9 +120,10 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #007BFF; /* Color the close button */
+  color: #007AFF; /* Blue color for close button */
 }
 
+/* Popup image styling */
 .user-popup img {
   width: 80px;
   height: 80px;
@@ -121,6 +131,7 @@
   margin-bottom: 15px;
 }
 
+/* Popup content spacing */
 .user-popup div {
   margin-bottom: 10px;
 }
@@ -130,24 +141,26 @@
   margin-left: 4px;
 }
 
+/* Search bar styling */
 .search-bar {
   padding: 10px;
-  background-color: #FFF;
+  background-color: #2C2C2E; /* Dark background */
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .search-bar input {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #CCC5B9;
+  border: 1px solid #3A3A3C; /* Darker border */
   font-size: 16px;
-  color: #252422;
+  color: #F0F0F5; /* Light text color */
+  background-color: #1C1C1E; /* Dark background */
 }
 
 .search-bar input::placeholder {
-  color: #CCC5B9; /* Lighter placeholder color */
+  color: #6C6C6C; /* Lighter placeholder color */
 }
 
 /* Responsive Styles */
@@ -183,8 +196,8 @@
   .remove-friend-btn,
   .accept-btn,
   .decline-btn {
-    font-size: 0.8em;
-    padding: 4px 10px;
+    font-size: 0.9em;
+    padding: 6px 12px;
   }
 
   .remove-friend-btn {
@@ -233,8 +246,8 @@
   .remove-friend-btn,
   .accept-btn,
   .decline-btn {
-    font-size: 0.7em;
-    padding: 3px 8px;
+    font-size: 0.8em;
+    padding: 4px 8px;
   }
 
   .remove-friend-btn {

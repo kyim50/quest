@@ -19,14 +19,15 @@ const HomeScreen = () => {
   const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
   const [name, setName] = useState('Default Name');
   const [bio, setBio] = useState('Default Bio');
+  const [status, setStatus] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isQuestWindowOpen, setIsQuestWindowOpen] = useState(false);
   const [currentUserIds, setCurrentUserIds] = useState([]);
   const [quests, setQuests] = useState([]);
+  const [currentQuest, setCurrentQuest] = useState(null);
   const fileInputRef = useRef(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [isPrivate, setIsPrivate] = useState(false);
-
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -39,11 +40,10 @@ const HomeScreen = () => {
     }
     return user.uid;
   };
-  
-  
+
   const handlePrivacyModeChange = async (newPrivacyMode) => {
     setIsPrivate(newPrivacyMode);
-  
+
     if (auth.currentUser) {
       const userDocRef = doc(db, 'users', auth.currentUser.uid);
       try {
@@ -52,7 +52,7 @@ const HomeScreen = () => {
         console.error('Error updating privacy mode:', error);
       }
     }
-  
+
     displayAllUserMarkers();
   };
 
@@ -90,29 +90,25 @@ const HomeScreen = () => {
       console.error('Error fetching user data:', error);
     }
   };
-  
-  window.viewUserProfile = viewUserProfile; // Add this line
-  
+
+  window.viewUserProfile = viewUserProfile;
+
   const addMarker = (latitude, longitude, profilePhotoUrl, name, bio, isFriend, receiverId) => {
     const currentUserId = getReceiverId();
     const isCurrentUser = currentUserId === receiverId;
-  
+
     const userIcon = L.divIcon({
       className: 'user-icon',
-      html: `
-        <div class="marker-container">
-          <img src="${profilePhotoUrl}" alt="Profile Photo" />
-        </div>
-      `,
+      html: `<div class="marker-container"><img src="${profilePhotoUrl}" alt="Profile Photo" /></div>`,
       iconSize: [70, 70],
       iconAnchor: [35, 35],
     });
-  
+
     let viewButton = '';
     if (receiverId !== getReceiverId()) {
       viewButton = `<button onclick="viewUserProfile('${receiverId}')">View</button>`;
     }
-  
+
     const popupContent = `
       <div class="popup-content">
         <img src="${profilePhotoUrl}" alt="Profile Photo" />
@@ -123,16 +119,13 @@ const HomeScreen = () => {
         </div>
       </div>
     `;
-  
+
     const marker = L.marker([latitude, longitude], { icon: userIcon })
       .addTo(mapRef.current)
       .bindPopup(popupContent);
-  
+
     markersRef.current.push(marker);
   };
-  
-  
-  
 
   const debouncedUpdateMarker = useCallback(debounce((profilePhotoUrl, latitude, longitude) => {
     if (mapRef.current) {
@@ -184,7 +177,21 @@ const HomeScreen = () => {
           setName(userData.name || 'Default Name');
           setProfilePhoto(userData.profilePhoto || 'placeholder.jpg');
           setBio(userData.bio || 'Default Bio');
+          setStatus(userData.status || '');
           setIsPrivate(userData.isPrivate || false);
+
+          if (userData.currentQuest) {
+            const senderData = await fetchUserData(userData.currentQuest.senderId);
+            const receiverData = await fetchUserData(userData.currentQuest.receiverId);
+            setCurrentQuest({
+              ...userData.currentQuest,
+              senderName: senderData.name || 'Unknown Sender',
+              receiverName: receiverData.name || 'Unknown Receiver',
+              state: userData.currentQuest.isAccepted ? 'Pending' : 'In Progress',
+            });
+          } else {
+            setCurrentQuest(null);
+          }
 
           navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -219,7 +226,7 @@ const HomeScreen = () => {
       const map = L.map('map', { zoomControl: false }).setView([51.505, -0.09], 13);
       mapRef.current = map;
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '© OpenStreetMap contributors © CartoDB'
       }).addTo(map);
 
@@ -277,13 +284,13 @@ const HomeScreen = () => {
       const users = await fetchAllUserLocations();
       const receiverId = getReceiverId();
       if (!receiverId) return;
-  
+
       const currentUserDocRef = doc(db, 'users', receiverId);
       const currentUserDoc = await getDoc(currentUserDocRef);
       const currentUserFriends = currentUserDoc.data().friends || [];
-  
+
       clearMarkers();
-  
+
       const userIds = users.map(user => {
         const { location, profilePhoto, name, bio, receiverId } = user;
         if (isUserActive(user.lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
@@ -293,14 +300,12 @@ const HomeScreen = () => {
         }
         return null;
       }).filter(id => id !== null);
-  
+
       setCurrentUserIds(userIds);
     } catch (error) {
       console.error('Error displaying user markers:', error);
     }
   };
-  
-  
 
   const setUserIsActive = async (isActive) => {
     if (auth.currentUser) {
@@ -315,18 +320,18 @@ const HomeScreen = () => {
 
   const setupUserLocationsListener = () => {
     const usersCollectionRef = collection(db, 'users');
-  
+
     const unsubscribe = onSnapshot(usersCollectionRef, async snapshot => {
       const users = snapshot.docs.map(doc => doc.data());
       clearMarkers();
-  
+
       const receiverId = getReceiverId();
       if (!receiverId) return;
-  
+
       const currentUserDocRef = doc(db, 'users', receiverId);
       const currentUserDoc = await getDoc(currentUserDocRef);
       const currentUserFriends = currentUserDoc.data().friends || [];
-  
+
       const userIds = users.map(user => {
         const { location, profilePhoto, name, bio, receiverId } = user;
         if (isUserActive(user.lastActive) && location && typeof location.latitude === 'number' && typeof location.longitude === 'number') {
@@ -336,13 +341,12 @@ const HomeScreen = () => {
         }
         return null;
       }).filter(id => id !== null);
-  
+
       setCurrentUserIds(userIds);
     });
-  
+
     return () => unsubscribe();
   };
-  
 
   const editProfile = () => {
     setIsEditing(true);
@@ -371,16 +375,19 @@ const HomeScreen = () => {
 
     const newName = document.getElementById('edit-name').value;
     const newBio = document.getElementById('edit-bio').value;
+    const newStatus = document.getElementById('edit-status').value;
 
     try {
       await updateUserProfile(auth.currentUser.uid, {
         profilePhoto: newProfilePhotoURL,
         name: newName || name,
         bio: newBio || bio,
+        status: newStatus || status,
       });
 
       setName(newName || name);
       setBio(newBio || bio);
+      setStatus(newStatus || status);
       setProfilePhoto(newProfilePhotoURL);
       debouncedUpdateMarker(newProfilePhotoURL);
 
@@ -434,7 +441,6 @@ const HomeScreen = () => {
   const handlePhotoClick = () => {
     fileInputRef.current.click();
   };
-  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -453,6 +459,31 @@ const HomeScreen = () => {
     setActiveSection('profile-section');
   };
 
+  const handleStatusSubmit = async () => {
+    try {
+      await updateUserProfile(auth.currentUser.uid, {
+        status: status,
+      });
+
+      setStatus(status);
+      showNotification('Status updated successfully!', 'success');
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      showNotification('Error updating status', 'error');
+    }
+  };
+
+  useEffect(() => {
+    const statusTimeout = setTimeout(() => {
+      setStatus('');
+      updateUserProfile(auth.currentUser.uid, {
+        status: '',
+      });
+    }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+
+    return () => clearTimeout(statusTimeout);
+  }, [status]);
+
   return (
     <div className="map-container">
       <div className="logout-container">
@@ -462,7 +493,7 @@ const HomeScreen = () => {
       </div>
       <div id="map" className="map-placeholder"></div>
       <div className="address-bar" id="address-bar">{address}</div>
-    
+
       {/* Render Notification Display */}
       <NotificationDisplay />
 
@@ -474,16 +505,29 @@ const HomeScreen = () => {
                 <img src="/edit.png" alt="Edit Profile" />
               </button>
               <div className="profile-photo" onClick={isEditing ? handlePhotoClick : undefined}>
-  <img id="profile-photo" src={profilePhoto} alt="Profile" />
-</div>
+                <img id="profile-photo" src={profilePhoto} alt="Profile" />
+              </div>
               <div className="profile-info">
                 <div className="profile-name" id="profile-name">{name}</div>
                 <div className="profile-bio" id="profile-bio">{bio}</div>
+                <div className="profile-status" id="profile-status">{status}</div>
               </div>
               {isEditing && (
                 <form id="profile-form" onSubmit={handleSubmit}>
                   <input type="text" id="edit-name" placeholder="Enter new name" defaultValue={name} />
                   <input type="text" id="edit-bio" placeholder="Enter new bio" defaultValue={bio} />
+                  <input
+                    type="text"
+                    id="edit-status"
+                    placeholder="Enter your status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleStatusSubmit();
+                      }
+                    }}
+                  />
                   <button type="button" className="uploadpfp" onClick={handlePhotoClick}>Upload Profile Photo</button>
                   <input
                     type="file"
@@ -496,6 +540,15 @@ const HomeScreen = () => {
                   <button type="button" className="cancel" onClick={cancelEdit}>Cancel</button>
                 </form>
               )}
+
+              {!isEditing && currentQuest && (
+                <div className="current-quest-info">
+                  <h3>Current Quest</h3>
+                  <p>Title: {currentQuest.name}</p>
+                  <p>State: {currentQuest.state}</p>
+                </div>
+              )}
+
               <Privacy isPrivate={isPrivate} onPrivacyModeChange={handlePrivacyModeChange} />
             </div>
           </section>
@@ -504,7 +557,6 @@ const HomeScreen = () => {
         {activeSection === 'quests-section' && (
           <div className={`quests-window ${isQuestWindowOpen ? 'show-section' : 'hide-section'}`}>
             <Quests quests={quests} currentUserIds={currentUserIds} />
-            {/* Pass quests data to Quests component */}
           </div>
         )}
 

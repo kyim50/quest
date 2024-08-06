@@ -58,7 +58,7 @@ const LoginScreen = () => {
     <div className="login-screen">
 
       <div className="container">
-        <h1>Login to Your Account</h1>
+        <h1>Login</h1>
 
         
 

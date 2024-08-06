@@ -12,7 +12,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgb(15, 15, 150);
+    /*background-color: rgb(15, 15, 150);*/
+    background-image: url('/public/background\ Finale.png');
 }
 
 
@@ -25,15 +26,15 @@ body {
     align-items: center; /* Center-align items */
     width: 80%;
     max-width: 500px; /* Adjust width as needed */
-    background-color: rgb(242, 242, 247); /* Semi-transparent white background */
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 30px rgba(252, 251, 251, 0.21);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: rgb(28, 28, 30);
+    color: rgb(246, 246, 248);
 }
 
 /* Registration and Login form styling */
@@ -56,11 +57,11 @@ body {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #0a0a0a;
     border-radius: 10px;
     font-size: 16px;
-    background-color: rgb(229, 229, 234);
-    color: rgb(28, 28, 30);
+    background-color: rgb(0, 0, 0);
+    color: rgb(134, 134, 134);
     position: relative; /* To contain eye icon */
     outline: none; /* Remove outline on focus */
 }
@@ -70,6 +71,7 @@ body {
     position: relative;
     width: 100%;
     margin-bottom: 10px;
+    
 }
 
 /* Eye icon styling for password toggle */
@@ -88,7 +90,7 @@ body {
 .register-form button {
     width: 100%;
     padding: 10px;
-    background-color: rgb(10, 132, 255);
+    background-color: rgb(16,17,17);
     color: #fff;
     border: none;
     border-radius: 30px;
@@ -124,7 +126,7 @@ body {
     width: 92%; /* Make button same width as login button */
     margin-left: 20px;
     padding: 10px;
-    background-color: rgb(0, 122, 255);
+    background-color: rgb(16, 17, 17);
     color: #fff;
     border: none;
     border-radius: 30px;
@@ -138,7 +140,7 @@ body {
 }
 
 .login-section a.register-btn:hover {
-    background-color: #0056b3;
+    background-color: #080808;
     text-decoration: none;
 }
 
@@ -146,7 +148,7 @@ body {
 .google-login-btn {
     width: 90%;
     padding: 10px;
-    background-color: rgb(0, 122, 255); /* Google color */
+    background-color: rgb(16, 17, 17); /* Google color */
     color: #fff;
     border: none;
     border-radius: 30px;
@@ -175,7 +177,7 @@ body {
 .forgot-password-btn {
   background: none;
   border: none;
-  color: rgb(10, 132, 255);
+  color: rgb(16, 17, 17);
   cursor: pointer;
   text-decoration: underline;
   font-size: 14px;
@@ -203,7 +205,7 @@ body {
 .reset-password-container button {
   width: 90%;
   padding: 10px;
-  background-color: rgb(10, 132, 255);
+  background-color: rgb(69, 69, 70);
   color: #fff;
   border: none;
   border-radius: 30px;

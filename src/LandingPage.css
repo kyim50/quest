@@ -2,20 +2,21 @@
 body {
     width: 100%;
     height: 100%;
+    background-color: rgb(28, 28, 30);
     background-image: none;
-    background-color: rgb(28,28,30);
     margin: 0; /* Remove default margin */
     overflow-x: hidden; /* Prevent horizontal scroll */
     overflow-y: auto;
+    font-family: Arial, sans-serif; /* Add a font for consistency */
 }
 
 /* Logo Styles */
 .logo {
     position: absolute;
     display: block;
-    height: 60px; /* Adjust logo size as needed */
-    top: 20px;
-    left: 20px;
+    height: 60px; /* Default logo size */
+    top: 5%;
+    left: 2%;
 }
 
 /* Button Styles */
@@ -23,25 +24,25 @@ body {
     position: absolute;
     left: 50%; /* Center horizontally */
     transform: translateX(-50%); /* Shift left by half its width */
-    background-color: rgb(10,145,255); /* Vivid orange color */
+    background-color: rgb(10, 145, 255); /* Vivid blue color */
     color: white;
     border: none;
     font-size: 36px;
     font-weight: bolder;
     cursor: pointer;
     border-radius: 10px;
-    width: 100%;
-    max-width: 400px;
-    height: 75px;
+    width: 300px;
+    height: 90px;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.3s;
-    
+    transition: background-color 0.5s, width 0.5s, height 0.5s;
 }
 
 .login-button:hover {
-    background-color: rgb(7, 106, 187); /* Slightly darker orange for hover effect */
+    background-color: rgb(7, 106, 187); /* Slightly darker blue for hover effect */
+    height: 100px;
+    width: 320px;
 }
 
 /* Main Content Styles */
@@ -49,31 +50,31 @@ body {
     text-align: center;
     width: 80%;
     margin: 0 auto;
+    padding-bottom: 100px; /* Add padding to create space for scrolling */
 }
 
 .headline {
     font-size: 24px; /* Headline main text must be the biggest */
     margin-top: 150px;
-    margin-bottom: 20px;
     font-weight: 500;
     color: #999999;
 }
 
 .Today {
-    color: rgb(10,145,255);
+    color: rgb(10, 145, 255);
     display: inline;
 }
 
 .mainheadline {
     font-size: 48px;
     margin-bottom: 15px;
-    color: #ffffff; /* Almost black color */
+    color: #ffffff; /* White color */
     font-weight: bold;
 }
 
 .subtext {
     font-size: 18px;
-    color: #999999; /* Dark taupe color */
+    color: #999999; /* Light gray color */
     margin: 0 auto;
     margin-bottom: 50px;
     font-weight: 400;
@@ -83,13 +84,14 @@ body {
 /* Functions Section Styles */
 .Functions {
     color: #ffffff; /* White text for contrast */
-    padding: 50px 20px; /* Adjust padding as needed */
+    padding: 30px 5px; /* Reduced padding for mobile */
     text-align: center;
-    margin-top: 200px;
+    margin-top: 60px; /* Adjust margin to fit mobile view */
 }
 
+/* Functions Heading */
 .Functionsh1 {
-    font-size: 36px;
+    font-size: 24px;
     margin-bottom: 20px;
     font-weight: bold;
 }
@@ -101,20 +103,22 @@ body {
     justify-content: center;
     gap: 20px; /* Space between rectangles */
 }
-
+span{
+    color: rgb(10, 145, 255);
+}
 /* Individual rectangles */
 .function-box {
     background-color: #403D39; /* Dark taupe color */
-    width: 350px; /* Adjust size as needed */
-    height: 200px; /* Adjust size as needed */
+    width: 100%; /* Full width of grid cell */
+    max-width: 350px;
+    height: 225px; /* Adjust height for mobile */
     border-radius: 10px; /* Rounded corners */
     display: flex;
-    
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: #ffffff; /* White text */
-    font-size: 16px;
+    font-size: 14px; /* Adjust font size */
     font-weight: bold;
     padding: 10px; /* Padding inside the box */
     box-sizing: border-box; /* Ensure padding is included in the width and height */
@@ -124,131 +128,192 @@ body {
 /* Add specific styles for the content inside the rectangles */
 .functionicon img {
     width: auto; /* Adjust icon size */
-    height: 50px; /* Maintain aspect ratio */
+    height: 40px; /* Adjust icon size */
     margin-bottom: 5px;
 }
 
 .functionrectheader {
-    font-size: 36px;
+    font-size: 18px; /* Adjust font size for mobile */
     margin-bottom: 5px;
     text-align: center;
 }
 
-span{
-    color:rgb(10,145,255);
-}
 .functiontext {
-    font-size: 12px;
+    font-size: 10px; /* Adjust font size for mobile */
     text-align: center;
-    line-height: 1.4; /* Line height for readability */
+    line-height: 1.2; /* Line height for readability */
     overflow-y: auto; /* Allow vertical scrolling if text is too long */
     font-weight: 500;
 }
-
 
 /* Footer Styles */
 footer {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    color: #999999; /* Dark taupe color */
+    color: #999999; /* Light gray color */
     font-size: 10px;
 }
 
 /* Responsive Styles */
 @media (max-width: 1200px) {
-    .headline {
-        font-size: 20px;
-        margin-top: 100px;
-    }
-
+    /* Adjust styles for smaller desktop screens */
     .mainheadline {
         font-size: 40px;
     }
-
-    .login-button {
-        font-size: 32px;
-        height: 65px;
+    .Functionsh1 {
+        font-size: 30px;
+    }
+    .function-box {
+        width: 300px;
+        height: 180px;
     }
 }
 
 @media (max-width: 992px) {
-    .headline {
-        font-size: 18px;
-        margin-top: 80px;
+    /* Adjust styles for tablets */
+    .logo {
+        height: 50px;
     }
-
+    .login-button {
+        font-size: 28px;
+        width: 260px;
+        height: 80px;
+    }
     .mainheadline {
         font-size: 36px;
     }
-
-    .login-button {
+    .headline {
+        font-size: 20px;
+    }
+    .subtext {
+        font-size: 16px;
+    }
+    .Functionsh1 {
         font-size: 28px;
-        height: 60px;
+    }
+    .function-box {
+        width: 280px;
+        height: 160px;
+    }
+    footer {
+        font-size: 9px;
     }
 }
-
 @media (max-width: 768px) {
+    /* Adjust styles for mobile devices */
     .logo {
-        height: 50px;
-        top: 15px;
-        left: 15px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 70px; /* Increase logo size for mobile */
+        top: 60px; /* Adjust top position to bring the logo closer to the text */
     }
-
-    .headline {
-        font-size: 16px;
-        margin-top: 60px;
-    }
-
-    .mainheadline {
-        font-size: 32px;
-    }
-
     .login-button {
         font-size: 24px;
-        height: 50px;
+        width: 240px;
+        height: 70px;
+        position: absolute; /* Position it absolutely within its container */
+        bottom: 20px; /* Move closer to the bottom */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .landing-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 120px); /* Adjust height to fit in the viewport minus margins */
+        text-align: center;
+    }
+    .headline {
+        font-size: 18px;
+        margin-top: 0; /* Remove top margin to center vertically */
+    }
+    .mainheadline {
+        font-size: 28px; /* Reduced font size to fit text better */
+        margin-bottom: 10px; /* Reduce space below mainheadline */
+    }
+    .subtext {
+        font-size: 12px; /* Reduced font size */
+        margin-top: 10px; /* Adjust top margin to match spacing */
+        margin-bottom: 30px;
+    }
+    .Functions {
+        padding: 40px 10px;
+        margin-top: 60px; /* Reduce margin to bring the section closer */
+    }
+    .Functionsh1 {
+        font-size: 24px;
+    }
+    .function-box {
+        width: 240px;
+        height: 140px;
     }
 }
 
 @media (max-width: 576px) {
+    /* Adjust styles for small mobile devices */
     .logo {
-        height: 40px;
-        top: 10px;
-        left: 10px;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 80px; /* Further increase logo size for small mobile */
+        top: 60px; /* Adjust top position to bring the logo closer to the text */
     }
-
-    .headline {
-        font-size: 14px;
-        margin-top: 40px;
-    }
-
-    .mainheadline {
-        font-size: 28px;
-    }
-
     .login-button {
         font-size: 20px;
-        height: 45px;
+        width: 200px;
+        height: 60px;
+        position: absolute; /* Position it absolutely within its container */
+        bottom: 20px; /* Move closer to the bottom */
+        left: 50%;
+        transform: translateX(-50%);
     }
-}
-
-@media (max-width: 400px) {
-    .login-button {
-        font-size: 18px;
-        height: 40px;
-        width: 90%;
+    .landing-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 120px); /* Adjust height to fit in the viewport minus margins */
+        text-align: center;
     }
-
     .headline {
-        font-size: 12px;
-        margin-top: 20px;
-    }
-
-    .mainheadline {
-        font-size: 24px;
-    }
-
-    .subtext {
         font-size: 16px;
+        margin-top: 0; /* Remove top margin to center vertically */
+    }
+    .mainheadline {
+        font-size: 24px; /* Further reduced font size to ensure better text wrapping */
+        margin-bottom: 0px; /* Reduce space below mainheadline */
+    }
+    .subtext {
+        font-size: 12px; /* Further reduced font size */
+        margin-top: 5px; /* Adjust top margin to match spacing */
+        margin-bottom: 30px;
+    }
+    .Functions {
+        padding: 30px 5px;
+        margin-top: 60px; /* Reduce margin to bring the section closer */
+    }
+    .Functionsh1 {
+        font-size: 20px;
+    }
+    .functionicon img{
+        height:25px;
+        width:auto;
+    }
+    .function-box {
+        width: 150px;
+        height: 150px;
+        padding: 8px;
+    }
+    .functionrectheader{
+        font-size: 14px;
+    }
+    .functiontext {
+        font-size: 7px;
+    }
+    footer {
+        display:none;
     }
 }

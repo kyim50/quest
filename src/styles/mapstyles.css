@@ -6,14 +6,9 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-
-
 ::-webkit-scrollbar {
   width: 0px; /* Hide scrollbar */
 }
-
-
-
 
 body {
   display: flex;
@@ -26,9 +21,6 @@ body {
   color: #FFFFFF; /* White text */
   overflow: hidden;
 }
-
-
-
 
 @keyframes popUp {
   0% {
@@ -68,10 +60,7 @@ body {
   z-index: 2;
 }
 
-
-
-
-.circular-marker {
+.marker-container {
   position: relative;
   width: 50px; /* Adjust size as needed */
   height: 50px; /* Adjust size as needed */
@@ -85,9 +74,7 @@ body {
   animation: popUp 0.5s ease-out;
 }
 
-
-
-.circular-marker img {
+.marker-container img {
   border-radius: 50%;
   width: 46px; /* Adjust to fit inside the border */
   height: 46px;
@@ -256,28 +243,6 @@ body {
 .nav-icon:not(.active):hover {
   opacity: 0; /* Fade out the original image */
 }
-/*
-/* Ensure the active image is displayed when hovered */
-.nav-button:nth-of-type(1):hover .nav-icon:not(.active) {
-  content: url('/profile_hover.png'); 
-  opacity: 1; 
-}
-
-.nav-button:nth-of-type(2):hover .nav-icon:not(.active) {
-  content: url('/connections_hover.png'); 
-  opacity: 1; 
-}
-
-.nav-button:nth-of-type(3):hover .nav-icon:not(.active) {
-  content: url('/quest_hover.png'); 
-  opacity: 1; 
-}
-
-.nav-button:nth-of-type(4):hover .nav-icon:not(.active) {
-  content: url('/history_hover.png'); 
-  opacity: 1; 
-}
-
 
 /* Image (icon) styling */
 img {
@@ -307,8 +272,6 @@ img {
     left: 50%;
     transform: translateX(-50%);
   }
-
-  
 
   .nav-bar {
     width: 70%;
@@ -382,10 +345,8 @@ img {
     left: 2.05%;
     border-radius: 10px;
   }
-
 }
 
-/* Additional styles for content sections */
 /* Additional styles for content sections */
 .content-section {
   margin: 10px 0;
@@ -400,35 +361,6 @@ img {
   flex-direction: column;
   align-items: center;
   margin: 20px 0;
-}
-
-
-
-
-/* Profile photo marker styling */
-.profile-photo-marker {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px; /* Adjust size as needed */
-  height: 50px; /* Adjust size as needed */
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: #FFFFFF; /* White */
-}
-
-/* Profile photo image styling */
-.profile-photo-marker img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%; /* Ensure the height covers the container */
-  border-radius: 50%;
-  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
-  object-position: center; /* Centers the image within the container */
-  transform: translate(-50%, -50%); /* Center the image horizontally and vertically */
 }
 
 /* Profile name and bio styling */
@@ -464,8 +396,6 @@ img {
   height: 100px;
   object-fit: cover;
 }
-
-
 
 .cancel,
 .uploadpfp {
@@ -632,30 +562,6 @@ label {
   font-size: 16px;
 }
 
-.marker-profile-photo,
-.popup-profile-photo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.playing-status {
-  background-color: #292b2f; /* Slightly darker */
-  padding: 10px;
-  border-radius: 5px;
-  width: 100%;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.playing-status img {
-  width: 24px;
-  height: 24px;
-  margin-right: 5px;
-  vertical-align: middle;
-}
-
 .status-label {
   display: inline-block;
   font-size: 0.9rem;
@@ -663,23 +569,10 @@ label {
   vertical-align: middle;
 }
 
-.loading-animation {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #7289da;
+.profile-photo img {
+  width: 100px; /* Adjust as needed */
+  height: 100px; /* Adjust as needed */
   border-radius: 50%;
-  border-top-color: transparent;
-  animation: spin 1s linear infinite;
-  margin-left: 5px;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  object-fit: cover; /* Ensures the image covers the circle */
+  display: block;
 }

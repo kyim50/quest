@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, uploadImage, updateUserProfile, fetchAllUserLocations, fetchUserLocations, fetchUserData, updateLastActive, setUserIsActive } from '../firebase';
 import { doc, updateDoc, collection, getDocs, onSnapshot, getDoc } from 'firebase/firestore';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import mapboxgl from 'mapbox-gl';
 import '../styles/mapstyles.css';
 import Quests from './Quests.js';
 import Connections from './Connections.js';
@@ -11,6 +11,8 @@ import { useNotification } from '../NotificationContext';
 import { Privacy } from './Privacy.js';
 import { debounce } from 'lodash';
 
+const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
+mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const HomeScreen = () => {
   const mapRef = useRef(null);
@@ -29,17 +31,9 @@ const HomeScreen = () => {
   const fileInputRef = useRef(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [isPrivate, setIsPrivate] = useState(false);
-  const [selectedMarker, setSelectedMarker] = useState(null);
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyB0NklgG2-WB9hpyusVd5ZbFyfhnEfNMGs',
-  });
-
-
-  
 
   const getReceiverId = () => {
     const user = auth.currentUser;
@@ -65,10 +59,6 @@ const HomeScreen = () => {
     displayAllUserMarkers();
   };
 
-
-
-
-
   const heartbeatInterval = 30000;
 
   const sendHeartbeat = async () => {
@@ -86,6 +76,9 @@ const HomeScreen = () => {
   }, []);
 
   const clearMarkers = () => {
+    markersRef.current.forEach(marker => {
+      marker.remove();
+    });
     markersRef.current = [];
   };
 
@@ -107,28 +100,45 @@ const HomeScreen = () => {
     const currentUserId = getReceiverId();
     const isCurrentUser = currentUserId === receiverId;
 
-    const marker = {
-      id: receiverId,
-      latitude,
-      longitude,
-      profilePhotoUrl,
-      name,
-      bio,
-      isFriend,
-      receiverId,
-    };
+    const userIcon = document.createElement('div');
+    userIcon.className = 'user-icon';
+    userIcon.innerHTML = `<div class="marker-container"><img src="${profilePhotoUrl}" alt="Profile Photo" /></div>`;
+
+    let viewButton = '';
+    if (receiverId !== getReceiverId()) {
+      viewButton = `<button onclick="viewUserProfile('${receiverId}')">View</button>`;
+    }
+
+    const popupContent = `
+      <div class="popup-content">
+        <img src="${profilePhotoUrl}" alt="Profile Photo" />
+        <div>
+          <h3>${name}</h3>
+          <p>${bio}</p>
+          ${viewButton}
+        </div>
+      </div>
+    `;
+
+    const marker = new mapboxgl.Marker(userIcon)
+      .setLngLat([longitude, latitude])
+      .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+      .addTo(mapRef.current);
 
     markersRef.current.push(marker);
+    console.log('Marker added:', marker);
   };
 
   const debouncedUpdateMarker = useCallback(debounce((profilePhotoUrl, latitude, longitude) => {
     if (mapRef.current) {
+      mapRef.current.flyTo({ center: [longitude, latitude], zoom: 13 });
+
       clearMarkers();
       addMarker(latitude, longitude, profilePhotoUrl, 'Your current location');
 
       updateUserLocation(latitude, longitude);
 
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyB0NklgG2-WB9hpyusVd5ZbFyfhnEfNMGs`)
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -136,7 +146,7 @@ const HomeScreen = () => {
           return response.json();
         })
         .then(data => {
-          const userAddress = data.results[0].formatted_address || 'Address not found';
+          const userAddress = data.display_name || 'Address not found';
           setAddress(userAddress);
         })
         .catch(error => {
@@ -196,7 +206,6 @@ const HomeScreen = () => {
               setAddress('Unable to retrieve location');
             }
           );
-        
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -216,12 +225,22 @@ const HomeScreen = () => {
     };
 
     if (!mapRef.current) {
-      checkAuthStatus();
-      const unsubscribeQuests = fetchQuests();
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v10',
+        center: [0, 0],
+        zoom: 2
+      });
+      mapRef.current = map;
 
-      return () => {
-        unsubscribeQuests();
-      };
+      map.on('load', () => {
+        checkAuthStatus();
+        const unsubscribeQuests = fetchQuests();
+
+        return () => {
+          unsubscribeQuests();
+        };
+      });
     } else {
       checkAuthStatus();
     }
@@ -464,38 +483,6 @@ const HomeScreen = () => {
     return () => clearTimeout(statusTimeout);
   }, [status]);
 
-  if (loadError) return 'Error loading maps';
-  if (!isLoaded) return 'Loading Maps';
-
-
-
-
-  const CircleMarker = ({ position, onClick }) => {
-    const divRef = useRef(null);
-  
-    useEffect(() => {
-      const div = divRef.current;
-      if (!div) return;
-  
-      const panes = div.parentNode.parentNode.parentNode.parentNode;
-      const overlayLayer = panes.getElementsByClassName('overlayMouseTarget')[0];
-      overlayLayer.appendChild(div);
-  
-      const point = new window.google.maps.Point(div.offsetLeft, div.offsetTop);
-      const projection = panes.getMap().getProjection();
-      const worldCoordinate = projection.fromContainerPixelToLatLng(point);
-      div.style.left = `${worldCoordinate.lng()}px`;
-      div.style.top = `${worldCoordinate.lat()}px`;
-    }, [position]);
-  
-    return (
-      <div ref={divRef} className="circle-marker" onClick={onClick} />
-    );
-  };
-
-
-
-  
   return (
     <div className="map-container">
       <div className="logout-container">
@@ -503,53 +490,7 @@ const HomeScreen = () => {
           <img src="/logout.png" alt="Log Out" />
         </button>
       </div>
-
-
-    
-      
-      <GoogleMap
-        mapContainerStyle={{ width: '100%', height: '100%' }}
-        center={{ lat: 18.1096, lng: -77.2975 }}
-        zoom={13}
-        ref={mapRef}
-        options={{
-          fullscreenControl: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          zoomControlOptions: {
-            position: window.google.maps.ControlPosition.TOP_LEFT // Positioning the zoom control to the top left
-          }
-        }}
-      >
-        {markersRef.current.map(marker => (
-          <Marker
-            key={marker.id}
-            position={{ lat: marker.latitude, lng: marker.longitude }}
-            icon={{
-              url: marker.profilePhotoUrl,
-              scaledSize: new window.google.maps.Size(70, 70),
-              origin: new window.google.maps.Point(0, 0),
-              anchor: new window.google.maps.Point(35, 35),
-            }}
-            onClick={() => setSelectedMarker(marker)}
-          >
-            {selectedMarker === marker && (
-              <InfoWindow onCloseClick={() => setSelectedMarker(null)}>
-                <div className="popup-content">
-                  <img src={marker.profilePhotoUrl} alt="Profile Photo" />
-                  <div>
-                    <h3>{marker.name}</h3>
-                    <p>{marker.bio}</p>
-                    {marker.receiverId !== getReceiverId() && (
-                      <button onClick={() => viewUserProfile(marker.receiverId)}>View</button>
-                    )}
-                  </div>
-                </div>
-              </InfoWindow>
-            )}
-          </Marker>
-        ))}
-      </GoogleMap>
+      <div id="map" className="map-placeholder"></div>
       <div className="address-bar" id="address-bar">{address}</div>
 
       {/* Render Notification Display */}
@@ -628,50 +569,21 @@ const HomeScreen = () => {
       </div>
 
       <div className={`nav-bar ${activeSection ? 'hide-nav-bar' : ''}`}>
-      <nav>
-        <button
-          onClick={() => showSection('profile-section')}
-          className="nav-button"
-        >
-          <img
-            src={activeSection === 'profile-section' ? 'profile_hover.png' : 'profile.png'}
-            alt="Profile Icon"
-            className="nav-icon"
-          />
-        </button>
-        <button
-          onClick={() => showSection('connections-section')}
-          className="nav-button"
-        >
-          <img
-            src={activeSection === 'connections-section' ? 'connections_hover.png' : 'connections.png'}
-            alt="Connections Icon"
-            className="nav-icon"
-          />
-        </button>
-        <button
-          onClick={() => showSection('quests-section')}
-          className="nav-button"
-        >
-          <img
-            src={activeSection === 'quests-section' ? 'quest_hover.png' : 'quest.png'}
-            alt="Quests Icon"
-            className="nav-icon"
-          />
-        </button>
-        <button
-          onClick={() => showSection('history-section')}
-          className="nav-button"
-        >
-          <img
-            src={activeSection === 'history-section' ? 'history_hover.png' : 'history.png'}
-            alt="History Icon"
-            className="nav-icon"
-          />
-        </button>
-      </nav>
-    </div>
-  
+        <nav>
+          <button onClick={() => showSection('profile-section')} className="nav-button">
+            <img src="profile.png" alt="Profile Icon" />
+          </button>
+          <button onClick={() => showSection('connections-section')} className="nav-button">
+            <img src="connections.png" alt="Connections Icon" />
+          </button>
+          <button onClick={() => showSection('quests-section')} className="nav-button">
+            <img src="quest.png" alt="Quests Icon" />
+          </button>
+          <button onClick={() => showSection('history-section')} className="nav-button">
+            <img src="history.png" alt="History Icon" />
+          </button>
+        </nav>
+      </div>
     </div>
   );
 };

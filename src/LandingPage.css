@@ -128,12 +128,6 @@ span {
     transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease; /* Add transition for smooth animation */
 }
 
-.function-box:hover {
-    transform: scale(1.02); /* Slightly increase size */
-    width: 110%;
-  
-}
-
 /* Add specific styles for the content inside the rectangles */
 .functionicon {
     display: flex;
@@ -141,11 +135,6 @@ span {
     align-items: center;
     transition: transform 0.3s ease; /* Transition for smooth movement */
 }
-
-.function-box:hover .functionicon {
-    transform: translateY(-60px); /* Move icon and header up on hover */
-}
-
 
 .functionicon img {
     width: auto; /* Adjust icon size */
@@ -158,13 +147,6 @@ span {
     margin-bottom: 5px;
     text-align: center;
     transition: transform 0.3s ease; /* Transition for smooth movement */
-
-}
-
-
-.function-box:hover .functionrectheader{
-    transform: translateY(-60px); /* Move icon and header up on hover */
-
 }
 
 .functiontext {
@@ -173,17 +155,32 @@ span {
     line-height: 1.2; /* Line height for readability */
     overflow-y: auto; /* Allow vertical scrolling if text is too long */
     font-weight: 500;
-    max-width:300px;
+    max-width: 300px;
     opacity: 0; /* Initially hidden */
     transition: opacity 0.3s ease; /* Transition for smooth fade-in */
     position: absolute;
     margin-top: 30px;
 }
 
-.function-box:hover .functiontext {
-    opacity: 1; /* Show text on hover */
-}
+/* Hover effects only on laptops */
+@media (min-width: 992px) {
+    .function-box:hover {
+        transform: scale(1.02); /* Slightly increase size */
+        width: 110%;
+    }
 
+    .function-box:hover .functionicon {
+        transform: translateY(-60px); /* Move icon and header up on hover */
+    }
+
+    .function-box:hover .functionrectheader {
+        transform: translateY(-60px); /* Move icon and header up on hover */
+    }
+
+    .function-box:hover .functiontext {
+        opacity: 1; /* Show text on hover */
+    }
+}
 
 /* Footer Styles */
 footer {
@@ -294,66 +291,45 @@ footer {
 @media (max-width: 576px) {
     /* Adjust styles for small mobile devices */
     .logo {
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 80px; /* Further increase logo size for small mobile */
-        top: 60px; /* Adjust top position to bring the logo closer to the text */
+        height: 60px;
     }
     .login-button {
         font-size: 20px;
         width: 200px;
         height: 60px;
-        position: absolute; /* Position it absolutely within its container */
-        bottom: 20px; /* Move closer to the bottom */
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .landing-main {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: calc(100vh - 120px); /* Adjust height to fit in the viewport minus margins */
-        text-align: center;
     }
     .headline {
         font-size: 16px;
-        margin-top: 0; /* Remove top margin to center vertically */
     }
     .mainheadline {
-        font-size: 24px; /* Further reduced font size to ensure better text wrapping */
-        margin-bottom: 0px; /* Reduce space below mainheadline */
+        font-size: 24px;
     }
     .subtext {
-        font-size: 12px; /* Further reduced font size */
-        margin-top: 5px; /* Adjust top margin to match spacing */
-        margin-bottom: 30px;
-    }
-    .Functions {
-        padding: 30px 5px;
-        margin-top: 60px; /* Reduce margin to bring the section closer */
-    }
-    .Functionsh1 {
-        font-size: 20px;
-    }
-    .functionicon img{
-        height:25px;
-        width:auto;
-    }
-    .function-box {
-        width: 150px;
-        height: 150px;
-        padding: 8px;
-    }
-
-    
-    .functionrectheader{
         font-size: 14px;
     }
-    .functiontext {
-        font-size: 7px;
+    .Functionsh1 {
+        font-size: 22px;
     }
+    .function-box {
+        width: 170px;
+        height: 200px;
+    }
+.functionicon{
+    transform:translateY(-50px);
+}
+.functionrectheader{
+    font-size: 16px;
+    transform:translateY(-50px);
+}
+
+    .functiontext{
+        opacity:1;
+        font-size: 9px;
+        margin-top: 60px; 
+        font-weight: 600;
+    }
+    
+    
     footer {
         display:none;
     }

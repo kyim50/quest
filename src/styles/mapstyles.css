@@ -259,22 +259,22 @@ body {
 /*
 /* Ensure the active image is displayed when hovered */
 .nav-button:nth-of-type(1):hover .nav-icon:not(.active) {
-  content: url('/profile_hover.png'); 
+  content: url('../assets/profile_hover.png'); 
   opacity: 1; 
 }
 
 .nav-button:nth-of-type(2):hover .nav-icon:not(.active) {
-  content: url('/connections_hover.png'); 
+  content: url('../assets/connections_hover.png'); 
   opacity: 1; 
 }
 
 .nav-button:nth-of-type(3):hover .nav-icon:not(.active) {
-  content: url('/quest_hover.png'); 
+  content: url('../assets/quest_hover.png'); 
   opacity: 1; 
 }
 
 .nav-button:nth-of-type(4):hover .nav-icon:not(.active) {
-  content: url('/history_hover.png'); 
+  content: url('../assets/history_hover.png'); 
   opacity: 1; 
 }
 

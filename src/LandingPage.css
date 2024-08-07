@@ -102,9 +102,11 @@ body {
     justify-content: center;
     gap: 20px; /* Space between rectangles */
 }
-span{
+
+span {
     color: rgb(10, 145, 255);
 }
+
 /* Individual rectangles */
 .function-box {
     background-color: #403D39; /* Dark taupe color */
@@ -122,12 +124,32 @@ span{
     padding: 10px; /* Padding inside the box */
     box-sizing: border-box; /* Ensure padding is included in the width and height */
     overflow: hidden; /* Hide overflow text */
+    position: relative; /* Required for positioning of absolute elements */
+    transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease; /* Add transition for smooth animation */
+}
+
+.function-box:hover {
+    transform: scale(1.02); /* Slightly increase size */
+    width: 110%;
+  
 }
 
 /* Add specific styles for the content inside the rectangles */
+.functionicon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease; /* Transition for smooth movement */
+}
+
+.function-box:hover .functionicon {
+    transform: translateY(-60px); /* Move icon and header up on hover */
+}
+
+
 .functionicon img {
     width: auto; /* Adjust icon size */
-    height: 40px; /* Adjust icon size */
+    height: 30px; /* Adjust icon size */
     margin-bottom: 5px;
 }
 
@@ -135,15 +157,33 @@ span{
     font-size: 18px; /* Adjust font size for mobile */
     margin-bottom: 5px;
     text-align: center;
+    transition: transform 0.3s ease; /* Transition for smooth movement */
+
+}
+
+
+.function-box:hover .functionrectheader{
+    transform: translateY(-60px); /* Move icon and header up on hover */
+
 }
 
 .functiontext {
-    font-size: 10px; /* Adjust font size for mobile */
+    font-size: 12px; /* Adjust font size for mobile */
     text-align: center;
     line-height: 1.2; /* Line height for readability */
     overflow-y: auto; /* Allow vertical scrolling if text is too long */
     font-weight: 500;
+    max-width:300px;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease; /* Transition for smooth fade-in */
+    position: absolute;
+    margin-top: 30px;
 }
+
+.function-box:hover .functiontext {
+    opacity: 1; /* Show text on hover */
+}
+
 
 /* Footer Styles */
 footer {
@@ -306,6 +346,8 @@ footer {
         height: 150px;
         padding: 8px;
     }
+
+    
     .functionrectheader{
         font-size: 14px;
     }

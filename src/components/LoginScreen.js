@@ -95,9 +95,9 @@ const LoginScreen = () => {
 
         <div className="separator"></div> {/* Thin line separating the buttons */}
           {/* Google login button */}
-        <button className="google-login-btn" onClick={handleGoogleLogin}>
+          <a href="#" className="google-login-link" onClick={handleGoogleLogin}>
           <FaGoogle /> Login with Google
-        </button>
+        </a>
         <p className="or-text">or</p>
 
         <p className="login-section">

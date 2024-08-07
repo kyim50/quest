@@ -145,27 +145,26 @@ body {
 }
 
 /* Google login button styling */
-.google-login-btn {
-    width: 90%;
-    padding: 10px;
-    background-color: rgb(16, 17, 17); /* Google color */
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-bottom: 20px; /* Space below the Google button */
-}
-
-.google-login-btn:hover {
-    background-color: #0056b3; /* Darker color for hover */
-}
-
-.google-login-btn svg {
-    margin-right: 10px; /* Space between icon and text */
-}
-
+.google-login-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*padding: 10px;*/
+    /*background-color: #4285F4;*/
+    color: white;
+    text-decoration: none;
+    /*border-radius: 4px;*/
+    /*margin-top: 10px;*/
+  }
+  
+  .google-login-link:hover {
+    background-color: #cfcfcf;
+  }
+  
+  .google-login-link svg {
+    margin-right: 8px;
+  }
+  
 
 /* Forgot password section styling */
 .forgot-password-section {

@@ -4,6 +4,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: Helvetica, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ 
 }
 
 /* Body styling */
@@ -13,7 +14,7 @@ body {
     justify-content: center;
     align-items: center;
     /*background-color: rgb(15, 15, 150);*/
-    background-image: url('/public/background\ Finale.png');
+    background-image: url('C:\Users\brita\source\repos\quest\public\background Finale.png');
 }
 
 
@@ -26,7 +27,7 @@ body {
     align-items: center; /* Center-align items */
     width: 80%;
     max-width: 500px; /* Adjust width as needed */
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+    background-color: rgba(0, 0, 0, 0.85); /* Semi-transparent black background */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 6px 30px rgba(252, 251, 251, 0.21);

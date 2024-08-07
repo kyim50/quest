@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, uploadImage, updateUserProfile, fetchAllUserLocations, fetchUserLocations, fetchUserData, updateLastActive, setUserIsActive } from '../firebase';
 import { doc, updateDoc, collection, getDocs, onSnapshot, getDoc } from 'firebase/firestore';
-import L from 'leaflet';
+import mapboxgl from 'mapbox-gl';
 import '../styles/mapstyles.css';
 import Quests from './Quests.js';
 import Connections from './Connections.js';
@@ -10,6 +10,9 @@ import NotificationDisplay from '../NotificationDisplay.js';
 import { useNotification } from '../NotificationContext';
 import { Privacy } from './Privacy.js';
 import { debounce } from 'lodash';
+
+const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
+mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const HomeScreen = () => {
   const mapRef = useRef(null);
@@ -74,7 +77,7 @@ const HomeScreen = () => {
 
   const clearMarkers = () => {
     markersRef.current.forEach(marker => {
-      mapRef.current.removeLayer(marker);
+      marker.remove();
     });
     markersRef.current = [];
   };
@@ -97,12 +100,9 @@ const HomeScreen = () => {
     const currentUserId = getReceiverId();
     const isCurrentUser = currentUserId === receiverId;
 
-    const userIcon = L.divIcon({
-      className: 'user-icon',
-      html: `<div class="marker-container"><img src="${profilePhotoUrl}" alt="Profile Photo" /></div>`,
-      iconSize: [70, 70],
-      iconAnchor: [35, 35],
-    });
+    const userIcon = document.createElement('div');
+    userIcon.className = 'user-icon';
+    userIcon.innerHTML = `<div class="marker-container"><img src="${profilePhotoUrl}" alt="Profile Photo" /></div>`;
 
     let viewButton = '';
     if (receiverId !== getReceiverId()) {
@@ -120,16 +120,18 @@ const HomeScreen = () => {
       </div>
     `;
 
-    const marker = L.marker([latitude, longitude], { icon: userIcon })
-      .addTo(mapRef.current)
-      .bindPopup(popupContent);
+    const marker = new mapboxgl.Marker(userIcon)
+      .setLngLat([longitude, latitude])
+      .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+      .addTo(mapRef.current);
 
     markersRef.current.push(marker);
+    console.log('Marker added:', marker);
   };
 
   const debouncedUpdateMarker = useCallback(debounce((profilePhotoUrl, latitude, longitude) => {
     if (mapRef.current) {
-      mapRef.current.setView([latitude, longitude], 13);
+      mapRef.current.flyTo({ center: [longitude, latitude], zoom: 13 });
 
       clearMarkers();
       addMarker(latitude, longitude, profilePhotoUrl, 'Your current location');
@@ -223,25 +225,22 @@ const HomeScreen = () => {
     };
 
     if (!mapRef.current) {
-      const map = L.map('map', { zoomControl: false }).setView([51.505, -0.09], 13);
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v10',
+        center: [0, 0],
+        zoom: 2
+      });
       mapRef.current = map;
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap contributors © CartoDB'
-      }).addTo(map);
+      map.on('load', () => {
+        checkAuthStatus();
+        const unsubscribeQuests = fetchQuests();
 
-      L.control.zoom({
-        position: 'topleft'
-      }).addTo(map);
-
-      map.attributionControl.remove();
-
-      checkAuthStatus();
-      const unsubscribeQuests = fetchQuests();
-
-      return () => {
-        unsubscribeQuests();
-      };
+        return () => {
+          unsubscribeQuests();
+        };
+      });
     } else {
       checkAuthStatus();
     }

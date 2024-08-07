@@ -1,0 +1,20 @@
+/* custom-marker.css */
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Adjust size as needed */
+  height: 40px; /* Adjust size as needed */
+  border: 2px solid #ffffff; /* Outline color */
+  border-radius: 50%; /* Circular outline */
+  background-color: #000000; /* Background color inside the outline */
+  padding: 2px; /* Space between the outline and the image */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5); /* Optional: Shadow for a 3D effect */
+}
+
+.custom-marker img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}

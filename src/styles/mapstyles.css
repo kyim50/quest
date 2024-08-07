@@ -17,7 +17,7 @@ body {
   align-items: center; /* Center content horizontally */
   height: 100vh;
   width: 100vw;
-  background-color: #1C1C1E; /* Dark mode background */
+  background-color: rgb(28,28,30); /* Dark mode background */
   color: #FFFFFF; /* White text */
   overflow: hidden;
 }
@@ -115,8 +115,8 @@ body {
   max-width: 500px;
   height: 50px;
   padding: 10px;
-  background-color: #2C2C2E; /* Darker background */
-  color: #FFFFFF; /* White text */
+  background-color: rgb(28,28,30); /* Darker background */
+  color: rgb(229,229,234); /* White text */
   text-align: left;
   position: absolute;
   top: 5%;
@@ -140,7 +140,7 @@ body {
   max-width: 400px;
   height: 70%;
   max-height: 400px;
-  background-color: #2C2C2E; /* Darker background */
+  background-color:rgb(28,28,30); /* Darker background */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -150,7 +150,7 @@ body {
   left: 5%;
   border-radius: 10px;
   z-index: 10;
-  color: #FFFFFF; /* White text */
+  color: rgb(229,229,234); /* White text */
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: auto;
@@ -179,7 +179,7 @@ body {
   width: 90%;
   max-width: 400px;
   height: 70px;
-  background-color: #2C2C2E; /* Darker background */
+  background-color: rgb(28,28,30); /* Darker background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -220,6 +220,53 @@ body {
   padding: 0;
 }
 
+/* Initial image for each icon */
+.nav-icon {
+  opacity: 1;
+}
+
+/* Hover effect to show the alternate image */
+.nav-button:hover .nav-icon {
+  opacity: 0;
+}
+
+.nav-button:hover .nav-icon.active {
+  opacity: 1;
+  transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Display active image initially for the active section */
+.nav-icon.active {
+  opacity: 1;
+}
+
+.nav-icon:not(.active):hover {
+  opacity: 0; /* Fade out the original image */
+}
+/*
+/* Ensure the active image is displayed when hovered */
+/*
+.nav-button:nth-of-type(1):hover .nav-icon:not(.active) {
+  content: url('/profile_hover.png'); 
+  opacity: 1; 
+}
+
+.nav-button:nth-of-type(2):hover .nav-icon:not(.active) {
+  content: url('/connections_hover.png'); 
+  opacity: 1; 
+}
+
+.nav-button:nth-of-type(3):hover .nav-icon:not(.active) {
+  content: url('/quest_hover.png'); 
+  opacity: 1; 
+}
+
+.nav-button:nth-of-type(4):hover .nav-icon:not(.active) {
+  content: url('/history_hover.png'); 
+  opacity: 1; 
+}
+/*
+
 /* Image (icon) styling */
 img {
   width: auto;
@@ -247,10 +294,6 @@ img {
     bottom: 70px;
     left: 50%;
     transform: translateX(-50%);
-  }
-  /* Hide the zoom control container */
-  .leaflet-control-zoom {
-    display: none;
   }
 
   .nav-bar {
@@ -298,7 +341,7 @@ img {
 @media (min-width: 1025px) {
   img {
     width: auto;
-    height: 30px;
+    height: 20px;
   }
 
   .address-bar {
@@ -328,11 +371,10 @@ img {
 }
 
 /* Additional styles for content sections */
-/* Additional styles for content sections */
 .content-section {
   margin: 10px 0;
   width: 100%;
-  background-color: #2C2C2E; /* Darker background */
+  background-color: rgb(58,58,60); /* Darker background */
   border-radius: 10px;
 }
 
@@ -342,32 +384,6 @@ img {
   flex-direction: column;
   align-items: center;
   margin: 20px 0;
-}
-
-/* Profile photo marker styling */
-.profile-photo-marker {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px; /* Adjust size as needed */
-  height: 50px; /* Adjust size as needed */
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: #FFFFFF; /* White */
-}
-
-/* Profile photo image styling */
-.profile-photo-marker img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%; /* Ensure the height covers the container */
-  border-radius: 50%;
-  object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
-  object-position: center; /* Centers the image within the container */
-  transform: translate(-50%, -50%); /* Center the image horizontally and vertically */
 }
 
 /* Profile name and bio styling */
@@ -402,29 +418,6 @@ img {
   width: 100px;
   height: 100px;
   object-fit: cover;
-}
-
-.profile-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  background-color: gray;
-  color: white;
-  border-radius: 15px;
-  padding: 5px 10px;
-  display: flex;
-  align-items: center;
-}
-
-.tag button {
-  background: none;
-  border: none;
-  color: white;
-  margin-left: 5px;
-  cursor: pointer;
 }
 
 .cancel,
@@ -592,30 +585,6 @@ label {
   font-size: 16px;
 }
 
-.marker-profile-photo,
-.popup-profile-photo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.playing-status {
-  background-color: #292b2f; /* Slightly darker */
-  padding: 10px;
-  border-radius: 5px;
-  width: 100%;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.playing-status img {
-  width: 24px;
-  height: 24px;
-  margin-right: 5px;
-  vertical-align: middle;
-}
-
 .status-label {
   display: inline-block;
   font-size: 0.9rem;
@@ -623,23 +592,10 @@ label {
   vertical-align: middle;
 }
 
-.loading-animation {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #7289da;
+.profile-photo img {
+  width: 100px; /* Adjust as needed */
+  height: 100px; /* Adjust as needed */
   border-radius: 50%;
-  border-top-color: transparent;
-  animation: spin 1s linear infinite;
-  margin-left: 5px;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  object-fit: cover; /* Ensures the image covers the circle */
+  display: block;
 }

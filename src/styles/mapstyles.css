@@ -6,9 +6,14 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+
+
 ::-webkit-scrollbar {
   width: 0px; /* Hide scrollbar */
 }
+
+
+
 
 body {
   display: flex;
@@ -17,10 +22,13 @@ body {
   align-items: center; /* Center content horizontally */
   height: 100vh;
   width: 100vw;
-  background-color: #1C1C1E; /* Dark mode background */
+  background-color: rgb(28,28,30); /* Dark mode background */
   color: #FFFFFF; /* White text */
   overflow: hidden;
 }
+
+
+
 
 @keyframes popUp {
   0% {
@@ -60,7 +68,10 @@ body {
   z-index: 2;
 }
 
-.marker-container {
+
+
+
+.circular-marker {
   position: relative;
   width: 50px; /* Adjust size as needed */
   height: 50px; /* Adjust size as needed */
@@ -74,7 +85,9 @@ body {
   animation: popUp 0.5s ease-out;
 }
 
-.marker-container img {
+
+
+.circular-marker img {
   border-radius: 50%;
   width: 46px; /* Adjust to fit inside the border */
   height: 46px;
@@ -115,8 +128,8 @@ body {
   max-width: 500px;
   height: 50px;
   padding: 10px;
-  background-color: #2C2C2E; /* Darker background */
-  color: #FFFFFF; /* White text */
+  background-color: rgb(28,28,30); /* Darker background */
+  color: rgb(229,229,234); /* White text */
   text-align: left;
   position: absolute;
   top: 5%;
@@ -140,7 +153,7 @@ body {
   max-width: 400px;
   height: 70%;
   max-height: 400px;
-  background-color: #2C2C2E; /* Darker background */
+  background-color:rgb(28,28,30); /* Darker background */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -150,7 +163,7 @@ body {
   left: 5%;
   border-radius: 10px;
   z-index: 10;
-  color: #FFFFFF; /* White text */
+  color: rgb(229,229,234); /* White text */
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: auto;
@@ -179,7 +192,7 @@ body {
   width: 90%;
   max-width: 400px;
   height: 70px;
-  background-color: #2C2C2E; /* Darker background */
+  background-color: rgb(28,28,30); /* Darker background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -220,6 +233,52 @@ body {
   padding: 0;
 }
 
+/* Initial image for each icon */
+.nav-icon {
+  opacity: 1;
+}
+
+/* Hover effect to show the alternate image */
+.nav-button:hover .nav-icon {
+  opacity: 0;
+}
+
+.nav-button:hover .nav-icon.active {
+  opacity: 1;
+  transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Display active image initially for the active section */
+.nav-icon.active {
+  opacity: 1;
+}
+
+.nav-icon:not(.active):hover {
+  opacity: 0; /* Fade out the original image */
+}
+/*
+/* Ensure the active image is displayed when hovered */
+.nav-button:nth-of-type(1):hover .nav-icon:not(.active) {
+  content: url('/profile_hover.png'); 
+  opacity: 1; 
+}
+
+.nav-button:nth-of-type(2):hover .nav-icon:not(.active) {
+  content: url('/connections_hover.png'); 
+  opacity: 1; 
+}
+
+.nav-button:nth-of-type(3):hover .nav-icon:not(.active) {
+  content: url('/quest_hover.png'); 
+  opacity: 1; 
+}
+
+.nav-button:nth-of-type(4):hover .nav-icon:not(.active) {
+  content: url('/history_hover.png'); 
+  opacity: 1; 
+}
+
+
 /* Image (icon) styling */
 img {
   width: auto;
@@ -248,10 +307,8 @@ img {
     left: 50%;
     transform: translateX(-50%);
   }
-  /* Hide the zoom control container */
-  .leaflet-control-zoom {
-    display: none;
-  }
+
+  
 
   .nav-bar {
     width: 70%;
@@ -298,7 +355,7 @@ img {
 @media (min-width: 1025px) {
   img {
     width: auto;
-    height: 30px;
+    height: 20px;
   }
 
   .address-bar {
@@ -325,6 +382,7 @@ img {
     left: 2.05%;
     border-radius: 10px;
   }
+
 }
 
 /* Additional styles for content sections */
@@ -332,7 +390,7 @@ img {
 .content-section {
   margin: 10px 0;
   width: 100%;
-  background-color: #2C2C2E; /* Darker background */
+  background-color: rgb(58,58,60); /* Darker background */
   border-radius: 10px;
 }
 
@@ -343,6 +401,9 @@ img {
   align-items: center;
   margin: 20px 0;
 }
+
+
+
 
 /* Profile photo marker styling */
 .profile-photo-marker {
@@ -404,28 +465,7 @@ img {
   object-fit: cover;
 }
 
-.profile-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
 
-.tag {
-  background-color: gray;
-  color: white;
-  border-radius: 15px;
-  padding: 5px 10px;
-  display: flex;
-  align-items: center;
-}
-
-.tag button {
-  background: none;
-  border: none;
-  color: white;
-  margin-left: 5px;
-  cursor: pointer;
-}
 
 .cancel,
 .uploadpfp {

@@ -51,9 +51,7 @@ button {
   margin-right: 10px; /* Space between buttons */
 }
 
-button:hover {
-  background-color: #0051A1; /* Darker blue on hover */
-}
+
 
 /* Quest buttons */
 .create-quest-btn {

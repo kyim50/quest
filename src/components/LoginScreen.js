@@ -6,6 +6,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa'; // Import icons
 import '../styles/login.css'; // Custom styles
 
+
+
+
 const LoginScreen = () => {
   const navigate = useNavigate(); // Initialize navigate
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility

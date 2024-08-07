@@ -5,6 +5,8 @@ body {
     background-image: none;
     background-color: rgb(28,28,30);
     margin: 0; /* Remove default margin */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-y: auto;
 }
 
 /* Logo Styles */
@@ -35,6 +37,7 @@ body {
     justify-content: center;
     align-items: center;
     transition: background-color 0.3s;
+    
 }
 
 .login-button:hover {
@@ -69,7 +72,6 @@ body {
 }
 
 .subtext {
-    max-width: 600px;
     font-size: 18px;
     color: #999999; /* Dark taupe color */
     margin: 0 auto;
@@ -78,15 +80,81 @@ body {
     text-align: center;
 }
 
+/* Functions Section Styles */
+.Functions {
+    color: #ffffff; /* White text for contrast */
+    padding: 50px 20px; /* Adjust padding as needed */
+    text-align: center;
+    margin-top: 200px;
+}
+
+.Functionsh1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Container for rectangles */
+.functions-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Space between rectangles */
+}
+
+/* Individual rectangles */
+.function-box {
+    background-color: #403D39; /* Dark taupe color */
+    width: 350px; /* Adjust size as needed */
+    height: 200px; /* Adjust size as needed */
+    border-radius: 10px; /* Rounded corners */
+    display: flex;
+    
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff; /* White text */
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px; /* Padding inside the box */
+    box-sizing: border-box; /* Ensure padding is included in the width and height */
+    overflow: hidden; /* Hide overflow text */
+}
+
+/* Add specific styles for the content inside the rectangles */
+.functionicon img {
+    width: auto; /* Adjust icon size */
+    height: 50px; /* Maintain aspect ratio */
+    margin-bottom: 5px;
+}
+
+.functionrectheader {
+    font-size: 36px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+span{
+    color:rgb(10,145,255);
+}
+.functiontext {
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.4; /* Line height for readability */
+    overflow-y: auto; /* Allow vertical scrolling if text is too long */
+    font-weight: 500;
+}
 
 
-footer{
-    position:absolute;
-    bottom:20px;
-    right:20px;
+/* Footer Styles */
+footer {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
     color: #999999; /* Dark taupe color */
     font-size: 10px;
 }
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
     .headline {

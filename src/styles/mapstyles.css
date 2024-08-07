@@ -245,6 +245,7 @@ body {
 }
 /*
 /* Ensure the active image is displayed when hovered */
+/*
 .nav-button:nth-of-type(1):hover .nav-icon:not(.active) {
   content: url('/profile_hover.png'); 
   opacity: 1; 
@@ -264,7 +265,7 @@ body {
   content: url('/history_hover.png'); 
   opacity: 1; 
 }
-
+/*
 
 /* Image (icon) styling */
 img {

@@ -17,7 +17,6 @@ const UserProfile = () => {
   const fileInputRef = useRef(null);
   const { showNotification } = useNotification();
 
-  // Updated predefinedTags array with emojis
   const predefinedTags = [
     { text: '🎓', value: 'education' },
     { text: '🍔', value: 'food' },
@@ -83,6 +82,12 @@ const UserProfile = () => {
     }
   };
 
+  const handleProfilePhotoClick = () => {
+    if (isEditing) {
+      fileInputRef.current.click();
+    }
+  };
+
   const handleAddTag = (tag) => {
     if (tags.length < 3 && !tags.includes(tag)) {
       setTags([...tags, tag]);
@@ -102,7 +107,12 @@ const UserProfile = () => {
       <div className="profile-container">
         <div className="profile-header">
           <div className="profile-photo-container">
-            <img src={profilePhoto} alt="Profile" className="profile-photo" />
+            <img
+              src={profilePhoto}
+              alt="Profile"
+              className="profile-photo"
+              onClick={handleProfilePhotoClick} // Add click event
+            />
             {isEditing && (
               <input
                 type="file"

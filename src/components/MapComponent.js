@@ -1,35 +1,55 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { addMarker, clearMarkers } from './UserLocationService';
+import { setupUserLocationsListener, trackUserLocation } from './UserLocationService';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const MapComponent = ({ address, setAddress }) => {
+  const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const markersRef = useRef([]);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [currentUserIds, setCurrentUserIds] = useState([]);
 
   useEffect(() => {
     if (!mapRef.current) {
-      const map = new mapboxgl.Map({
-        container: 'map',
+      mapRef.current = new mapboxgl.Map({
+        container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/dark-v10',
         center: [0, 0],
         zoom: 2
       });
-      mapRef.current = map;
 
-      map.on('load', () => {
-        // Initialize map-related functionality
+      mapRef.current.on('load', () => {
+        setMapLoaded(true);
       });
     }
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+      }
+    };
   }, []);
 
-  // ... (include other map-related functions like updateUserLocation, displayAllUserMarkers, etc.)
+  useEffect(() => {
+    let unsubscribe;
+    if (mapLoaded && mapRef.current) {
+      trackUserLocation(mapRef.current, setAddress);
+      unsubscribe = setupUserLocationsListener(mapRef.current, setCurrentUserIds);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [mapLoaded, mapRef.current]);
 
   return (
     <>
-      <div id="map" className="map-placeholder"></div>
+      <div ref={mapContainerRef} className="map-placeholder" style={{ width: '100%', height: '100%' }}></div>
       <div className="address-bar" id="address-bar">{address}</div>
     </>
   );

@@ -1,7 +1,6 @@
-import { collection, onSnapshot, doc, updateDoc, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, query, where, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import mapboxgl from 'mapbox-gl';
-import './MapComponent';
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -28,8 +27,8 @@ export const updateUserLocation = async (latitude, longitude) => {
 };
 
 export const addMarker = (map, latitude, longitude, profilePhotoUrl, name, bio) => {
-  if (!map || typeof map.getCanvasContainer !== 'function') {
-    console.error('Invalid map object');
+  if (!map || typeof map.addLayer !== 'function') {
+    console.error('Invalid map object in addMarker');
     return null;
   }
 
@@ -56,39 +55,63 @@ export const addMarker = (map, latitude, longitude, profilePhotoUrl, name, bio) 
   dot.className = 'marker-dot';
   el.appendChild(dot);
 
+  // Create a new marker
   const marker = new mapboxgl.Marker(el)
-    .setLngLat([longitude, latitude])
-    .addTo(map);
+    .setLngLat([longitude, latitude]);
 
+  // Add the marker to the map
+  marker.addTo(map);
+
+  // Create a popup
   const popup = new mapboxgl.Popup({ offset: 25 })
     .setHTML(`<h3>${name}</h3><p>${bio}</p>`);
 
+  // Attach the popup to the marker
   marker.setPopup(popup);
 
   return marker;
 };
 
 export const setupUserLocationsListener = (map, setCurrentUserIds) => {
-  if (!map || typeof map.getCanvasContainer !== 'function') {
-    console.error('Invalid map object');
+  console.log('Setting up user locations listener');
+  if (!map || typeof map.addLayer !== 'function') {
+    console.error('Invalid map object in setupUserLocationsListener');
     return () => {};
   }
 
   const usersCollectionRef = collection(db, 'users');
   const activeUsersQuery = query(usersCollectionRef, where("isActive", "==", true));
 
-  return onSnapshot(activeUsersQuery, snapshot => {
+  return onSnapshot(activeUsersQuery, async (snapshot) => {
+    console.log('User locations snapshot received');
     const activeUserIds = new Set();
+    const currentUser = auth.currentUser;
+    
+    if (!currentUser) {
+      console.warn('No authenticated user found');
+      return;
+    }
 
-    snapshot.forEach(doc => {
+    // Fetch the current user's data to get their friend list and privacy setting
+    const currentUserDoc = await getDoc(doc(db, 'users', currentUser.uid));
+    const currentUserData = currentUserDoc.data();
+    const currentUserFriends = currentUserData?.friends || [];
+    const isCurrentUserPrivate = currentUserData?.isPrivate || false;
+
+    snapshot.forEach(async (doc) => {
       const userId = doc.id;
       const userData = doc.data();
 
-      // Filter for active users only
-      if (userData.isActive && userData.location) {
+      // Determine if the user should be visible based on privacy settings and friendship
+      const isVisible = !userData.isPrivate || 
+                        userId === currentUser.uid || 
+                        (isCurrentUserPrivate && currentUserFriends.includes(userId)) ||
+                        (!isCurrentUserPrivate && currentUserFriends.includes(userId));
+
+      if (userData.isActive && userData.location && isVisible) {
         activeUserIds.add(userId);
 
-        // Check if the user has been inactive for more than 5 minutes (300000 milliseconds)
+        // Check if the user has been inactive for more than 5 minutes
         const lastActivityTimestamp = new Date(userData.location.timestamp).getTime();
         const currentTimestamp = new Date().getTime();
         const inactiveTime = currentTimestamp - lastActivityTimestamp;
@@ -110,12 +133,18 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
               map,
               userData.location.latitude,
               userData.location.longitude,
-              userData.profilePhotoUrl,
+              userData.profilePhoto,
               userData.name,
               userData.bio
             );
             if (marker) markers[userId] = marker;
           }
+        }
+      } else {
+        // Remove markers for users who are no longer visible
+        if (markers[userId]) {
+          markers[userId].remove();
+          delete markers[userId];
         }
       }
     });
@@ -128,13 +157,18 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
       }
     });
 
-    setCurrentUserIds([...activeUserIds]);
+    if (typeof setCurrentUserIds === 'function') {
+      setCurrentUserIds([...activeUserIds]);
+    } else {
+      console.warn('setCurrentUserIds is not a function');
+    }
   });
 };
 
 export const trackUserLocation = (map, setAddress) => {
-  if (!map || typeof map.getCanvasContainer !== 'function') {
-    console.error('Invalid map object');
+  console.log('Setting up user location tracking');
+  if (!map || typeof map.addLayer !== 'function') {
+    console.error('Invalid map object in trackUserLocation');
     return;
   }
 
@@ -185,8 +219,6 @@ export const trackUserLocation = (map, setAddress) => {
     console.error('Geolocation is not supported by this browser.');
   }
 };
-
-
 
 export const setUserIsActive = async (isActive) => {
   if (auth.currentUser) {

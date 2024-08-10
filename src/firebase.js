@@ -25,13 +25,14 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBuFcBCEz40H65PLz4hOwgxaf_ua1g3HcM",
-  authDomain: "quest-backup-2.firebaseapp.com",
-  projectId: "quest-backup-2",
-  storageBucket: "quest-backup-2.appspot.com",
-  messagingSenderId: "606083436529",
-  appId: "1:606083436529:web:8226d91ffa2434e1defe50",
-  measurementId: "G-JT29T80MD8"
+  apiKey: "AIzaSyC2wTEeSiz_09FzWarn52vwzSlzfHXjATE",
+  authDomain: "quests-b5b92.firebaseapp.com",
+  databaseURL: "https://quests-b5b92-default-rtdb.firebaseio.com",
+  projectId: "quests-b5b92",
+  storageBucket: "quests-b5b92.appspot.com",
+  messagingSenderId: "388972050284",
+  appId: "1:388972050284:web:38dfdb79a67edcf0756549",
+  measurementId: "G-Y1P89CPKCY"
 };
 
 // Initialize Firebase

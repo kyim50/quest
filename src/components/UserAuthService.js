@@ -1,11 +1,10 @@
 import { auth } from '../firebase';
 import { setUserIsActive } from './UserLocationService';
 
-export const checkAuthStatus = (navigate, onAuthSuccess) => {
+export const checkAuthStatus = (navigate) => {
   return auth.onAuthStateChanged(user => {
     if (user) {
       setUserIsActive(true);
-      onAuthSuccess();
     } else {
       setUserIsActive(false);
       navigate('/login');

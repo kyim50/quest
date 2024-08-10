@@ -9,7 +9,6 @@ import ConnectionsComponent from './ConnectionsComponent';
 import NavigationBar from './NavigationBar';
 import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
-import { setupUserLocationsListener } from './UserLocationService';
 
 const HomeScreen = () => {
   const [activeSection, setActiveSection] = useState('');
@@ -22,12 +21,10 @@ const HomeScreen = () => {
   const { showNotification } = useNotification();
 
   useEffect(() => {
-    const unsubscribeAuth = checkAuthStatus(navigate, () => {
-      setupUserLocationsListener(setCurrentUserIds);
-    });
-
+    const unsubscribeAuth = checkAuthStatus(navigate);
     return () => unsubscribeAuth();
   }, [navigate]);
+
 
   const showSection = (sectionId) => {
     if (activeSection === sectionId) {
@@ -50,7 +47,7 @@ const HomeScreen = () => {
           <img src="/logout.png" alt="Log Out" />
         </button>
       </div>
-      <MapComponent address={address} setAddress={setAddress} />
+      <MapComponent address={address} setAddress={setAddress} setCurrentUserIds={setCurrentUserIds} />
       <div className={`rectangular-container ${activeSection ? '' : 'hidden'}`} id="content-container">
         {activeSection === 'profile-section' && <UserProfile />}
         {activeSection === 'quests-section' && (

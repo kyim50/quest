@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, updateDoc, doc } from '../firebase';
 import { useNotification } from '../NotificationContext'; // Import useNotification
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock, faUnlock } from '@fortawesome/free-solid-svg-icons';
 import '../styles/mapstyles.css';
+import '../styles/profile.css';
 
 export const Privacy = ({ isPrivate = false, onPrivacyModeChange }) => {
   const [isPrivateMode, setIsPrivateMode] = useState(isPrivate);
@@ -18,7 +21,6 @@ export const Privacy = ({ isPrivate = false, onPrivacyModeChange }) => {
       await updateDoc(userDocRef, { isPrivate: newIsPrivate });
       setIsPrivateMode(newIsPrivate);
 
-      // Check if onPrivacyModeChange is a function before calling it
       if (typeof onPrivacyModeChange === 'function') {
         onPrivacyModeChange(newIsPrivate);
       } else {
@@ -33,17 +35,8 @@ export const Privacy = ({ isPrivate = false, onPrivacyModeChange }) => {
   };
 
   return (
-    <div className="privacy-settings">
-      <label className="privacy-label">
-        <input
-          type="checkbox"
-          checked={isPrivateMode}
-          onChange={handlePrivacyToggle}
-          className="privacy-checkbox"
-        />
-        <span className="privacy-slider"></span>
-        <span className="privacy-text">Private Mode</span>
-      </label>
+    <div className="privacy-settings" onClick={handlePrivacyToggle}>
+      <FontAwesomeIcon icon={isPrivateMode ? faLock : faUnlock} />
     </div>
   );
 };

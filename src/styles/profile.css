@@ -1,0 +1,206 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(28,28,30);
+    padding: 20px;
+    border-radius: 10px;
+    color: #fffcf2;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.profile-photo-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid white;
+}
+
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info {
+    text-align: center;
+}
+
+.profile-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.profile-status {
+    font-size: 16px;
+    color: #ccc5b9;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #0f0;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.profile-bio {
+    font-size: 14px;
+    color: #ccc5b9;
+    margin-top: 5px;
+}
+
+
+
+.edit-profile-button {
+    margin-top: 20px;
+    background-color: rgb(58,58,60);
+    color: #fffcf2;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 300px;
+    transition: background-color 0.5;
+}
+
+.edit-profile-button:hover{
+    background-color: rgb(84, 84, 85);
+}
+
+.edit-profile-button i {
+    margin-right: 10px;
+}
+
+.edit-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.cancel-edit-button{
+    margin-top:20px;
+}
+.edit-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.profile-name-edit,
+.profile-bio-edit {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.char-count {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.tag {
+    background-color: rgb(58,58,60); /* light beige */
+    color: #252422; /* almost black */
+    padding: 5px 10px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center; /* Center align items */
+    height: 30px;
+}
+
+.tag button {
+    background: none;
+    border: none;
+    color: rgb( 10, 145, 255); /* vivid orange */
+    margin-left:0px; /* Reduced margin to bring closer */
+    cursor: pointer;
+    font-size: 14px; /* Adjust font size if needed */
+}
+
+
+.add-tag {
+    display: inline-block;
+    position: relative;
+}
+
+.add-tag button {
+    background-color: rgb( 10, 145, 255); /* vivid orange */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.tag-options {
+    display: flex;
+    flex-wrap: wrap; /* Allows the options to wrap to the next line */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #FFFCF2; /* off-white */
+    border: 1px solid #CCC5B9; /* light beige */
+    border-radius: 5px;
+    padding: 5px;
+    z-index: 10;
+    max-width: 100%; /* Ensures the container does not exceed the width of its parent */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow for better visibility */
+    overflow-x: auto; /* Adds horizontal scroll if needed */
+}
+
+.tag-options button {
+    background-color: #FFFCF2; /* off-white */
+    color: #403D39; /* dark taupe */
+    padding: 5px 8px; /* Reduced padding for smaller space */
+    margin: 2px; /* Space between buttons */
+    border: 1px solid #CCC5B9; /* light beige */
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.tag-options button:hover {
+    background-color: #CCC5B9; /* light beige */
+}
+
+
+  
+/* profile.css */
+.privacy-settings {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    cursor: pointer;
+  }
+  
+  .privacy-settings svg {
+    width: 24px; /* Adjust size as needed */
+    height: 24px; /* Adjust size as needed */
+    color: #333; /* Adjust color as needed */
+  }
+  

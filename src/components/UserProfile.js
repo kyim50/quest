@@ -12,8 +12,8 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [tags, setTags] = useState([]); // New state for tags
-  const [showTagOptions, setShowTagOptions] = useState(false); // State to control tag options visibility
+  const [tags, setTags] = useState([]);
+  const [showTagOptions, setShowTagOptions] = useState(false);
   const fileInputRef = useRef(null);
   const { showNotification } = useNotification();
 
@@ -38,7 +38,7 @@ const UserProfile = () => {
         setBio(userData.bio || 'Default Bio');
         setStatus(userData.status || '');
         setIsPrivate(userData.isPrivate || false);
-        setTags(userData.tags || []); // Load user tags
+        setTags(userData.tags || []);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -64,7 +64,7 @@ const UserProfile = () => {
         name,
         bio,
         profilePhoto: selectedPhoto ? URL.createObjectURL(selectedPhoto) : profilePhoto,
-        tags, // Save user tags
+        tags,
       });
       setIsEditing(false);
       showNotification('Profile updated successfully!', 'success');
@@ -88,14 +88,18 @@ const UserProfile = () => {
     }
   };
 
-  const handleAddTag = (tag) => {
+  const handleAddTag = async (tag) => {
     if (tags.length < 3 && !tags.includes(tag)) {
-      setTags([...tags, tag]);
+      const updatedTags = [...tags, tag];
+      setTags(updatedTags);
+      await updateUserProfile(auth.currentUser.uid, { tags: updatedTags });
     }
   };
 
-  const handleRemoveTag = (tag) => {
-    setTags(tags.filter((t) => t !== tag));
+  const handleRemoveTag = async (tag) => {
+    const updatedTags = tags.filter((t) => t !== tag);
+    setTags(updatedTags);
+    await updateUserProfile(auth.currentUser.uid, { tags: updatedTags });
   };
 
   const toggleTagOptions = () => {
@@ -106,20 +110,24 @@ const UserProfile = () => {
     <section id="profile-section" className="content-section show-section">
       <div className="profile-container">
         <div className="profile-header">
-          <div className="profile-photo-container">
+          <div className="profile-photo-container" onClick={handleProfilePhotoClick}>
             <img
               src={profilePhoto}
               alt="Profile"
               className="profile-photo"
-              onClick={handleProfilePhotoClick} // Add click event
             />
             {isEditing && (
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handlePhotoChange}
-                style={{ display: 'none' }}
-              />
+              <>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handlePhotoChange}
+                  style={{ display: 'none' }}
+                />
+                <div className="edit-photo-overlay">
+                  Edit Profile Photo
+                </div>
+              </>
             )}
           </div>
           <div className="profile-info">
@@ -137,9 +145,9 @@ const UserProfile = () => {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   className="profile-bio-edit"
-                  maxLength={150} // Set the maxLength to 150 characters
+                  maxLength={150}
                 />
-                <p className="char-count">{bio.length}/150</p> {/* Display character count */}
+                <p className="char-count">{bio.length}/150</p>
               </div>
             ) : (
               <>
@@ -159,7 +167,7 @@ const UserProfile = () => {
         <div className="tags-container">
           {tags.map((tag) => (
             <div key={tag} className="tag">
-              {predefinedTags.find(t => t.value === tag).text} {/* Display emoji */}
+              {predefinedTags.find(t => t.value === tag).text}
               <button onClick={() => handleRemoveTag(tag)}>x</button>
             </div>
           ))}

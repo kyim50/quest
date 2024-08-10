@@ -16,7 +16,7 @@ const MapComponent = ({ address, setAddress }) => {
     if (!mapRef.current) {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/dark-v10',
+        style: 'mapbox://styles/kyim50/clzniqnmq009s01qgee0a13s0',
         center: [0, 0],
         zoom: 2
       });

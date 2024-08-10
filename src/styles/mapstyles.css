@@ -64,7 +64,7 @@ body {
   position: relative;
   width: 50px; /* Adjust size as needed */
   height: 50px; /* Adjust size as needed */
-  border: 2px solid rgba(255, 255, 255, 0.7); /* Thin white outline with transparency */
+  border: 2px solid rgba(92, 92, 92, 0.7); /* Thin white outline with transparency */
   border-radius: 50%;
   display: flex;
   justify-content: center;

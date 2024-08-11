@@ -16,6 +16,7 @@ const HomeScreen = () => {
   const [currentUserIds, setCurrentUserIds] = useState([]);
   const [quests, setQuests] = useState([]);
   const [address, setAddress] = useState('Loading address...');
+  const [map, setMap] = useState(null);
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -24,7 +25,6 @@ const HomeScreen = () => {
     const unsubscribeAuth = checkAuthStatus(navigate);
     return () => unsubscribeAuth();
   }, [navigate]);
-
 
   const showSection = (sectionId) => {
     if (activeSection === sectionId) {
@@ -47,11 +47,21 @@ const HomeScreen = () => {
           <img src="/logout.png" alt="Log Out" />
         </button>
       </div>
-      <MapComponent address={address} setAddress={setAddress} setCurrentUserIds={setCurrentUserIds} />
+      <MapComponent 
+        address={address} 
+        setAddress={setAddress} 
+        setCurrentUserIds={setCurrentUserIds}
+        setMap={setMap}
+      />
       <div className={`rectangular-container ${activeSection ? '' : 'hidden'}`} id="content-container">
         {activeSection === 'profile-section' && <UserProfile />}
         {activeSection === 'quests-section' && (
-          <QuestsComponent isOpen={isQuestWindowOpen} quests={quests} currentUserIds={currentUserIds} />
+          <QuestsComponent 
+            isOpen={isQuestWindowOpen} 
+            quests={quests} 
+            currentUserIds={currentUserIds} 
+            map={map}
+          />
         )}
         {activeSection === 'connections-section' && <ConnectionsComponent currentUserIds={currentUserIds} />}
       </div>

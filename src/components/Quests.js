@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, getDocs } from '../firebase';
-import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc, arrayUnion } from 'firebase/firestore';
 import '../styles/quests.css';
 import { useNotification } from '../NotificationContext';
+import mapboxgl from 'mapbox-gl';
 
-const Quests = () => {
+const Quests = ({ map, currentUserIds }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -21,6 +22,7 @@ const Quests = () => {
   const [acceptors, setAcceptors] = useState({ acceptors: [], pendingAcceptors: [] });
   const [showAcceptorsModal, setShowAcceptorsModal] = useState(false);
   const [selectedAcceptor, setSelectedAcceptor] = useState(null);
+  const [showApproveModal, setShowApproveModal] = useState(false);
 
   const { showNotification } = useNotification();
 
@@ -58,13 +60,13 @@ const Quests = () => {
           const publicQuestsQuery = query(collection(db, 'quests'), where('isPublic', '==', true));
           const createdQuestsQuery = query(collection(db, 'quests'), where('uid', '==', auth.currentUser.uid));
           const targetQuestsQuery = query(collection(db, 'quests'), where('targetUser', '==', auth.currentUser.uid));
-      
+
           const [publicSnapshot, createdSnapshot, targetSnapshot] = await Promise.all([
             getDocs(publicQuestsQuery),
             getDocs(createdQuestsQuery),
             getDocs(targetQuestsQuery)
           ]);
-      
+
           const publicQuests = publicSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           const createdQuests = createdSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           const targetQuests = await Promise.all(targetSnapshot.docs.map(async docSnap => {
@@ -73,16 +75,15 @@ const Quests = () => {
             const senderData = senderDoc.exists() ? senderDoc.data() : {};
             return { id: docSnap.id, ...questData, senderName: senderData.name || 'Unknown sender' };
           }));
-      
+
           const allQuests = [...publicQuests, ...createdQuests, ...targetQuests];
           const uniqueQuests = new Map(allQuests.map(q => [q.id, q]));
           setQuests(Array.from(uniqueQuests.values()));
-      
+
         } catch (error) {
           console.error("Error fetching quests:", error);
         }
       };
-      
 
       fetchQuests();
     }
@@ -168,59 +169,191 @@ const Quests = () => {
   };
 
   const handleDeclineQuest = async (questId) => {
-  if (!auth.currentUser) {
-    return;
-  }
-
-  try {
-    const questRef = doc(db, 'quests', questId);
-    const questDoc = await getDoc(questRef);
-    const questData = questDoc.data();
-
-    if (!questData.isPublic && questData.targetUser === auth.currentUser.uid) {
-      await deleteDoc(questRef);
-      setQuests(quests.filter(quest => quest.id !== questId));
-      showNotification('Quest declined!', 'success');
-    } else {
-      const updatedAcceptedBy = questData.acceptedBy.filter(id => id !== auth.currentUser.uid);
-      await updateDoc(questRef, { acceptedBy: updatedAcceptedBy });
-      setQuests(quests.map(q => q.id === questId ? { ...q, acceptedBy: updatedAcceptedBy } : q));
-      showNotification('Quest declined!', 'success');
+    if (!auth.currentUser) {
+      return;
     }
-  } catch (error) {
-    console.error('Error declining quest:', error);
-    showNotification('Failed to decline quest.', 'error');
-  }
-};
 
+    try {
+      const questRef = doc(db, 'quests', questId);
+      const questDoc = await getDoc(questRef);
+      const questData = questDoc.data();
+
+      if (!questData.isPublic && questData.targetUser === auth.currentUser.uid) {
+        // For private quests, delete the quest entirely
+        await deleteDoc(questRef);
+        setQuests(quests.filter(quest => quest.id !== questId));
+        showNotification('Quest declined!', 'success');
+      } else if (questData.isPublic) {
+        // For public quests, add the current user to the declinedBy array
+        await updateDoc(questRef, {
+          declinedBy: arrayUnion(auth.currentUser.uid)
+        });
+        // Remove the quest from the local state for this user
+        setQuests(quests.filter(quest => quest.id !== questId));
+        showNotification('Quest declined!', 'success');
+      } else {
+        // For quests where the current user is not the target and it's not public
+        const updatedAcceptedBy = questData.acceptedBy.filter(id => id !== auth.currentUser.uid);
+        await updateDoc(questRef, { acceptedBy: updatedAcceptedBy });
+        setQuests(quests.map(q => q.id === questId ? { ...q, acceptedBy: updatedAcceptedBy } : q));
+        showNotification('Quest declined!', 'success');
+      }
+    } catch (error) {
+      console.error('Error declining quest:', error);
+      showNotification('Failed to decline quest.', 'error');
+    }
+  };
 
   const handleAcceptQuest = async (quest) => {
-    if (!auth.currentUser) return;
-
+    if (!auth.currentUser) {
+      console.error('No authenticated user');
+      return;
+    }
+  
+    console.log('Quest object:', quest);  // Log the entire quest object
+  
+    if (!quest.id) {
+      console.error('Quest ID is missing');
+      return;
+    }
+  
     const updatedQuest = {
       ...quest,
       status: 'accepted',
     };
-
+  
     if (quest.isPublic) {
       updatedQuest.pendingAcceptors = [...(quest.pendingAcceptors || []), auth.currentUser.uid];
     } else {
       updatedQuest.acceptedBy = auth.currentUser.uid;
     }
-
+  
     try {
       const questRef = doc(db, 'quests', quest.id);
       await updateDoc(questRef, updatedQuest);
       setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
       showNotification('Quest accepted!', 'success');
+  
+      if (!quest.uid) {
+        console.error('Sender ID is missing from the quest object');
+        return;
+      }
+  
+      // Fetch the sender's location from the database
+      const senderRef = doc(db, 'users', quest.uid);
+      const senderDoc = await getDoc(senderRef);
+      
+      if (!senderDoc.exists()) {
+        console.error('Sender document not found');
+        return;
+      }
+  
+      const senderData = senderDoc.data();
+      console.log('Sender data:', senderData);
+  
+      if (!senderData || !senderData.location) {
+        console.error('Sender location not found');
+        return;
+      }
+  
+      const senderLocation = senderData.location;
+      console.log('Sender location:', senderLocation);
+  
+      if (!map) {
+        console.error('Map object is not available');
+        return;
+      }
+  
+      // Get the current user's location
+      const userLocation = map.getCenter();
+      console.log('User location:', userLocation);
+  
+      // Calculate and display the route
+      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${senderLocation.longitude},${senderLocation.latitude};${userLocation.lng},${userLocation.lat}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+  
+      console.log('Fetching route from URL:', url);
+  
+      const response = await fetch(url);
+      const data = await response.json();
+  
+      console.log('Route data:', data);
+  
+      if (!data.routes || data.routes.length === 0) {
+        console.error('No route found in the response');
+        return;
+      }
+  
+      const route = data.routes[0].geometry;
+  
+      if (map.getSource('route')) {
+        map.getSource('route').setData(route);
+      } else {
+        map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: {
+            type: 'geojson',
+            data: route
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#007bff',
+            'line-width': 5,
+            'line-opacity': 0.75
+          }
+        });
+      }
+  
+      // Add a marker at the sender's location
+      if (map.getSource('sender')) {
+        map.getSource('sender').setData({
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [senderLocation.longitude, senderLocation.latitude]
+          }
+        });
+      } else {
+        map.addLayer({
+          id: 'sender',
+          type: 'circle',
+          source: {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Point',
+                coordinates: [senderLocation.longitude, senderLocation.latitude]
+              }
+            }
+          },
+          paint: {
+            'circle-radius': 10,
+            'circle-color': '#3887be'
+          }
+        });
+      }
+  
+      // Fit the map bounds to include both the sender's location and the current user's location
+      const bounds = new mapboxgl.LngLatBounds()
+        .extend([senderLocation.longitude, senderLocation.latitude])
+        .extend([userLocation.lng, userLocation.lat]);
+      map.fitBounds(bounds, { padding: 50 });
+  
     } catch (error) {
       console.error('Error accepting quest:', error);
       showNotification('Failed to accept quest.', 'error');
     }
   };
+  
 
   const handleApproveAcceptor = async (questId) => {
-    console.log('Approving acceptor:', selectedAcceptor); // Check the selectedAcceptor value
+    console.log('Approving acceptor:', selectedAcceptor);
 
     if (!selectedAcceptor) {
       console.error('Selected acceptor is not defined.');
@@ -237,21 +370,22 @@ const Quests = () => {
       }
 
       // Filter out the selectedAcceptor from pendingAcceptors and add it to acceptedBy
-      const newPendingAcceptors = questData.pendingAcceptors ? questData.pendingAcceptors.filter(id => id !== selectedAcceptor.receiverId) : [];
-      const newAcceptedBy = questData.acceptedBy ? [...questData.acceptedBy, selectedAcceptor.receiverId] : [selectedAcceptor.receiverId];
+      const newPendingAcceptors = questData.pendingAcceptors ? questData.pendingAcceptors.filter(id => id !== selectedAcceptor.id) : [];
+      const newAcceptedBy = questData.acceptedBy ? [...questData.acceptedBy, selectedAcceptor.id] : [selectedAcceptor.id];
 
       // Update the quest document
       await updateDoc(questRef, {
         pendingAcceptors: newPendingAcceptors,
         acceptedBy: newAcceptedBy,
-        targetUser: selectedAcceptor.receiverId // Set the target user
+        targetUser: selectedAcceptor.id // Set the target user
       });
 
       setQuests(prevQuests => prevQuests.map(q =>
-        q.id === questId ? { ...q, pendingAcceptors: newPendingAcceptors, acceptedBy: newAcceptedBy, targetUser: selectedAcceptor.receiverId } : q
+        q.id === questId ? { ...q, pendingAcceptors: newPendingAcceptors, acceptedBy: newAcceptedBy, targetUser: selectedAcceptor.id } : q
       ));
 
       showNotification(`Quest approved for ${selectedAcceptor.name}!`, 'success');
+      setShowApproveModal(false);
     } catch (error) {
       console.error('Error approving acceptor:', error);
       showNotification('Failed to approve acceptor.', 'error');
@@ -394,155 +528,177 @@ const Quests = () => {
       </div>
 
       {isPopupOpen && (
-        <div className="quest-popup">
-          <h3>Create a New Quest</h3>
-          <input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={handleDescriptionChange}
-          />
-          <select
-            value={timeFrame}
-            onChange={(e) => setTimeFrame(e.target.value)}
-          >
-            <option value="">Select Time Frame</option>
-            <option value="5 mins">5 mins</option>
-            <option value="10 mins">10 mins</option>
-            <option value="15 mins">15 mins</option>
-            <option value="30 mins">30 mins</option>
-            <option value="1 hour">1 hour</option>
-          </select>
-          <div className="toggle-container">
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={isPublic}
-                onChange={handleToggleChange}
-              />
-              <span className="slider"></span>
-            </label>
-            <span>{isPublic ? 'Public' : 'Private'}</span>
-          </div>
-          {!isPublic && (
-            <>
-              <input
-                type="text"
-                placeholder="Search user"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              {searchTerm && filteredUsers.length > 0 && (
-  <div className="user-search-results">
-    {filteredUsers.map(user => (
-      <div
-        key={user.id}
-        className="user-search-result"
-        onClick={() => handleSelectUser(user)}
-      >
-        <img src={user.profilePhoto || '/default-profile.png'} alt="Profile" className="user-pfp" />
-        {user.name}
-      </div>
-    ))}
-  </div>
-)}
-
-              {selectedUser && (
-                <div className="selected-user">
-                  <p>Selected User: {selectedUser.name}</p>
-                </div>
-              )}
-            </>
-          )}
-          <div className="quest-popup-actions">
-            <button onClick={handleCreateQuest}>Prepare Quest</button>
-            <button onClick={() => setIsPopupOpen(false)}>Cancel</button>
+        <div className="modal-overlay">
+          <div className="modal quest-popup">
+            <h3>Create a New Quest</h3>
+            <input
+              type="text"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <textarea
+              placeholder="Description"
+              value={description}
+              onChange={handleDescriptionChange}
+            />
+            <select
+              value={timeFrame}
+              onChange={(e) => setTimeFrame(e.target.value)}
+            >
+              <option value="">Select Time Frame</option>
+              <option value="5 mins">5 mins</option>
+              <option value="10 mins">10 mins</option>
+              <option value="15 mins">15 mins</option>
+              <option value="30 mins">30 mins</option>
+              <option value="1 hour">1 hour</option>
+            </select>
+            <div className="toggle-container">
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={isPublic}
+                  onChange={handleToggleChange}
+                />
+                <span className="slider"></span>
+              </label>
+              <span>{isPublic ? 'Public' : 'Private'}</span>
+            </div>
+            {!isPublic && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Search user"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+                {searchTerm && filteredUsers.length > 0 && (
+                  <div className="user-search-results">
+                    {filteredUsers.map(user => (
+                      <div
+                        key={user.id}
+                        className="user-search-result"
+                        onClick={() => handleSelectUser(user)}
+                      >
+                        <img src={user.profilePhoto || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                        {user.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {selectedUser && (
+                  <div className="selected-user">
+                    <p>Selected User: {selectedUser.name}</p>
+                  </div>
+                )}
+              </>
+            )}
+            <div className="modal-actions">
+              <button className="confirm-button" onClick={handleCreateQuest}>Prepare Quest</button>
+              <button className="cancel-button" onClick={() => setIsPopupOpen(false)}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
 
       {confirmationDialogOpen && pendingQuest && (
-        <div className="confirmation-dialog">
-          <h3>Confirm Quest Sending</h3>
-          <p>Are you sure you want to send the quest with the following details?</p>
-          <p><strong>Title:</strong> {pendingQuest.title}</p>
-          <p><strong>Description:</strong> {pendingQuest.description}</p>
-          <p><strong>Time Frame:</strong> {pendingQuest.timeFrame}</p>
-          <div className="confirmation-dialog-actions">
-            <button onClick={handleConfirmQuest}>Confirm</button>
-            <button onClick={() => setConfirmationDialogOpen(false)}>Cancel</button>
+        <div className="modal-overlay">
+          <div className="modal confirmation-dialog">
+            <h3>Confirm Quest Sending</h3>
+            <p>Are you sure you want to send the quest with the following details?</p>
+            <p><strong>Title:</strong> {pendingQuest.title}</p>
+            <p><strong>Description:</strong> {pendingQuest.description}</p>
+            <p><strong>Time Frame:</strong> {pendingQuest.timeFrame}</p>
+            <div className="modal-actions">
+              <button className="confirm-button" onClick={handleConfirmQuest}>Confirm</button>
+              <button className="cancel-button" onClick={() => setConfirmationDialogOpen(false)}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
 
       {selectedProfile && (
-        <div className="profile-popup">
-          <button className="close-popup" onClick={closeProfilePopup}>X</button>
-          <h3>{selectedProfile.name}</h3>
-          <img src={selectedProfile.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="profile-pic" />
-          <p><strong>Bio:</strong> {selectedProfile.bio}</p>
+        <div className="modal-overlay">
+          <div className="modal profile-popup">
+            <button className="close-button" onClick={closeProfilePopup}>X</button>
+            <h3>{selectedProfile.name}</h3>
+            <img src={selectedProfile.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="profile-pic" />
+            <p><strong>Bio:</strong> {selectedProfile.bio}</p>
+          </div>
         </div>
       )}
 
-{showAcceptorsModal && (
-  <div className="acceptors-modal">
-    <h3>Accepted By</h3>
-    <ul>
-      {acceptors.acceptors.map((user, index) => (
-        <li key={index}>{user.name}</li>
-      ))}
-    </ul>
-    <h3>Pending Acceptors</h3>
-    <ul>
-      {acceptors.pendingAcceptors.map((user, index) => (
-        <li key={index}>
-          {user.name}
-          <button onClick={() => setSelectedAcceptor(user)}>Select</button>
-          <button onClick={() => handleApproveAcceptor(selectedQuest.id, user.id)}>Approve</button>
-        </li>
-      ))}
-    </ul>
-    <button onClick={() => setShowAcceptorsModal(false)}>Close</button>
-  </div>
-)}
+      {showApproveModal && selectedAcceptor && (
+        <div className="modal-overlay">
+          <div className="modal approve-modal">
+            <h3>Approve Acceptor</h3>
+            <p>Are you sure you want to approve {selectedAcceptor.name} for this quest?</p>
+            <div className="modal-actions">
+              <button className="confirm-button" onClick={() => handleApproveAcceptor(selectedQuest.id)}>Approve</button>
+              <button className="cancel-button" onClick={() => setShowApproveModal(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-<div className="quests-list">
-  <div className="quests-column">
-    <h3>Public Quests</h3>
-    {filteredQuests.filter(quest => quest.isPublic).length > 0 ? (
-      filteredQuests.filter(quest => quest.isPublic).map((quest) => {
-        const sender = users.find(user => user.id === quest.uid) || {};
-        const senderName = sender.name || '';
+      {showAcceptorsModal && (
+        <div className="modal-overlay">
+          <div className="modal acceptors-modal">
+            <h3>Accepted By</h3>
+            <ul>
+              {acceptors.acceptors.map((user, index) => (
+                <li key={index}>{user.name}</li>
+              ))}
+            </ul>
+            <h3>Pending Acceptors</h3>
+            <ul>
+              {acceptors.pendingAcceptors.map((user, index) => (
+                <li key={index}>
+                  {user.name}
+                  <button className="select-button" onClick={() => {
+                    setSelectedAcceptor(user);
+                    setShowApproveModal(true);
+                  }}>Select</button>
+                </li>
+              ))}
+            </ul>
+            <button className="close-button" onClick={() => setShowAcceptorsModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
 
-        return (
-          <div key={quest.id} className="quest-item">
-            <p><strong>Title:</strong> {quest.title}</p>
-            <p><strong>Description:</strong> {quest.description}</p>
-            <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-            <p><strong>Sender:</strong> {senderName}</p>
+      <div className="quests-list">
+        <div className="quests-column">
+          <h3>Public Quests</h3>
+          {filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser.uid))).length > 0 ? (
+            filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser.uid))).map((quest) => {
+              const sender = users.find(user => user.id === quest.uid) || {};
+              const senderName = sender.name || '';
 
-            {quest.isPublic && auth.currentUser.uid !== quest.uid && !quest.acceptedBy.includes(auth.currentUser.uid) && !quest.pendingAcceptors.includes(auth.currentUser.uid) && (
+              return (
+                <div key={quest.id} className="quest-item">
+                  <p><strong>Title:</strong> {quest.title}</p>
+                  <p><strong>Description:</strong> {quest.description}</p>
+                  <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+                  <p><strong>Sender:</strong> {senderName}</p>
+
+                  {quest.isPublic && auth.currentUser.uid !== quest.uid && !quest.acceptedBy.includes(auth.currentUser.uid) && !quest.pendingAcceptors.includes(auth.currentUser.uid) && (
                     <div className="quest-actions">
-                      <button onClick={() => handleAcceptQuest(quest)}>Accept</button>
-                      <button onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
+                      <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
+                      <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
                     </div>
                   )}
 
                   {quest.uid === auth.currentUser.uid && (
                     <div className="quest-actions">
-                      <button onClick={() => handleViewAcceptors(quest)}>View Pending Acceptors</button>
-                      <button onClick={() => handleCancelQuest(quest.id)}>Cancel Quest</button>
+                      <button className="select-button" onClick={() => handleViewAcceptors(quest)}>View Pending Acceptors</button>
+                      <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel Quest</button>
                     </div>
                   )}
 
                   {quest.acceptedBy.includes(auth.currentUser.uid) && (
                     <div className="quest-actions">
-                      <button onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
+                      <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
                     </div>
                   )}
                 </div>
@@ -553,93 +709,92 @@ const Quests = () => {
           )}
         </div>
 
-  <div className="quests-column">
-    <h3>Received Quests</h3>
-    {quests.filter(quest => quest.targetUser === auth.currentUser.uid && !quest.isPublic).length > 0 ? (
-      quests.filter(quest => quest.targetUser === auth.currentUser.uid && !quest.isPublic).map((quest) => {
-        const sender = users.find(user => user.id === quest.uid) || {};
-        const senderName = sender.name || '';
-        const isRecipient = quest.targetUser === auth.currentUser.uid;
-        const isSender = quest.uid === auth.currentUser.uid;
+        <div className="quests-column">
+          <h3>Received Quests</h3>
+          {quests.filter(quest => quest.targetUser === auth.currentUser.uid && !quest.isPublic).length > 0 ? (
+            quests.filter(quest => quest.targetUser === auth.currentUser.uid && !quest.isPublic).map((quest) => {
+              const sender = users.find(user => user.id === quest.uid) || {};
+              const senderName = sender.name || '';
+              const isRecipient = quest.targetUser === auth.currentUser.uid;
+              const isSender = quest.uid === auth.currentUser.uid;
 
-        return (
-          <div key={quest.id} className="quest-item">
-            <p><strong>Title:</strong> {quest.title}</p>
-            <p><strong>Description:</strong> {quest.description}</p>
-            <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-            <p><strong>Sender:</strong> {senderName}</p>
-            {isRecipient && quest.status === 'accepted' && (
-              <div className="quest-actions">
-                <button onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
-                <button onClick={() => handleCancelQuest(quest.id)}>Cancel</button>
-              </div>
-            )}
-            {isRecipient && quest.status !== 'accepted' ? (
-              <div className="quest-actions">
-                <button onClick={() => handleAcceptQuest(quest)}>Accept</button>
-                <button onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
-              </div>
-            ) : isSender ? (
-              <p>Status: {quest.status}</p>
-            ) : null}
-            {quest.acceptedBy && (
-              <div>
-                <p><strong>Accepted By:</strong> {users.find(user => user.id === quest.acceptedBy)?.name || 'Pending acceptance'}</p>
-                <img src={users.find(user => user.id === quest.acceptedBy)?.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-              </div>
-            )}
-          </div>
-        );
-      })
-    ) : (
-      <p>No received quests.</p>
-    )}
-  </div>
+              return (
+                <div key={quest.id} className="quest-item">
+                  <p><strong>Title:</strong> {quest.title}</p>
+                  <p><strong>Description:</strong> {quest.description}</p>
+                  <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+                  <p><strong>Sender:</strong> {senderName}</p>
+                  {isRecipient && quest.status === 'accepted' && (
+                    <div className="quest-actions">
+                      <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
+                      <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel</button>
+                    </div>
+                  )}
+                  {isRecipient && quest.status !== 'accepted' ? (
+                    <div className="quest-actions">
+                      <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
+                      <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
+                    </div>
+                  ) : isSender ? (
+                    <p>Status: {quest.status}</p>
+                  ) : null}
+                  {quest.acceptedBy && (
+                    <div>
+                      <p><strong>Accepted By:</strong> {users.find(user => user.id === quest.acceptedBy)?.name || 'Pending acceptance'}</p>
+                      <img src={users.find(user => user.id === quest.acceptedBy)?.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <p>No received quests.</p>
+          )}
+        </div>
 
-  <div className="quests-column">
-    <h3>Sent Quests</h3>
-    {quests.filter(quest => quest.uid === auth.currentUser.uid && !quest.isPublic).length > 0 ? (
-      quests.filter(quest => quest.uid === auth.currentUser.uid && !quest.isPublic).map((quest) => {
-        const acceptor = users.find(user => user.id === quest.acceptedBy) || {};
-        const acceptorName = acceptor.name || '';
-        const pendingAcceptors = users.filter(user => quest.pendingAcceptors && quest.pendingAcceptors.includes(user.id));
+        <div className="quests-column">
+          <h3>Sent Quests</h3>
+          {quests.filter(quest => quest.uid === auth.currentUser.uid && !quest.isPublic).length > 0 ? (
+            quests.filter(quest => quest.uid === auth.currentUser.uid && !quest.isPublic).map((quest) => {
+              const acceptor = users.find(user => user.id === quest.acceptedBy) || {};
+              const acceptorName = acceptor.name || '';
+              const pendingAcceptors = users.filter(user => quest.pendingAcceptors && quest.pendingAcceptors.includes(user.id));
 
-        return (
-          <div key={quest.id} className="quest-item">
-            <p><strong>Title:</strong> {quest.title}</p>
-            <p><strong>Description:</strong> {quest.description}</p>
-            <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-            <p><strong>Status:</strong> {quest.status}</p>
-            {pendingAcceptors.length > 0 && (
-              <div>
-                <p><strong>Pending Acceptors:</strong></p>
-                <ul>
-                  {pendingAcceptors.map(user => (
-                    <li key={user.id} onClick={() => handleSelectAcceptor(quest, user)}>
-                      {user.name}
-                      <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {quest.acceptedBy && (
-              <div>
-                <p><strong>Accepted By:</strong> {acceptorName}</p>
-                <img src={acceptor.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-              </div>
-            )}
-          </div>
-        );
-      })
-    ) : (
-      <p>No sent quests.</p>
-    )}
-  </div>
-</div>
-
+              return (
+                <div key={quest.id} className="quest-item">
+                  <p><strong>Title:</strong> {quest.title}</p>
+                  <p><strong>Description:</strong> {quest.description}</p>
+                  <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+                  <p><strong>Status:</strong> {quest.status}</p>
+                  {pendingAcceptors.length > 0 && (
+                    <div>
+                      <p><strong>Pending Acceptors:</strong></p>
+                      <ul>
+                        {pendingAcceptors.map(user => (
+                          <li key={user.id} onClick={() => handleSelectAcceptor(quest, user)}>
+                            {user.name}
+                            <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {quest.acceptedBy && (
+                    <div>
+                      <p><strong>Accepted By:</strong> {acceptorName}</p>
+                      <img src={acceptor.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <p>No sent quests.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
-
+  
 export default Quests;

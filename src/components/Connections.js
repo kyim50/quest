@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, serverTimestamp, arrayRemove, getDoc, arrayUnion, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, serverTimestamp, arrayRemove, getDoc, arrayUnion, query, where, orderBy, limit } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import './connections.css'; // Import your CSS
+import './connections.css';
 
 const Connections = ({ currentUserIds = [] }) => {
   const [people, setPeople] = useState([]);
@@ -13,6 +13,9 @@ const Connections = ({ currentUserIds = [] }) => {
   const [chatUser, setChatUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
 
   // Fetch active users who are not friends
   const fetchPeople = useCallback(async () => {
@@ -90,8 +93,8 @@ const Connections = ({ currentUserIds = [] }) => {
           return {
             id: req.id,
             senderId: req.senderId,
-            senderName: senderData?.name || 'User', // Default to 'User' if name is missing
-            senderPhoto: senderData?.profilePhoto || 'default_photo_url' // Default photo URL if missing
+            senderName: senderData?.name || 'User',
+            senderPhoto: senderData?.profilePhoto || 'default_photo_url'
           };
         })
       );
@@ -109,7 +112,7 @@ const Connections = ({ currentUserIds = [] }) => {
   }, [fetchPeople, fetchFriends]);
 
   const handleAddFriend = async (receiverId) => {
-    console.log('Attempting to send friend request to:', receiverId); // Debugging
+    console.log('Attempting to send friend request to:', receiverId);
     if (!receiverId) {
       console.error('Receiver ID is undefined.');
       return;
@@ -131,11 +134,11 @@ const Connections = ({ currentUserIds = [] }) => {
 
       await addDoc(collection(db, 'friend_requests'), {
         senderId: auth.currentUser.uid,
-        senderName: auth.currentUser.displayName, // Assuming the user's name is stored in the displayName field
-        senderPhoto: auth.currentUser.photoURL, // Assuming the user's photo URL is stored in the photoURL field
+        senderName: auth.currentUser.displayName,
+        senderPhoto: auth.currentUser.photoURL,
         receiverId,
         status: 'pending',
-        timestamp: serverTimestamp() // Use serverTimestamp for consistency
+        timestamp: serverTimestamp()
       });
       setNotification('Friend request sent!');
     } catch (error) {
@@ -190,7 +193,7 @@ const Connections = ({ currentUserIds = [] }) => {
   };
 
   const handleUserClick = (user) => {
-    console.log('User clicked:', user); // Debugging
+    console.log('User clicked:', user);
     setSelectedUser(user);
   };
 
@@ -199,10 +202,10 @@ const Connections = ({ currentUserIds = [] }) => {
   };
 
   const handleButtonClick = (user) => {
-    console.log('Button clicked for user:', user); // Debugging
+    console.log('Button clicked for user:', user);
     if (selectedUser === user) {
       if (user.id) {
-        handleAddFriend(user.id); // Use user.id here
+        handleAddFriend(user.id);
       } else {
         console.error('Selected user ID is missing.');
       }
@@ -218,11 +221,19 @@ const Connections = ({ currentUserIds = [] }) => {
   const handleChatClick = (user) => {
     setChatUser(user);
     fetchChatHistory(user.id);
+    updateChatHistory(user);
   };
 
   const handleCloseChat = () => {
     setChatUser(null);
     setMessages([]);
+  };
+
+  const updateChatHistory = (user) => {
+    setChatHistory(prevHistory => {
+      const updatedHistory = prevHistory.filter(item => item.id !== user.id);
+      return [user, ...updatedHistory];
+    });
   };
 
   const fetchChatHistory = async (userId) => {
@@ -235,11 +246,12 @@ const Connections = ({ currentUserIds = [] }) => {
     const q = query(messagesCollection,
       where('senderId', 'in', [auth.currentUser.uid, userId]),
       where('receiverId', 'in', [auth.currentUser.uid, userId]),
-      orderBy('timestamp')
+      orderBy('timestamp', 'desc'),
+      limit(20)
     );
 
     const querySnapshot = await getDocs(q);
-    const chatHistory = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const chatHistory = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).reverse();
     setMessages(chatHistory);
   };
 
@@ -255,26 +267,63 @@ const Connections = ({ currentUserIds = [] }) => {
       });
 
       setNewMessage('');
+      updateChatHistory(chatUser);
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
 
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+    
+    // Clear any existing timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    // Update user's typing status in Firestore
+    updateDoc(doc(db, 'users', auth.currentUser.uid), { isTyping: true });
+
+    // Set a new timeout
+    const newTimeout = setTimeout(() => {
+      updateDoc(doc(db, 'users', auth.currentUser.uid), { isTyping: false });
+    }, 2000); // Stop showing typing indicator after 2 seconds of inactivity
+
+    setTypingTimeout(newTimeout);
+  };
+
   useEffect(() => {
     if (chatUser) {
-      const unsubscribeMessages = onSnapshot(collection(db, 'messages'), (snapshot) => {
-        const chatHistory = snapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(msg =>
-            (msg.senderId === auth.currentUser.uid && msg.receiverId === chatUser.id) ||
-            (msg.senderId === chatUser.id && msg.receiverId === auth.currentUser.uid)
-          )
-          .sort((a, b) => a.timestamp.seconds - b.timestamp.seconds);
+      const unsubscribeMessages = onSnapshot(
+        query(
+          collection(db, 'messages'),
+          where('senderId', 'in', [auth.currentUser.uid, chatUser.id]),
+          where('receiverId', 'in', [auth.currentUser.uid, chatUser.id]),
+          orderBy('timestamp')
+        ),
+        (snapshot) => {
+          const chatHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setMessages(chatHistory);
+        }
+      );
 
-        setMessages(chatHistory);
-      });
+      // Subscribe to typing indicator
+      const unsubscribeTyping = onSnapshot(
+        doc(db, 'users', chatUser.id),
+        (doc) => {
+          const userData = doc.data();
+          if (userData && userData.isTyping) {
+            setIsTyping(true);
+          } else {
+            setIsTyping(false);
+          }
+        }
+      );
 
-      return () => unsubscribeMessages();
+      return () => {
+        unsubscribeMessages();
+        unsubscribeTyping();
+      };
     }
   }, [chatUser]);
 
@@ -343,12 +392,12 @@ const Connections = ({ currentUserIds = [] }) => {
           <img src={selectedUser.profilePhoto} alt="Profile" />
           <div>{selectedUser.name}</div>
           <div>{selectedUser.bio}</div>
-          <button className="view-profile-btn" onClick={() => handleAddFriend(selectedUser.id)}>+</button>
+          <button className="view-profile-btn" onClick={() => handleAddFriend(selectedUser.id)}>Add Friend</button>
           <button className="remove-friend-btn" onClick={() => handleRemoveFriend(selectedUser.id)}>Remove</button>
         </div>
       )}
 
-      {chatUser && (
+      {chatUser ? (
         <div className="chat-container">
           <div className="chat-header">
             <button className="back-btn" onClick={handleCloseChat}>← Back</button>
@@ -361,16 +410,33 @@ const Connections = ({ currentUserIds = [] }) => {
                 <div>{msg.content}</div>
               </div>
             ))}
+            {isTyping && (
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            )}
           </div>
           <div className="chat-input">
             <input
               type="text"
               placeholder="Type a message..."
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={handleInputChange}
             />
             <button onClick={handleSendMessage}>Send</button>
           </div>
+        </div>
+      ) : (
+        <div className="chat-history">
+          <h3>Recent Chats</h3>
+          {chatHistory.map(user => (
+            <div key={user.id} className="chat-history-item" onClick={() => handleChatClick(user)}>
+              <img src={user.profilePhoto} alt="Profile" />
+              <div>{user.name}</div>
+            </div>
+          ))}
         </div>
       )}
     </div>

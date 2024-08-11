@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { db, auth, getDocs } from '../firebase';
-import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc, arrayUnion, arrayRemove, } from 'firebase/firestore';
 import '../styles/quests.css';
 import { useNotification } from '../NotificationContext';
 import mapboxgl from 'mapbox-gl';
+import { removeRoute } from './UserLocationService';
 
 const Quests = ({ map, currentUserIds }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -205,113 +206,6 @@ const Quests = ({ map, currentUserIds }) => {
     }
   };
 
-  const displayRoute = async (senderLocation, receiverLocation) => {
-    if (!map) {
-      console.error('Map object is not available');
-      return;
-    }
-
-    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${senderLocation.longitude},${senderLocation.latitude};${receiverLocation.longitude},${receiverLocation.latitude}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (!data.routes || data.routes.length === 0) {
-        console.error('No route found in the response');
-        return;
-      }
-
-      const route = data.routes[0].geometry;
-
-      if (map.getSource('route')) {
-        map.getSource('route').setData(route);
-      } else {
-        map.addLayer({
-          id: 'route',
-          type: 'line',
-          source: {
-            type: 'geojson',
-            data: route
-          },
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': '#00FFFF',
-            'line-width': 5,
-            'line-opacity': 0.75
-          }
-        });
-      }
-
-      const addMarker = (id, location, color) => {
-        if (map.getSource(id)) {
-          map.getSource(id).setData({
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: [location.longitude, location.latitude]
-            }
-          });
-        } else {
-          map.addLayer({
-            id: id,
-            type: 'circle',
-            source: {
-              type: 'geojson',
-              data: {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                  type: 'Point',
-                  coordinates: [location.longitude, location.latitude]
-                }
-              }
-            },
-            paint: {
-              'circle-radius': 10,
-              'circle-color': color
-            }
-          });
-        }
-      };
-
-      addMarker('sender', senderLocation, '#3887be');
-      addMarker('receiver', receiverLocation, '#f30');
-
-      const bounds = new mapboxgl.LngLatBounds()
-        .extend([senderLocation.longitude, senderLocation.latitude])
-        .extend([receiverLocation.longitude, receiverLocation.latitude]);
-      map.fitBounds(bounds, { padding: 50 });
-
-    } catch (error) {
-      console.error('Error fetching or displaying route:', error);
-    }
-  };
-
-  const removeRoute = () => {
-    if (map.getLayer('route')) {
-      map.removeLayer('route');
-    }
-    if (map.getSource('route')) {
-      map.removeSource('route');
-    }
-    if (map.getLayer('sender')) {
-      map.removeLayer('sender');
-    }
-    if (map.getSource('sender')) {
-      map.removeSource('sender');
-    }
-    if (map.getLayer('receiver')) {
-      map.removeLayer('receiver');
-    }
-    if (map.getSource('receiver')) {
-      map.removeSource('receiver');
-    }
-  };
 
   const handleAcceptQuest = async (quest) => {
     if (!auth.currentUser) {
@@ -374,7 +268,15 @@ const Quests = ({ map, currentUserIds }) => {
       await updateDoc(questRef, updatedQuest);
   
       setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
-      setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
+      
+      // Only add to activeQuests and display route for private quests
+      if (!quest.isPublic) {
+        setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
+        
+        if (updatedQuest.routeInfo && map) {
+          displayRoute(map, updatedQuest.routeInfo.senderLocation, updatedQuest.routeInfo.receiverLocation);
+        }
+      }
   
       showNotification('Quest accepted!', 'success');
   
@@ -398,15 +300,95 @@ const Quests = ({ map, currentUserIds }) => {
     }
   };
 
+  const displayRoute = useCallback((senderLocation, receiverLocation) => {
+    if (!map || !map.loaded()) {
+      console.error('Map is not fully loaded');
+      return;
+    }
+
+    if (!senderLocation || !receiverLocation) {
+      console.error('Invalid locations for route display');
+      return;
+    }
+
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${senderLocation.longitude},${senderLocation.latitude};${receiverLocation.longitude},${receiverLocation.latitude}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.routes || data.routes.length === 0) {
+          console.error('No route found in the response');
+          return;
+        }
+
+        const route = data.routes[0].geometry;
+
+        if (map.getSource('route')) {
+          map.getSource('route').setData(route);
+        } else {
+          map.addLayer({
+            id: 'route',
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: route
+            },
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': '#00FFFF',
+              'line-width': 5,
+              'line-opacity': 0.75
+            }
+          });
+        }
+
+        const bounds = new mapboxgl.LngLatBounds()
+          .extend([senderLocation.longitude, senderLocation.latitude])
+          .extend([receiverLocation.longitude, receiverLocation.latitude]);
+        map.fitBounds(bounds, { padding: 50 });
+      })
+      .catch(error => {
+        console.error('Error fetching or displaying route:', error);
+      });
+  }, [map]);
+
+  useEffect(() => {
+    if (auth.currentUser && map) {
+      const unsubscribe = onSnapshot(
+        query(
+          collection(db, 'quests'),
+          where('status', 'in', ['approved', 'accepted']),
+          where('uid', '==', auth.currentUser.uid)
+        ),
+        (snapshot) => {
+          const userQuests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setActiveQuests(userQuests);
+
+          userQuests.forEach(quest => {
+            if (!quest.isPublic && quest.routeInfo) {
+              displayRoute(quest.routeInfo.senderLocation, quest.routeInfo.receiverLocation);
+            }
+          });
+        }
+      );
+
+      return () => unsubscribe();
+    }
+  }, [auth.currentUser, map, displayRoute]);
+
+
   const handleApproveAcceptor = async (questId, acceptor) => {
     console.log('Approving acceptor:', acceptor);
-
+  
     if (!acceptor || !acceptor.id) {
       console.error('Selected acceptor is not defined or missing id.');
       showNotification('Invalid acceptor data.', 'error');
       return;
     }
-
+  
     try {
       const questRef = doc(db, 'quests', questId);
       const questDoc = await getDoc(questRef);
@@ -416,9 +398,9 @@ const Quests = ({ map, currentUserIds }) => {
         showNotification('Quest not found.', 'error');
         return;
       }
-
+  
       const questData = questDoc.data();
-
+  
       const updatedQuest = {
         ...questData,
         pendingAcceptors: arrayRemove(acceptor.id),
@@ -426,20 +408,20 @@ const Quests = ({ map, currentUserIds }) => {
         targetUser: acceptor.id,
         status: 'approved'
       };
-
+  
       if (auth.currentUser) {
         const senderRef = doc(db, 'users', auth.currentUser.uid);
         const receiverRef = doc(db, 'users', acceptor.id);
-
+  
         const [senderDoc, receiverDoc] = await Promise.all([
           getDoc(senderRef),
           getDoc(receiverRef)
         ]);
-
+  
         if (senderDoc.exists() && receiverDoc.exists()) {
           const senderData = senderDoc.data();
           const receiverData = receiverDoc.data();
-
+  
           if (senderData.location && receiverData.location) {
             updatedQuest.routeInfo = {
               senderLocation: senderData.location,
@@ -448,16 +430,17 @@ const Quests = ({ map, currentUserIds }) => {
           }
         }
       }
-
+  
       await updateDoc(questRef, updatedQuest);
-
+  
       setQuests(prevQuests => prevQuests.map(q => q.id === questId ? { ...q, ...updatedQuest } : q));
       setActiveQuests(prevActiveQuests => [...prevActiveQuests, { ...questData, ...updatedQuest, id: questId }]);
-
+  
+      // Display route after approving the acceptor
       if (updatedQuest.routeInfo && map) {
-        displayRoute(updatedQuest.routeInfo.senderLocation, updatedQuest.routeInfo.receiverLocation);
+        displayRoute(map, updatedQuest.routeInfo.senderLocation, updatedQuest.routeInfo.receiverLocation);
       }
-
+  
       showNotification(`Quest approved for ${acceptor.name}!`, 'success');
       setShowAcceptorsModal(false);
     } catch (error) {
@@ -465,15 +448,20 @@ const Quests = ({ map, currentUserIds }) => {
       showNotification('Failed to approve acceptor.', 'error');
     }
   };
-
+  
   const handleCompleteQuest = async (questId) => {
     try {
       const questRef = doc(db, 'quests', questId);
       await deleteDoc(questRef);
       setQuests(quests.filter(quest => quest.id !== questId));
       setActiveQuests(activeQuests.filter(quest => quest.id !== questId));
+      
+      // Remove the route from the map
+      if (map) {
+        removeRoute(map);
+      }
+      
       showNotification('Quest completed and deleted!', 'success');
-      removeRoute();
     } catch (error) {
       console.error('Error completing quest:', error);
       showNotification('Failed to complete quest.', 'error');

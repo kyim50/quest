@@ -33,7 +33,6 @@ export const addMarker = (map, latitude, longitude, userData) => {
     return null;
   }
 
-  // Check if the map is fully loaded
   if (!map.loaded()) {
     console.log('Map not yet loaded, waiting...');
     map.on('load', () => addMarker(map, latitude, longitude, userData));
@@ -64,7 +63,6 @@ export const addMarker = (map, latitude, longitude, userData) => {
   dot.className = 'marker-dot';
   el.appendChild(dot);
 
-  // Create a new marker
   try {
     const marker = new mapboxgl.Marker(el)
       .setLngLat([longitude, latitude])
@@ -72,7 +70,6 @@ export const addMarker = (map, latitude, longitude, userData) => {
 
     console.log('Marker created:', marker);
 
-    // Create a custom popup
     const popup = new mapboxgl.Popup({
       offset: 25,
       closeButton: false,
@@ -80,7 +77,6 @@ export const addMarker = (map, latitude, longitude, userData) => {
       maxWidth: 'none'
     });
 
-    // Create the popup content
     const popupContent = document.createElement('div');
     popupContent.className = 'custom-popup';
     popupContent.innerHTML = `
@@ -102,7 +98,6 @@ export const addMarker = (map, latitude, longitude, userData) => {
       </div>
     `;
 
-    // Add friend functionality
     const addFriendButton = popupContent.querySelector('.add-friend-button');
     addFriendButton.addEventListener('click', async () => {
       console.log('Add friend button clicked');
@@ -126,13 +121,11 @@ export const addMarker = (map, latitude, longitude, userData) => {
 
     popup.setDOMContent(popupContent);
 
-    // Attach the popup to the marker
     marker.setPopup(popup);
 
-    // Show popup on click
     marker.getElement().addEventListener('click', (e) => {
       console.log('Marker clicked:', userData);
-      e.stopPropagation(); // Prevent the click from being captured by the map
+      e.stopPropagation();
       popup.addTo(map);
     });
 
@@ -150,7 +143,6 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
     return () => {};
   }
 
-  // Ensure the map is fully loaded before setting up the listener
   if (!map.loaded()) {
     map.on('load', () => setupUserLocationsListener(map, setCurrentUserIds));
     return () => {};
@@ -169,7 +161,6 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
       return;
     }
 
-    // Fetch the current user's data to get their friend list and privacy setting
     const currentUserDoc = await getDoc(doc(db, 'users', currentUser.uid));
     const currentUserData = currentUserDoc.data();
     const currentUserFriends = currentUserData?.friends || [];
@@ -180,7 +171,6 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
       const userData = doc.data();
       console.log('Processing user:', userId, userData);
 
-      // Determine if the user should be visible based on privacy settings and friendship
       const isVisible = !userData.isPrivate || 
                         userId === currentUser.uid || 
                         (isCurrentUserPrivate && currentUserFriends.includes(userId)) ||
@@ -189,7 +179,6 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
       if (userData.isActive && userData.location && isVisible) {
         activeUserIds.add(userId);
 
-        // Check if the user has been inactive for more than 5 minutes
         const lastActivityTimestamp = new Date(userData.location.timestamp).getTime();
         const currentTimestamp = new Date().getTime();
         const inactiveTime = currentTimestamp - lastActivityTimestamp;
@@ -230,7 +219,6 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
       }
     });
 
-    // Remove markers for users no longer in the active snapshot
     Object.keys(markers).forEach(markerId => {
       if (!activeUserIds.has(markerId)) {
         console.log('Removing marker for user no longer in snapshot:', markerId);
@@ -273,7 +261,6 @@ export const trackUserLocation = (map, setAddress) => {
           lastUserLocation = { latitude, longitude };
           hasInitializedFlyTo = true;
         }
-        // Fetch the address using Mapbox Geocoding API
         fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`)
           .then(response => response.json())
           .then(data => {
@@ -289,13 +276,12 @@ export const trackUserLocation = (map, setAddress) => {
         console.error('Error getting location:', error);
       },
       {
-        enableHighAccuracy: true, // Request the most accurate position data
-        maximumAge: 0, // Set maximumAge to 0 for continuous updates
+        enableHighAccuracy: true,
+        maximumAge: 0,
         timeout: 27000
       }
     );
 
-    // Return the watchId so it can be cleared when needed
     return watchId;
   } else {
     console.error('Geolocation is not supported by this browser.');
@@ -321,15 +307,8 @@ export const displayRoute = async (map, senderLocation, receiverLocation) => {
 
     const route = data.routes[0].geometry;
 
-    // Remove existing route layer and source if they exist
-    if (map.getLayer('route')) {
-      map.removeLayer('route');
-    }
-    if (map.getSource('route')) {
-      map.removeSource('route');
-    }
+    removeRoute(map);
 
-    // Add new source and layer for the route
     map.addSource('route', {
       type: 'geojson',
       data: {
@@ -354,28 +333,9 @@ export const displayRoute = async (map, senderLocation, receiverLocation) => {
       }
     });
 
-    const addMarker = (id, location, color) => {
-      // Remove existing marker if it exists
-      if (markers[id]) {
-        markers[id].remove();
-      }
+    addMarker(map, 'sender', senderLocation, '#3887be');
+    addMarker(map, 'receiver', receiverLocation, '#f30');
 
-      const el = document.createElement('div');
-      el.className = 'custom-marker';
-      el.style.backgroundColor = color;
-      el.style.width = '15px';
-      el.style.height = '15px';
-      el.style.borderRadius = '50%';
-
-      markers[id] = new mapboxgl.Marker(el)
-        .setLngLat([location.longitude, location.latitude])
-        .addTo(map);
-    };
-
-    addMarker('sender', senderLocation, '#3887be');
-    addMarker('receiver', receiverLocation, '#f30');
-
-    // Fit the map to the route
     const coordinates = route.coordinates;
     const bounds = coordinates.reduce((bounds, coord) => {
       return bounds.extend(coord);
@@ -405,11 +365,14 @@ export const removeRoute = (map) => {
     map.removeSource('route');
   }
 
-  // Remove markers
-  Object.values(markers).forEach(marker => marker.remove());
-  Object.keys(markers).forEach(key => delete markers[key]);
+  // Remove route markers
+  ['sender', 'receiver'].forEach(id => {
+    if (markers[id]) {
+      markers[id].remove();
+      delete markers[id];
+    }
+  });
 };
-
 export const setUserIsActive = async (isActive) => {
   if (auth.currentUser) {
     const userDocRef = doc(db, 'users', auth.currentUser.uid);

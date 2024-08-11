@@ -47,12 +47,20 @@ const HomeScreen = () => {
           <img src="/logout.png" alt="Log Out" />
         </button>
       </div>
+
+      <div className="adventure-btn-container">
+        <button className="add-adventure-btn" onClick={() => navigate('/adventure-feed')}>
+          +
+        </button>
+      </div>
+
       <MapComponent 
         address={address} 
         setAddress={setAddress} 
         setCurrentUserIds={setCurrentUserIds}
         setMap={setMap}
       />
+
       <div className={`rectangular-container ${activeSection ? '' : 'hidden'}`} id="content-container">
         {activeSection === 'profile-section' && <UserProfile />}
         {activeSection === 'quests-section' && (
@@ -65,6 +73,7 @@ const HomeScreen = () => {
         )}
         {activeSection === 'connections-section' && <ConnectionsComponent currentUserIds={currentUserIds} />}
       </div>
+
       <NavigationBar activeSection={activeSection} showSection={showSection} />
     </div>
   );

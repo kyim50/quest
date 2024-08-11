@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginScreen from "../src/components/LoginScreen";
 import RegisterScreen from "../src/components/RegisterScreen";
 import HomeScreen from "../src/components/HomeScreen";
-import { NotificationProvider } from "./NotificationContext"; // Adjust path as needed
-import NotificationDisplay from "./NotificationDisplay"; // Adjust path as needed
-import LandingPage from "./LandingPage"; // Ensure this path is correct
+import AdventureFeed from "../src/components/AdventureFeed";
+import { NotificationProvider } from "./NotificationContext";
+import NotificationDisplay from "./NotificationDisplay";
+import LandingPage from "./LandingPage";
 
 function App() {
   return (
@@ -20,7 +21,16 @@ function App() {
             element={
               <>
                 <HomeScreen />
-                <NotificationDisplay /> {/* Add notification display to HomeScreen */}
+                <NotificationDisplay />
+              </>
+            }
+          />
+          <Route
+            path="/adventure-feed"
+            element={
+              <>
+                <AdventureFeed />
+                <NotificationDisplay />
               </>
             }
           />

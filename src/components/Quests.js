@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, getDocs } from '../firebase';
-import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc, arrayUnion } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import '../styles/quests.css';
 import { useNotification } from '../NotificationContext';
 import mapboxgl from 'mapbox-gl';
@@ -316,114 +316,146 @@ const Quests = ({ map, currentUserIds }) => {
   const handleAcceptQuest = async (quest) => {
     if (!auth.currentUser) {
       console.error('No authenticated user');
+      showNotification('You must be logged in to accept quests.', 'error');
       return;
     }
-
-    console.log('Quest object:', quest);
-
+  
     if (!quest.id) {
       console.error('Quest ID is missing');
+      showNotification('Invalid quest. Please try again.', 'error');
       return;
     }
-
-    const updatedQuest = {
-      ...quest,
-      status: quest.isPublic ? 'pending' : 'accepted',
-    };
-
-    if (quest.isPublic) {
-      updatedQuest.pendingAcceptors = [...(quest.pendingAcceptors || []), auth.currentUser.uid];
-    } else {
-      updatedQuest.acceptedBy = auth.currentUser.uid;
-    }
-
+  
     try {
       const questRef = doc(db, 'quests', quest.id);
+      const questDoc = await getDoc(questRef);
+      
+      if (!questDoc.exists()) {
+        console.error('Quest does not exist');
+        showNotification('This quest no longer exists.', 'error');
+        return;
+      }
+  
+      const currentQuestData = questDoc.data();
+  
+      let updatedQuest = {
+        ...currentQuestData,
+        status: quest.isPublic ? 'pending' : 'accepted',
+      };
+  
+      if (quest.isPublic) {
+        updatedQuest.pendingAcceptors = arrayUnion(auth.currentUser.uid);
+      } else {
+        updatedQuest.acceptedBy = auth.currentUser.uid;
+      }
+  
       const senderDoc = await getDoc(doc(db, 'users', quest.uid));
       const receiverDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
-
-      if (senderDoc.exists() && receiverDoc.exists()) {
-        const senderData = senderDoc.data();
-        const receiverData = receiverDoc.data();
-
-        if (senderData.location && receiverData.location) {
-          updatedQuest.routeInfo = {
-            senderLocation: senderData.location,
-            receiverLocation: receiverData.location
-          };
-
-          await updateDoc(questRef, updatedQuest);
-          setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
-          setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
-
-          displayRoute(senderData.location, receiverData.location);
-        }
+  
+      if (!senderDoc.exists() || !receiverDoc.exists()) {
+        console.error('Sender or receiver data not found');
+        showNotification('Unable to process quest. User data missing.', 'error');
+        return;
       }
-
+  
+      const senderData = senderDoc.data();
+      const receiverData = receiverDoc.data();
+  
+      if (!senderData.location || !receiverData.location) {
+        console.error('Sender or receiver location missing');
+        showNotification('Location data is missing. Unable to display route.', 'warning');
+      } else {
+        updatedQuest.routeInfo = {
+          senderLocation: senderData.location,
+          receiverLocation: receiverData.location
+        };
+      }
+  
+      await updateDoc(questRef, updatedQuest);
+  
+      setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
+      setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
+  
       showNotification('Quest accepted!', 'success');
+  
+      // If it's a public quest, notify the quest creator
+      if (quest.isPublic) {
+        const notificationRef = doc(collection(db, 'notifications'));
+        await setDoc(notificationRef, {
+          type: 'quest_accepted',
+          questId: quest.id,
+          recipientId: quest.uid,
+          senderId: auth.currentUser.uid,
+          content: `${auth.currentUser.displayName || 'Someone'} has accepted your quest: ${quest.title}`,
+          createdAt: new Date(),
+          read: false
+        });
+      }
+  
     } catch (error) {
       console.error('Error accepting quest:', error);
-      showNotification('Failed to accept quest.', 'error');
+      showNotification('Failed to accept quest. Please try again.', 'error');
     }
   };
 
   const handleApproveAcceptor = async (questId, acceptor) => {
     console.log('Approving acceptor:', acceptor);
 
-    if (!acceptor) {
-      console.error('Selected acceptor is not defined.');
+    if (!acceptor || !acceptor.id) {
+      console.error('Selected acceptor is not defined or missing id.');
+      showNotification('Invalid acceptor data.', 'error');
       return;
     }
 
     try {
       const questRef = doc(db, 'quests', questId);
       const questDoc = await getDoc(questRef);
-      const questData = questDoc.data();
-
-      if (!questData) {
-        throw new Error('Quest data is missing.');
+      
+      if (!questDoc.exists()) {
+        console.error('Quest document does not exist.');
+        showNotification('Quest not found.', 'error');
+        return;
       }
 
-      const newPendingAcceptors = questData.pendingAcceptors ? questData.pendingAcceptors.filter(id => id !== acceptor.id) : [];
-      const newAcceptedBy = questData.acceptedBy ? [...questData.acceptedBy, acceptor.id] : [acceptor.id];
+      const questData = questDoc.data();
 
-      const senderDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
-      const receiverDoc = await getDoc(doc(db, 'users', acceptor.id));
+      const updatedQuest = {
+        ...questData,
+        pendingAcceptors: arrayRemove(acceptor.id),
+        acceptedBy: arrayUnion(acceptor.id),
+        targetUser: acceptor.id,
+        status: 'approved'
+      };
 
-      if (senderDoc.exists() && receiverDoc.exists()) {
-        const senderData = senderDoc.data();
-        const receiverData = receiverDoc.data();
+      if (auth.currentUser) {
+        const senderRef = doc(db, 'users', auth.currentUser.uid);
+        const receiverRef = doc(db, 'users', acceptor.id);
 
-        if (senderData.location && receiverData.location) {
-          await updateDoc(questRef, {
-            pendingAcceptors: newPendingAcceptors,
-            acceptedBy: newAcceptedBy,
-            targetUser: acceptor.id,
-            status: 'approved',
-            routeInfo: {
+        const [senderDoc, receiverDoc] = await Promise.all([
+          getDoc(senderRef),
+          getDoc(receiverRef)
+        ]);
+
+        if (senderDoc.exists() && receiverDoc.exists()) {
+          const senderData = senderDoc.data();
+          const receiverData = receiverDoc.data();
+
+          if (senderData.location && receiverData.location) {
+            updatedQuest.routeInfo = {
               senderLocation: senderData.location,
               receiverLocation: receiverData.location
-            }
-          });
-
-          const updatedQuest = {
-            ...questData,
-            id: questId,
-            pendingAcceptors: newPendingAcceptors,
-            acceptedBy: newAcceptedBy,
-            targetUser: acceptor.id,
-            status: 'approved',
-            routeInfo: {
-              senderLocation: senderData.location,
-              receiverLocation: receiverData.location
-            }
-          };
-
-          setQuests(prevQuests => prevQuests.map(q => q.id === questId ? updatedQuest : q));
-          setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
-
-          displayRoute(senderData.location, receiverData.location);
+            };
+          }
         }
+      }
+
+      await updateDoc(questRef, updatedQuest);
+
+      setQuests(prevQuests => prevQuests.map(q => q.id === questId ? { ...q, ...updatedQuest } : q));
+      setActiveQuests(prevActiveQuests => [...prevActiveQuests, { ...questData, ...updatedQuest, id: questId }]);
+
+      if (updatedQuest.routeInfo && map) {
+        displayRoute(updatedQuest.routeInfo.senderLocation, updatedQuest.routeInfo.receiverLocation);
       }
 
       showNotification(`Quest approved for ${acceptor.name}!`, 'success');
@@ -519,12 +551,12 @@ const Quests = ({ map, currentUserIds }) => {
 
       const acceptors = await Promise.all(acceptorsIds.map(async (id) => {
         const userDoc = await getDoc(doc(db, 'users', id));
-        return userDoc.data();
+        return { id, ...userDoc.data() };
       }));
 
       const pendingAcceptors = await Promise.all(pendingAcceptorsIds.map(async (id) => {
         const userDoc = await getDoc(doc(db, 'users', id));
-        return userDoc.data();
+        return { id, ...userDoc.data() };
       }));
 
       setAcceptors({ acceptors, pendingAcceptors });
@@ -532,6 +564,7 @@ const Quests = ({ map, currentUserIds }) => {
       setShowAcceptorsModal(true);
     } catch (error) {
       console.error('Error fetching acceptors:', error);
+      showNotification('Failed to fetch acceptors.', 'error');
     }
   };
 
@@ -545,13 +578,13 @@ const Quests = ({ map, currentUserIds }) => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredQuests = quests.filter(quest => {
-    if (quest.isPublic) {
-      return quest.uid === auth.currentUser.receiverId || quest.approvedUser === auth.currentUser.receiverId;
-    } else {
-      return quest.targetUser === auth.currentUser.receiverId || quest.uid === auth.currentUser.receiverId;
-    }
-  });
+const filteredQuests = quests.filter(quest => {
+  if (quest.isPublic) {
+    return quest.uid === auth.currentUser?.receiverId || quest.approvedUser === auth.currentUser?.receiverId;
+  } else {
+    return quest.targetUser === auth.currentUser?.receiverId || quest.uid === auth.currentUser?.receiverId;
+  }
+});
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
@@ -746,56 +779,59 @@ const Quests = ({ map, currentUserIds }) => {
         </div>
       )}
 
-      <div className="quests-list">
-        <div className="quests-column">
-          <h3>Public Quests</h3>
-          {filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser.uid))).length > 0 ? (
-            filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser.uid))).map((quest) => {
-              const sender = users.find(user => user.id === quest.uid) || {};
-              const senderName = sender.name || '';
+<div className="quests-list">
+  <div className="quests-column">
+    <h3>Public Quests</h3>
+    {filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser?.uid))).length > 0 ? (
+      filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser?.uid))).map((quest) => {
+        const sender = users.find(user => user.id === quest.uid) || {};
+        const senderName = sender.name || '';
 
-              return (
-                <div key={quest.id} className="quest-item">
-                  <p><strong>Title:</strong> {quest.title}</p>
-                  <p><strong>Description:</strong> {quest.description}</p>
-                  <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-                  <p><strong>Sender:</strong> {senderName}</p>
+        return (
+          <div key={quest.id} className="quest-item">
+            <p><strong>Title:</strong> {quest.title}</p>
+            <p><strong>Description:</strong> {quest.description}</p>
+            <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+            <p><strong>Sender:</strong> {senderName}</p>
 
-                  {quest.isPublic && auth.currentUser.uid !== quest.uid && !quest.acceptedBy.includes(auth.currentUser.uid) && !quest.pendingAcceptors.includes(auth.currentUser.uid) && (
-                    <div className="quest-actions">
-                      <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
-                      <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
-                    </div>
-                  )}
+            {quest.isPublic && 
+             auth.currentUser?.uid !== quest.uid && 
+             !(Array.isArray(quest.acceptedBy) && quest.acceptedBy.includes(auth.currentUser?.uid)) && 
+             !(Array.isArray(quest.pendingAcceptors) && quest.pendingAcceptors.includes(auth.currentUser?.uid)) && (
+              <div className="quest-actions">
+                <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
+                <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
+              </div>
+            )}
 
-                  {quest.uid === auth.currentUser.uid && (
-                    <div className="quest-actions">
-                      <button className="select-button" onClick={() => handleViewAcceptors(quest)}>View Pending Acceptors</button>
-                      <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel Quest</button>
-                    </div>
-                  )}
+            {quest.uid === auth.currentUser?.uid && (
+              <div className="quest-actions">
+                <button className="select-button" onClick={() => handleViewAcceptors(quest)}>View Pending Acceptors</button>
+                <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel Quest</button>
+              </div>
+            )}
 
-                  {quest.acceptedBy.includes(auth.currentUser.uid) && (
-                    <div className="quest-actions">
-                      <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <p>No public quests.</p>
+            {Array.isArray(quest.acceptedBy) && quest.acceptedBy.includes(auth.currentUser?.uid) && (
+              <div className="quest-actions">
+                <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
+              </div>
+            )}
+          </div>
+        );
+      })
+    ) : (
+      <p>No public quests.</p>
           )}
         </div>
 
         <div className="quests-column">
           <h3>Received Quests</h3>
-          {quests.filter(quest => quest.targetUser === auth.currentUser.uid && !quest.isPublic).length > 0 ? (
-            quests.filter(quest => quest.targetUser === auth.currentUser.uid && !quest.isPublic).map((quest) => {
+          {quests.filter(quest => quest.targetUser === auth.currentUser?.uid && !quest.isPublic).length > 0 ? (
+            quests.filter(quest => quest.targetUser === auth.currentUser?.uid && !quest.isPublic).map((quest) => {
               const sender = users.find(user => user.id === quest.uid) || {};
               const senderName = sender.name || '';
-              const isRecipient = quest.targetUser === auth.currentUser.uid;
-              const isSender = quest.uid === auth.currentUser.uid;
+              const isRecipient = quest.targetUser === auth.currentUser?.uid;
+              const isSender = quest.uid === auth.currentUser?.uid;
 
               return (
                 <div key={quest.id} className="quest-item">
@@ -834,8 +870,8 @@ const Quests = ({ map, currentUserIds }) => {
 
         <div className="quests-column">
           <h3>Sent Quests</h3>
-          {quests.filter(quest => quest.uid === auth.currentUser.uid && !quest.isPublic).length > 0 ? (
-            quests.filter(quest => quest.uid === auth.currentUser.uid && !quest.isPublic).map((quest) => {
+          {quests.filter(quest => quest.uid === auth.currentUser?.uid && !quest.isPublic).length > 0 ? (
+            quests.filter(quest => quest.uid === auth.currentUser?.uid && !quest.isPublic).map((quest) => {
               const acceptor = users.find(user => user.id === quest.acceptedBy) || {};
               const acceptorName = acceptor.name || '';
               const pendingAcceptors = users.filter(user => quest.pendingAcceptors && quest.pendingAcceptors.includes(user.id));
@@ -851,7 +887,7 @@ const Quests = ({ map, currentUserIds }) => {
                       <p><strong>Pending Acceptors:</strong></p>
                       <ul>
                         {pendingAcceptors.map(user => (
-                          <li key={user.id} onClick={() => handleSelectAcceptor(quest, user)}>
+                          <li key={user.receiverId} onClick={() => handleSelectAcceptor(quest, user)}>
                             {user.name}
                             <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
                           </li>
@@ -876,5 +912,5 @@ const Quests = ({ map, currentUserIds }) => {
     </div>
   );
 }
-  
+
 export default Quests;

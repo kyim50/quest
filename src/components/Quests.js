@@ -23,6 +23,7 @@ const Quests = ({ map, currentUserIds }) => {
   const [showAcceptorsModal, setShowAcceptorsModal] = useState(false);
   const [selectedAcceptor, setSelectedAcceptor] = useState(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
+  const [activeQuests, setActiveQuests] = useState([]);
 
   const { showNotification } = useNotification();
 
@@ -204,87 +205,25 @@ const Quests = ({ map, currentUserIds }) => {
     }
   };
 
-  const handleAcceptQuest = async (quest) => {
-    if (!auth.currentUser) {
-      console.error('No authenticated user');
+  const displayRoute = async (senderLocation, receiverLocation) => {
+    if (!map) {
+      console.error('Map object is not available');
       return;
     }
-  
-    console.log('Quest object:', quest);  // Log the entire quest object
-  
-    if (!quest.id) {
-      console.error('Quest ID is missing');
-      return;
-    }
-  
-    const updatedQuest = {
-      ...quest,
-      status: 'accepted',
-    };
-  
-    if (quest.isPublic) {
-      updatedQuest.pendingAcceptors = [...(quest.pendingAcceptors || []), auth.currentUser.uid];
-    } else {
-      updatedQuest.acceptedBy = auth.currentUser.uid;
-    }
-  
+
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${senderLocation.longitude},${senderLocation.latitude};${receiverLocation.longitude},${receiverLocation.latitude}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
     try {
-      const questRef = doc(db, 'quests', quest.id);
-      await updateDoc(questRef, updatedQuest);
-      setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
-      showNotification('Quest accepted!', 'success');
-  
-      if (!quest.uid) {
-        console.error('Sender ID is missing from the quest object');
-        return;
-      }
-  
-      // Fetch the sender's location from the database
-      const senderRef = doc(db, 'users', quest.uid);
-      const senderDoc = await getDoc(senderRef);
-      
-      if (!senderDoc.exists()) {
-        console.error('Sender document not found');
-        return;
-      }
-  
-      const senderData = senderDoc.data();
-      console.log('Sender data:', senderData);
-  
-      if (!senderData || !senderData.location) {
-        console.error('Sender location not found');
-        return;
-      }
-  
-      const senderLocation = senderData.location;
-      console.log('Sender location:', senderLocation);
-  
-      if (!map) {
-        console.error('Map object is not available');
-        return;
-      }
-  
-      // Get the current user's location
-      const userLocation = map.getCenter();
-      console.log('User location:', userLocation);
-  
-      // Calculate and display the route
-      const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${senderLocation.longitude},${senderLocation.latitude};${userLocation.lng},${userLocation.lat}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-  
-      console.log('Fetching route from URL:', url);
-  
       const response = await fetch(url);
       const data = await response.json();
-  
-      console.log('Route data:', data);
-  
+
       if (!data.routes || data.routes.length === 0) {
         console.error('No route found in the response');
         return;
       }
-  
+
       const route = data.routes[0].geometry;
-  
+
       if (map.getSource('route')) {
         map.getSource('route').setData(route);
       } else {
@@ -300,62 +239,138 @@ const Quests = ({ map, currentUserIds }) => {
             'line-cap': 'round'
           },
           paint: {
-            'line-color': '#007bff',
+            'line-color': '#00FFFF',
             'line-width': 5,
             'line-opacity': 0.75
           }
         });
       }
-  
-      // Add a marker at the sender's location
-      if (map.getSource('sender')) {
-        map.getSource('sender').setData({
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: [senderLocation.longitude, senderLocation.latitude]
-          }
-        });
-      } else {
-        map.addLayer({
-          id: 'sender',
-          type: 'circle',
-          source: {
-            type: 'geojson',
-            data: {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'Point',
-                coordinates: [senderLocation.longitude, senderLocation.latitude]
-              }
+
+      const addMarker = (id, location, color) => {
+        if (map.getSource(id)) {
+          map.getSource(id).setData({
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [location.longitude, location.latitude]
             }
-          },
-          paint: {
-            'circle-radius': 10,
-            'circle-color': '#3887be'
-          }
-        });
-      }
-  
-      // Fit the map bounds to include both the sender's location and the current user's location
+          });
+        } else {
+          map.addLayer({
+            id: id,
+            type: 'circle',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'Point',
+                  coordinates: [location.longitude, location.latitude]
+                }
+              }
+            },
+            paint: {
+              'circle-radius': 10,
+              'circle-color': color
+            }
+          });
+        }
+      };
+
+      addMarker('sender', senderLocation, '#3887be');
+      addMarker('receiver', receiverLocation, '#f30');
+
       const bounds = new mapboxgl.LngLatBounds()
         .extend([senderLocation.longitude, senderLocation.latitude])
-        .extend([userLocation.lng, userLocation.lat]);
+        .extend([receiverLocation.longitude, receiverLocation.latitude]);
       map.fitBounds(bounds, { padding: 50 });
-  
+
+    } catch (error) {
+      console.error('Error fetching or displaying route:', error);
+    }
+  };
+
+  const removeRoute = () => {
+    if (map.getLayer('route')) {
+      map.removeLayer('route');
+    }
+    if (map.getSource('route')) {
+      map.removeSource('route');
+    }
+    if (map.getLayer('sender')) {
+      map.removeLayer('sender');
+    }
+    if (map.getSource('sender')) {
+      map.removeSource('sender');
+    }
+    if (map.getLayer('receiver')) {
+      map.removeLayer('receiver');
+    }
+    if (map.getSource('receiver')) {
+      map.removeSource('receiver');
+    }
+  };
+
+  const handleAcceptQuest = async (quest) => {
+    if (!auth.currentUser) {
+      console.error('No authenticated user');
+      return;
+    }
+
+    console.log('Quest object:', quest);
+
+    if (!quest.id) {
+      console.error('Quest ID is missing');
+      return;
+    }
+
+    const updatedQuest = {
+      ...quest,
+      status: quest.isPublic ? 'pending' : 'accepted',
+    };
+
+    if (quest.isPublic) {
+      updatedQuest.pendingAcceptors = [...(quest.pendingAcceptors || []), auth.currentUser.uid];
+    } else {
+      updatedQuest.acceptedBy = auth.currentUser.uid;
+    }
+
+    try {
+      const questRef = doc(db, 'quests', quest.id);
+      const senderDoc = await getDoc(doc(db, 'users', quest.uid));
+      const receiverDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+
+      if (senderDoc.exists() && receiverDoc.exists()) {
+        const senderData = senderDoc.data();
+        const receiverData = receiverDoc.data();
+
+        if (senderData.location && receiverData.location) {
+          updatedQuest.routeInfo = {
+            senderLocation: senderData.location,
+            receiverLocation: receiverData.location
+          };
+
+          await updateDoc(questRef, updatedQuest);
+          setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
+          setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
+
+          displayRoute(senderData.location, receiverData.location);
+        }
+      }
+
+      showNotification('Quest accepted!', 'success');
     } catch (error) {
       console.error('Error accepting quest:', error);
       showNotification('Failed to accept quest.', 'error');
     }
   };
-  
 
-  const handleApproveAcceptor = async (questId) => {
-    console.log('Approving acceptor:', selectedAcceptor);
+  const handleApproveAcceptor = async (questId, acceptor) => {
+    console.log('Approving acceptor:', acceptor);
 
-    if (!selectedAcceptor) {
+    if (!acceptor) {
       console.error('Selected acceptor is not defined.');
       return;
     }
@@ -369,23 +384,50 @@ const Quests = ({ map, currentUserIds }) => {
         throw new Error('Quest data is missing.');
       }
 
-      // Filter out the selectedAcceptor from pendingAcceptors and add it to acceptedBy
-      const newPendingAcceptors = questData.pendingAcceptors ? questData.pendingAcceptors.filter(id => id !== selectedAcceptor.id) : [];
-      const newAcceptedBy = questData.acceptedBy ? [...questData.acceptedBy, selectedAcceptor.id] : [selectedAcceptor.id];
+      const newPendingAcceptors = questData.pendingAcceptors ? questData.pendingAcceptors.filter(id => id !== acceptor.id) : [];
+      const newAcceptedBy = questData.acceptedBy ? [...questData.acceptedBy, acceptor.id] : [acceptor.id];
 
-      // Update the quest document
-      await updateDoc(questRef, {
-        pendingAcceptors: newPendingAcceptors,
-        acceptedBy: newAcceptedBy,
-        targetUser: selectedAcceptor.id // Set the target user
-      });
+      const senderDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+      const receiverDoc = await getDoc(doc(db, 'users', acceptor.id));
 
-      setQuests(prevQuests => prevQuests.map(q =>
-        q.id === questId ? { ...q, pendingAcceptors: newPendingAcceptors, acceptedBy: newAcceptedBy, targetUser: selectedAcceptor.id } : q
-      ));
+      if (senderDoc.exists() && receiverDoc.exists()) {
+        const senderData = senderDoc.data();
+        const receiverData = receiverDoc.data();
 
-      showNotification(`Quest approved for ${selectedAcceptor.name}!`, 'success');
-      setShowApproveModal(false);
+        if (senderData.location && receiverData.location) {
+          await updateDoc(questRef, {
+            pendingAcceptors: newPendingAcceptors,
+            acceptedBy: newAcceptedBy,
+            targetUser: acceptor.id,
+            status: 'approved',
+            routeInfo: {
+              senderLocation: senderData.location,
+              receiverLocation: receiverData.location
+            }
+          });
+
+          const updatedQuest = {
+            ...questData,
+            id: questId,
+            pendingAcceptors: newPendingAcceptors,
+            acceptedBy: newAcceptedBy,
+            targetUser: acceptor.id,
+            status: 'approved',
+            routeInfo: {
+              senderLocation: senderData.location,
+              receiverLocation: receiverData.location
+            }
+          };
+
+          setQuests(prevQuests => prevQuests.map(q => q.id === questId ? updatedQuest : q));
+          setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
+
+          displayRoute(senderData.location, receiverData.location);
+        }
+      }
+
+      showNotification(`Quest approved for ${acceptor.name}!`, 'success');
+      setShowAcceptorsModal(false);
     } catch (error) {
       console.error('Error approving acceptor:', error);
       showNotification('Failed to approve acceptor.', 'error');
@@ -397,12 +439,62 @@ const Quests = ({ map, currentUserIds }) => {
       const questRef = doc(db, 'quests', questId);
       await deleteDoc(questRef);
       setQuests(quests.filter(quest => quest.id !== questId));
+      setActiveQuests(activeQuests.filter(quest => quest.id !== questId));
       showNotification('Quest completed and deleted!', 'success');
+      removeRoute();
     } catch (error) {
       console.error('Error completing quest:', error);
       showNotification('Failed to complete quest.', 'error');
     }
   };
+
+  useEffect(() => {
+    if (auth.currentUser && map) {
+      const unsubscribe = onSnapshot(
+        query(
+          collection(db, 'quests'),
+          where('status', 'in', ['approved', 'pending']),
+          where('uid', '==', auth.currentUser.uid)
+        ),
+        (snapshot) => {
+          const userQuests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setActiveQuests(userQuests);
+
+          userQuests.forEach(quest => {
+            if (quest.routeInfo) {
+              displayRoute(quest.routeInfo.senderLocation, quest.routeInfo.receiverLocation);
+            }
+          });
+        }
+      );
+
+      return () => unsubscribe();
+    }
+  }, [auth.currentUser, map]);
+
+  useEffect(() => {
+    if (auth.currentUser && map) {
+      const unsubscribe = onSnapshot(
+        query(
+          collection(db, 'quests'),
+          where('status', '==', 'approved'),
+          where('acceptedBy', 'array-contains', auth.currentUser.uid)
+        ),
+        (snapshot) => {
+          const acceptedQuests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setActiveQuests(prevActiveQuests => [...prevActiveQuests, ...acceptedQuests]);
+
+          acceptedQuests.forEach(quest => {
+            if (quest.routeInfo) {
+              displayRoute(quest.routeInfo.senderLocation, quest.routeInfo.receiverLocation);
+            }
+          });
+        }
+      );
+
+      return () => unsubscribe();
+    }
+  }, [auth.currentUser, map]);
 
   const handleCancelQuest = async (questId) => {
     try {
@@ -628,19 +720,6 @@ const Quests = ({ map, currentUserIds }) => {
         </div>
       )}
 
-      {showApproveModal && selectedAcceptor && (
-        <div className="modal-overlay">
-          <div className="modal approve-modal">
-            <h3>Approve Acceptor</h3>
-            <p>Are you sure you want to approve {selectedAcceptor.name} for this quest?</p>
-            <div className="modal-actions">
-              <button className="confirm-button" onClick={() => handleApproveAcceptor(selectedQuest.id)}>Approve</button>
-              <button className="cancel-button" onClick={() => setShowApproveModal(false)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showAcceptorsModal && (
         <div className="modal-overlay">
           <div className="modal acceptors-modal">
@@ -653,12 +732,12 @@ const Quests = ({ map, currentUserIds }) => {
             <h3>Pending Acceptors</h3>
             <ul>
               {acceptors.pendingAcceptors.map((user, index) => (
-                <li key={index}>
+                <li 
+                  key={index}
+                  onClick={() => handleApproveAcceptor(selectedQuest.id, user)}
+                  className="selectable-user"
+                >
                   {user.name}
-                  <button className="select-button" onClick={() => {
-                    setSelectedAcceptor(user);
-                    setShowApproveModal(true);
-                  }}>Select</button>
                 </li>
               ))}
             </ul>
@@ -730,14 +809,15 @@ const Quests = ({ map, currentUserIds }) => {
                       <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel</button>
                     </div>
                   )}
-                  {isRecipient && quest.status !== 'accepted' ? (
+                  {isRecipient && quest.status === 'pending' && (
                     <div className="quest-actions">
                       <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
                       <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
                     </div>
-                  ) : isSender ? (
+                  )}
+                  {isSender && (
                     <p>Status: {quest.status}</p>
-                  ) : null}
+                  )}
                   {quest.acceptedBy && (
                     <div>
                       <p><strong>Accepted By:</strong> {users.find(user => user.id === quest.acceptedBy)?.name || 'Pending acceptance'}</p>

@@ -26,7 +26,8 @@ export const updateUserLocation = async (latitude, longitude) => {
   }
 };
 
-export const addMarker = (map, latitude, longitude, profilePhotoUrl, name, bio) => {
+export const addMarker = (map, latitude, longitude, userData) => {
+  console.log('Adding marker for user:', userData);
   if (!map || typeof map.addLayer !== 'function') {
     console.error('Invalid map object in addMarker');
     return null;
@@ -36,17 +37,18 @@ export const addMarker = (map, latitude, longitude, profilePhotoUrl, name, bio) 
   el.className = 'marker-container';
 
   const img = document.createElement('img');
-  img.src = profilePhotoUrl || '/default-profile.png';
-  img.alt = name;
+  img.src = userData.profilePhoto || '/default-profile.png';
+  img.alt = userData.name || 'User';
+  img.className = 'marker-image';
 
   let errorLogged = false;
 
   img.onerror = () => {
     if (!errorLogged) {
-      console.warn(`Failed to load image for ${name}, default profile used.`);
-      errorLogged = true; // Log the error only once
+      console.warn(`Failed to load image for ${userData.name || 'user'}, default profile used.`);
+      errorLogged = true;
     }
-    img.src = '/default-profile.png'; // Fallback to default image
+    img.src = '/default-profile.png';
   };
 
   el.appendChild(img);
@@ -57,17 +59,74 @@ export const addMarker = (map, latitude, longitude, profilePhotoUrl, name, bio) 
 
   // Create a new marker
   const marker = new mapboxgl.Marker(el)
-    .setLngLat([longitude, latitude]);
+    .setLngLat([longitude, latitude])
+    .addTo(map);
 
-  // Add the marker to the map
-  marker.addTo(map);
+  console.log('Marker created:', marker);
 
-  // Create a popup
-  const popup = new mapboxgl.Popup({ offset: 25 })
-    .setHTML(`<h3>${name}</h3><p>${bio}</p>`);
+  // Create a custom popup
+  const popup = new mapboxgl.Popup({
+    offset: 25,
+    closeButton: false,
+    closeOnClick: false,
+    maxWidth: 'none'
+  });
+
+  // Create the popup content
+  const popupContent = document.createElement('div');
+  popupContent.className = 'custom-popup';
+  popupContent.innerHTML = `
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="profile-photo-container">
+          <img src="${userData.profilePhoto || '/default-profile.png'}" alt="${userData.name || 'User'}" class="profile-photo">
+        </div>
+        <div class="profile-info">
+          <h2 class="profile-name">${userData.name || 'Unknown User'}</h2>
+          <p class="profile-status"><span class="status-dot"></span> Active</p>
+          <p class="profile-bio">${userData.bio || 'No bio available'}</p>
+        </div>
+      </div>
+      <div class="tags-container">
+        ${(userData.tags || []).map(tag => `<div class="tag">${tag}</div>`).join('')}
+      </div>
+      <button class="add-friend-button">Add Friend</button>
+    </div>
+  `;
+
+  // Add friend functionality
+  const addFriendButton = popupContent.querySelector('.add-friend-button');
+  addFriendButton.addEventListener('click', async () => {
+    console.log('Add friend button clicked');
+    try {
+      const currentUserRef = doc(db, 'users', auth.currentUser.uid);
+      const currentUserDoc = await getDoc(currentUserRef);
+      const currentUserData = currentUserDoc.data();
+      const friends = currentUserData.friends || [];
+
+      if (!friends.includes(userData.id)) {
+        await updateDoc(currentUserRef, {
+          friends: [...friends, userData.id]
+        });
+        addFriendButton.textContent = 'Friend Added';
+        addFriendButton.disabled = true;
+      }
+    } catch (error) {
+      console.error('Error adding friend:', error);
+    }
+  });
+
+  popup.setDOMContent(popupContent);
 
   // Attach the popup to the marker
   marker.setPopup(popup);
+
+  // Show popup on click
+  marker.getElement().addEventListener('click', (e) => {
+    console.log('Marker clicked:', userData);
+    e.stopPropagation(); // Prevent the click from being captured by the map
+    popup.addTo(map);
+  });
 
   return marker;
 };
@@ -101,6 +160,7 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
     snapshot.forEach(async (doc) => {
       const userId = doc.id;
       const userData = doc.data();
+      console.log('Processing user:', userId, userData);
 
       // Determine if the user should be visible based on privacy settings and friendship
       const isVisible = !userData.isPrivate || 
@@ -117,31 +177,34 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
         const inactiveTime = currentTimestamp - lastActivityTimestamp;
 
         if (inactiveTime > 300000) {
-          // Remove the marker for inactive users
+          console.log('Removing inactive user:', userId);
           if (markers[userId]) {
             markers[userId].remove();
             delete markers[userId];
           }
         } else {
-          // Update or add marker for active users
           if (markers[userId]) {
-            // Update existing marker position
+            console.log('Updating marker for user:', userId);
             markers[userId].setLngLat([userData.location.longitude, userData.location.latitude]);
           } else {
-            // Add new marker for active user
+            console.log('Adding new marker for user:', userId);
             const marker = addMarker(
               map,
               userData.location.latitude,
               userData.location.longitude,
-              userData.profilePhoto,
-              userData.name,
-              userData.bio
+              {
+                id: userId,
+                name: userData.name,
+                profilePhoto: userData.profilePhoto,
+                bio: userData.bio,
+                tags: userData.tags
+              }
             );
             if (marker) markers[userId] = marker;
           }
         }
       } else {
-        // Remove markers for users who are no longer visible
+        console.log('Removing marker for non-visible user:', userId);
         if (markers[userId]) {
           markers[userId].remove();
           delete markers[userId];
@@ -152,6 +215,7 @@ export const setupUserLocationsListener = (map, setCurrentUserIds) => {
     // Remove markers for users no longer in the active snapshot
     Object.keys(markers).forEach(markerId => {
       if (!activeUserIds.has(markerId)) {
+        console.log('Removing marker for user no longer in snapshot:', markerId);
         markers[markerId].remove();
         delete markers[markerId];
       }

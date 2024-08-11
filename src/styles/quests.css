@@ -371,3 +371,14 @@ input:checked + .slider:before {
 .acceptors-modal li:last-child {
   border-bottom: none;
 }
+
+.selectable-user {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.selectable-user:hover {
+  background-color: #3A3A3C;
+}

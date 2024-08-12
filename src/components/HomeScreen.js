@@ -6,6 +6,7 @@ import MapComponent from './MapComponent';
 import UserProfile from './UserProfile';
 import QuestsComponent from './QuestsComponent';
 import ConnectionsComponent from './ConnectionsComponent';
+import HistorySection from './HistorySection'; // Make sure this import is correct
 import NavigationBar from './NavigationBar';
 import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
@@ -40,6 +41,30 @@ const HomeScreen = () => {
     }
   };
 
+  const renderSection = () => {
+    switch(activeSection) {
+      case 'profile-section':
+        return <UserProfile />;
+      case 'quests-section':
+        return (
+          <QuestsComponent 
+            isOpen={isQuestWindowOpen} 
+            quests={quests} 
+            currentUserIds={currentUserIds} 
+            map={map}
+          />
+        );
+      case 'connections-section':
+        return <ConnectionsComponent currentUserIds={currentUserIds} />;
+      case 'history-section':
+        console.log('Rendering HistorySection');
+        console.log('HistorySection component:', HistorySection);
+        return HistorySection ? <HistorySection currentUser={auth.currentUser} /> : <div>History Section not available</div>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="map-container">
       <div className="logout-container">
@@ -62,16 +87,7 @@ const HomeScreen = () => {
       />
 
       <div className={`rectangular-container ${activeSection ? '' : 'hidden'}`} id="content-container">
-        {activeSection === 'profile-section' && <UserProfile />}
-        {activeSection === 'quests-section' && (
-          <QuestsComponent 
-            isOpen={isQuestWindowOpen} 
-            quests={quests} 
-            currentUserIds={currentUserIds} 
-            map={map}
-          />
-        )}
-        {activeSection === 'connections-section' && <ConnectionsComponent currentUserIds={currentUserIds} />}
+        {renderSection()}
       </div>
 
       <NavigationBar activeSection={activeSection} showSection={showSection} />

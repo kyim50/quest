@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginScreen from "../src/components/LoginScreen";
 import RegisterScreen from "../src/components/RegisterScreen";
 import HomeScreen from "../src/components/HomeScreen";
-import AdventureFeed from "../src/components/AdventureFeed";
 import { NotificationProvider } from "./NotificationContext";
 import NotificationDisplay from "./NotificationDisplay";
 import LandingPage from "./LandingPage";
@@ -29,7 +28,6 @@ function App() {
             path="/adventure-feed"
             element={
               <>
-                <AdventureFeed />
                 <NotificationDisplay />
               </>
             }

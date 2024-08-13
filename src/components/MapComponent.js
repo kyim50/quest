@@ -21,6 +21,7 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap }) => {
         style: 'mapbox://styles/kyim50/clzniqnmq009s01qgee0a13s0',
         center: [0, 0],
         zoom: 2,
+        attributionControl: false,
       });
 
       newMap.on('load', () => {
@@ -51,6 +52,8 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap }) => {
       }
     };
   }, [mapLoaded, mapInstance, setAddress, setCurrentUserIds]);
+
+  
 
   const handleQuestAccepted = async (quest) => {
     if (mapInstance && quest.senderLocation) {

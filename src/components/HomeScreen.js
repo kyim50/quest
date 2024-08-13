@@ -73,12 +73,6 @@ const HomeScreen = () => {
         </button>
       </div>
 
-      <div className="adventure-btn-container">
-        <button className="add-adventure-btn" onClick={() => navigate('/adventure-feed')}>
-          +
-        </button>
-      </div>
-
       <MapComponent 
         address={address} 
         setAddress={setAddress} 

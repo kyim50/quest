@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Camera } from 'react-camera-pro';
 import { Grid, Tab, Tabs, Button, TextField, CircularProgress } from '@mui/material';
+import { FlashOn, CameraAlt, Refresh } from '@mui/icons-material';
 import {
   auth,
   db,
@@ -20,6 +21,7 @@ const HistorySection = ({ currentUser }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [quests, setQuests] = useState([]);
   const cameraRef = useRef(null);
+  const [facingMode, setFacingMode] = useState('environment');
 
   useEffect(() => {
     fetchQuests();
@@ -43,6 +45,10 @@ const HistorySection = ({ currentUser }) => {
   const handleCapture = () => {
     const imageSrc = cameraRef.current.takePhoto();
     setCapturedImage(imageSrc);
+  };
+
+  const handleFlipCamera = () => {
+    setFacingMode(prevMode => prevMode === 'user' ? 'environment' : 'user');
   };
 
   const handleUpload = async () => {
@@ -87,24 +93,44 @@ const HistorySection = ({ currentUser }) => {
 
       {activeTab === 0 && (
         <div className="capture-tab">
-          <Camera ref={cameraRef} />
-          <Button onClick={handleCapture} disabled={isLoading}>
-            Capture
-          </Button>
-          {capturedImage && (
-            <>
-              <img src={capturedImage} alt="Captured" style={{ maxWidth: '100%' }} />
-              <TextField
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                placeholder="Add a caption..."
-                fullWidth
-                margin="normal"
+          <div className="camera-container">
+            <div className="camera-wrapper">
+              <Camera
+                ref={cameraRef}
+                facingMode={facingMode}
+                aspectRatio={1}
+                errorMessages={{}}
               />
+            </div>
+            <div className="camera-controls">
+              <button className="control-button flash-button">
+                <FlashOn />
+              </button>
+              <button className="control-button capture-button" onClick={handleCapture}>
+                <CameraAlt />
+              </button>
+              <button className="control-button flip-button" onClick={handleFlipCamera}>
+                <Refresh />
+              </button>
+            </div>
+          </div>
+          {capturedImage && (
+            <div className="preview-container">
+              <img src={capturedImage} alt="Captured" className="captured-image" />
+              <div className="caption-bubble">
+                <TextField
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  placeholder="Add a caption..."
+                  fullWidth
+                  margin="normal"
+                  variant="standard"
+                />
+              </div>
               <Button onClick={handleUpload} disabled={isLoading}>
                 {isLoading ? <CircularProgress size={24} /> : 'Upload'}
               </Button>
-            </>
+            </div>
           )}
         </div>
       )}

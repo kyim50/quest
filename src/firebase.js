@@ -145,24 +145,33 @@ export const signInWithEmailAndPassword = async (email, password) => {
 
 
 // Function to upload a file to Firebase Storage and get the download URL
-export const uploadImage = (file) => {
-  return new Promise((resolve, reject) => {
-    const storageRef = ref(storage, `profile_photos/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+export const uploadImage = async (file) => {
+  const storage = getStorage();
+  const storageRef = ref(storage, `profile_photos/${auth.currentUser.uid}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
 
-    uploadTask.on(
-      'state_changed',
-      null,
+  return new Promise((resolve, reject) => {
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        // You can handle progress here if needed
+      },
       (error) => {
+        console.error('Error uploading image:', error);
         reject(error);
       },
       async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve(downloadURL);
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(downloadURL);
+        } catch (error) {
+          console.error('Error getting download URL:', error);
+          reject(error);
+        }
       }
     );
   });
 };
+
 
 // Function to update user profile in Firestore
 // Function to update user profile in Firestore

@@ -60,13 +60,20 @@ const UserProfile = () => {
 
   const handleSaveProfile = async () => {
     try {
+      let photoURL = profilePhoto;
+      if (selectedPhoto) {
+        // Upload the new photo to Firebase Storage
+        photoURL = await uploadImage(selectedPhoto);
+      }
+
       await updateUserProfile(auth.currentUser.uid, {
         name,
         bio,
-        profilePhoto: selectedPhoto ? URL.createObjectURL(selectedPhoto) : profilePhoto,
+        profilePhoto: photoURL,
         tags,
       });
       setIsEditing(false);
+      setSelectedPhoto(null);
       showNotification('Profile updated successfully!', 'success');
     } catch (error) {
       console.error('Error updating profile:', error);

@@ -72,7 +72,10 @@ const RegisterScreen = () => {
   return (
     <section className="register-container">
       <div className="register-section">
-        <h2>Register</h2>
+        <h2>Create New Account</h2>
+        <p style={{ marginTop: '10px' }}>
+          Already a user? <Link to="/login" style={{ color: '#007BFF' }}>Login here.</Link>
+        </p>
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
           {({ isSubmitting, errors }) => (
             <Form className="register-form">
@@ -92,20 +95,21 @@ const RegisterScreen = () => {
                 </div>
               </div>
               <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+            
+            <section className= "button-container">
 
+              
+            </section>
               <button type="submit" disabled={isSubmitting}>Register</button>
               {errors.general && <div style={{ color: 'red', marginTop: '10px' }}>{errors.general}</div>}
             </Form>
           )}
         </Formik>
-        <div className="separator"></div> {/* Thin line separating the buttons */}
 
         <button className="google-register-btn" onClick={handleGoogleSignUp}>
           <FaGoogle /> Register with Google
         </button>
-        <p style={{ marginTop: '10px' }}>
-          Already have an account? <Link to="/login" style={{ color: '#007BFF' }}>Login</Link>
-        </p>
+        
       </div>
     </section>
   );

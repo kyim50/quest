@@ -12,7 +12,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden; /* Prevent scrolling */
-    background-color: rgb(229, 229, 234);
+    background-color: rgb(28,28,30);
 }
 
 /* Register container */
@@ -20,14 +20,14 @@ body {
     display: flex;
     flex-direction: column; /* Stack elements vertically */
     justify-content: center;
-    align-items: flex-end; /* Align items to the right */
+    align-items: flex-start; /* Align items to the left */
     width: 80%;
-    max-width: 500px; /* Adjust width as needed */
-    background-color: rgb(242, 242, 247); /* Semi-transparent white background */
+    max-width: 700px; /* Adjust width as needed */
+    background-color: rgb(58,58,60); /* Semi-transparent white background */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    text-align: left; /* Align text to the left */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -36,13 +36,13 @@ body {
 
 /* Register section styling */
 .register-section {
-    width: 100%; /* Take full width of container */
+    width: 50%; /* Constrain to 50% of the container */
     padding: 20px;
 }
 
 .register-section h2 {
     margin-bottom: 20px;
-    color: #333; /* Dark text color */
+    color: #fff; /* Dark text color */
 }
 
 .register-form {
@@ -53,11 +53,11 @@ body {
 .register-form input {
     width: 100%;
     padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
+    margin-bottom: 30px;
+    border: none;
     border-radius: 10px;
     font-size: 16px;
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(99,99,102);
     color: rgb(255, 255, 255);
     outline: none; /* Remove outline on focus */
 }
@@ -97,10 +97,11 @@ body {
 .register-form button:hover {
     background-color: #0056b3;
 }
+
 .separator {
     width: 90%;
     height: 1px;
-    margin-bottom:20px;
+    margin-bottom: 20px;
     background-color: #ccc; /* Thin line color */
 }
 
@@ -115,7 +116,7 @@ body {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-bottom:10px;
+    margin-bottom: 10px;
 }
 
 .google-register-btn:hover {

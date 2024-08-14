@@ -17,35 +17,58 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 60%; /* Restrict width to 60% of the container */
+    width: 60%;
     margin-top: 30px;
 }
 
-
 .register-form input {
-    width: 100%; /* Make the input take up 100% of the form's width (60% of container) */
+    width: 100%;
     padding: 10px;
-    height: 60px;
+    height: 40px;
     margin: 15px 0;
     background-color: rgb(99, 99, 102);
-    border-radius: 20px;
-    border: none; /* Remove any default borders */
-    box-shadow: none; /* Prevent any default shadow */
+    
+    border: none;
+    box-shadow: none;
     font-size: 16px;
-    color: white; /* Ensure text color remains white */
+    color: white;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Ensure consistent styling for all input fields, including the username */
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="password"] {
+    border-radius: 15px;
+    outline: none;
+    background-clip: padding-box;
+    border: 1px solid transparent;
 }
 
 /* Prevent color or border change on focus */
 .register-form input:focus,
 .register-form input:active {
-    background-color: rgb(99, 99, 102); /* Keep background color consistent */
-    outline: none; /* Remove the border on focus */
-    box-shadow: none; /* Prevent any shadow or highlight effect */
+    background-color: rgb(99, 99, 102);
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+
+/* Remove autofill background color */
+.register-form input:-webkit-autofill,
+.register-form input:-webkit-autofill:hover,
+.register-form input:-webkit-autofill:focus,
+.register-form input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgb(99, 99, 102) inset !important;
+    -webkit-text-fill-color: white !important;
 }
 
 .password-container {
     position: relative;
-    width: 100%; /* Match input width */
+    width: 100%;
 }
 
 .password-container input {
@@ -64,7 +87,8 @@
 .button-container {
     display: flex;
     justify-content: space-between;
-    width: 100%; /* Make buttons match the form's width */
+    align-items: center;
+    width: 100%;
     margin-top: 20px;
 }
 
@@ -73,29 +97,51 @@ button {
     background-color: rgb(10,145,255);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 15px;
+    height:40px;
+    font-size: 18px;
+    font-weight: 600;
     cursor: pointer;
-    width: 48%; /* Make the buttons equal in width */
+    width: 48%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    transition: width 0.3s, background-color 0.3s;
 }
 
+button:hover{
+    background-color: rgb(9, 126, 221);
+    width:49%;
+}
+.google-register-btn:hover{
+    background-color: #d8d5d5;
+    width:49%;
+}
 .google-register-btn {
     background-color: #fff;
-    color: rgb(10,145,255); /* Set text color */
     border: none;
-    border-radius: 5px;
+    border-radius: 15px;
     cursor: pointer;
-    width: 48%; /* Make the buttons equal in width */
+    width: 48%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    transition: width 0.3s, background-color 0.3s;
 }
 
+.google-register-btn img{
+    height:25px;
+    width:auto;
+}
 .createacc {
-    font-size: 32px;
-    text-align: left; /* Align title to the left */
-    width: 100%; /* Full width for proper left alignment */
+    font-size: 28px;
+    text-align: left;
+    width: 100%;
 }
 
 .aauser {
-    font-size: 18px;
-    text-align: left; /* Align the "Already a user?" to the left */
+    font-size: 14px;
+    text-align: left;
     width: 100%;
     margin-bottom: 20px;
 }

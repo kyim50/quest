@@ -19,11 +19,7 @@ const RegisterScreen = () => {
     password: ''
   };
 
-  const validationSchema = Yup.object({
-    name: Yup.string().required('Required'),
-    email: Yup.string().email('Invalid email address').required('Required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Required') // Updated validation
-  });
+  
 
   const onSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
@@ -76,17 +72,17 @@ const RegisterScreen = () => {
         <p className="aauser">
           Already a user? <Link to="/login" style={{ color: 'rgb(10,145,255)' }}>Login here.</Link>
         </p>
-        <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+        <Formik initialValues={initialValues}  onSubmit={onSubmit}>
           {({ isSubmitting, errors }) => (
             <Form className="register-form">
-            <Field className="username" type="text" name="name" placeholder="Username" />
+            <Field className="username" type="text" name="name" placeholder="Username" required/>
             <ErrorMessage name="name" component="div" style={{ color: 'red' }} />
             <Field type="email" name="email" placeholder="Email" />
-            <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
+            <ErrorMessage name="email" component="div" style={{ color: 'red' }} required />
             
             {/* Password input with toggle icon */}
             <div className="password-container">
-                <Field type={showPassword ? "text" : "password"} name="password" placeholder="Password" />
+                <Field type={showPassword ? "text" : "password"} name="password" placeholder="Password" required/>
                 <div className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
@@ -94,8 +90,8 @@ const RegisterScreen = () => {
             <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
             
             <div className="button-container">
-                <button className="google-register-btn" onClick={handleGoogleSignUp}>
-                    <FaGoogle /> Register with Google
+                <button className="google-register-btn" onClick={handleGoogleSignUp} required>
+                    <img src="/google-logo.png" alt="Google" className="google-logo" />
                 </button>
                 <button type="submit" disabled={isSubmitting}>Register</button>
                 

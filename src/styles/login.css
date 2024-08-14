@@ -40,7 +40,7 @@ body {
 }
 
 /* Registration and Login form styling */
-.register-form {
+.login-form {
     width: 100%; /* Take full width of container */
     padding: 20px;
     position: relative; /* To position eye icon within */
@@ -55,12 +55,12 @@ body {
 }
 
 /* Register and Login form input styling */
-.register-form input {
+.login-form input {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
     border: 2px solid #0a0a0a;
-    border-radius: 10px;
+    border-radius: 300px;
     font-size: 16px;
     background-color: rgb(0, 0, 0);
     color: rgb(134, 134, 134);
@@ -89,7 +89,7 @@ body {
 }
 
 /* Button styling */
-.register-form button {
+.login-form button {
     width: 100%;
     padding: 10px;
     background-color: rgb(16,17,17);
@@ -102,7 +102,7 @@ body {
     margin-top: 30px;
 }
 
-.register-form button:hover {
+.login-form button:hover {
     background-color: #0056b3;
     transition: background-color 0.3s ease; /* Smooth transition on hover */
 }
@@ -123,7 +123,7 @@ body {
     padding-bottom: 10px;
 }
 
-.login-section a.register-btn {
+.login-section a.gotoregister {
     display: block;
     width: 92%; /* Make button same width as login button */
     margin-left: 20px;
@@ -141,7 +141,7 @@ body {
     padding-bottom: 10px;
 }
 
-.login-section a.register-btn:hover {
+.login-section a.gotoregister:hover {
     background-color: #080808;
     text-decoration: none;
 }

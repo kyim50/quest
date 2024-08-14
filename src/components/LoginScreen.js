@@ -67,7 +67,7 @@ const LoginScreen = () => {
 
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
           {({ isSubmitting }) => (
-            <Form className="register-form">
+            <Form className="login-form">
               <Field type="email" name="email" placeholder="Email Address" required />
               <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
               
@@ -104,7 +104,7 @@ const LoginScreen = () => {
         <p className="or-text">or</p>
 
         <p className="login-section">
-          <Link to="/register" className="register-btn">
+          <Link to="/register" className="gotoregister">
             Register here
           </Link>
         </p>

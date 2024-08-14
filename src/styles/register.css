@@ -1,128 +1,101 @@
-/* Reset default margins and paddings, and set box-sizing to border-box */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Helvetica, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Body styling */
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* Prevent scrolling */
-    background-color: rgb(28,28,30);
-}
-
-/* Register container */
 .register-container {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    justify-content: center;
-    align-items: flex-start; /* Align items to the left */
-    width: 80%;
-    max-width: 700px; /* Adjust width as needed */
-    background-color: rgb(58,58,60); /* Semi-transparent white background */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: left; /* Align text to the left */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-/* Register section styling */
-.register-section {
-    width: 50%; /* Constrain to 50% of the container */
-    padding: 20px;
-}
-
-.register-section h2 {
-    margin-bottom: 20px;
-    color: #fff; /* Dark text color */
+    height: 70%;
+    width: 60%;
+    border-radius: 20px;
+    min-width: 800px;
+    min-height: 300px;
+    padding: 20px 30px;
+    background-color: rgb(58, 58, 60);
 }
 
 .register-form {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 60%; /* Restrict width to 60% of the container */
+    margin-top: 30px;
 }
+
 
 .register-form input {
-    width: 100%;
+    width: 100%; /* Make the input take up 100% of the form's width (60% of container) */
     padding: 10px;
-    margin-bottom: 30px;
-    border: none;
-    border-radius: 10px;
+    height: 60px;
+    margin: 15px 0;
+    background-color: rgb(99, 99, 102);
+    border-radius: 20px;
+    border: none; /* Remove any default borders */
+    box-shadow: none; /* Prevent any default shadow */
     font-size: 16px;
-    background-color: rgb(99,99,102);
-    color: rgb(255, 255, 255);
-    outline: none; /* Remove outline on focus */
+    color: white; /* Ensure text color remains white */
 }
 
-/* Password container styling */
+/* Prevent color or border change on focus */
+.register-form input:focus,
+.register-form input:active {
+    background-color: rgb(99, 99, 102); /* Keep background color consistent */
+    outline: none; /* Remove the border on focus */
+    box-shadow: none; /* Prevent any shadow or highlight effect */
+}
+
 .password-container {
     position: relative;
-    width: 100%;
-    margin-bottom: 10px;
+    width: 100%; /* Match input width */
 }
 
-/* Eye icon styling for password toggle */
+.password-container input {
+    width: 100%;
+    padding-right: 40px;
+}
+
 .password-toggle {
     position: absolute;
-    top: 50%;
     right: 10px;
+    top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: rgba(28, 28, 30, 0.5); /* Eye icon color */
-    font-size: 1.25em; /* Adjust icon size */
-    pointer-events: auto; /* Ensure the icon is clickable */
 }
 
-/* Button styling */
-.register-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: rgb(16, 17, 17);
-    color: #fff;
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Make buttons match the form's width */
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: rgb(10,145,255);
+    color: white;
     border: none;
-    border-radius: 30px;
-    font-size: 16px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition on hover */
+    width: 48%; /* Make the buttons equal in width */
 }
 
-.register-form button:hover {
-    background-color: #0056b3;
-}
-
-.separator {
-    width: 90%;
-    height: 1px;
-    margin-bottom: 20px;
-    background-color: #ccc; /* Thin line color */
-}
-
-/* Google login button styling */
 .google-register-btn {
-    width: 90%;
-    padding: 10px;
-    background-color: rgb(0, 122, 255); /* Google red color */
-    color: #fff;
+    background-color: #fff;
+    color: rgb(10,145,255); /* Set text color */
     border: none;
-    border-radius: 30px;
-    font-size: 16px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-bottom: 10px;
+    width: 48%; /* Make the buttons equal in width */
 }
 
-.google-register-btn:hover {
-    background-color: #0056b3; /* Darker red for hover */
+.createacc {
+    font-size: 32px;
+    text-align: left; /* Align title to the left */
+    width: 100%; /* Full width for proper left alignment */
 }
 
-.google-register-btn svg {
-    margin-right: 10px; /* Space between icon and text */
+.aauser {
+    font-size: 18px;
+    text-align: left; /* Align the "Already a user?" to the left */
+    width: 100%;
+    margin-bottom: 20px;
 }

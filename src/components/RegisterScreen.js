@@ -71,46 +71,44 @@ const RegisterScreen = () => {
 
   return (
     <section className="register-container">
-      <div className="register-section">
-        <h2>Create New Account</h2>
-        <p style={{ marginTop: '10px' }}>
-          Already a user? <Link to="/login" style={{ color: '#007BFF' }}>Login here.</Link>
+    
+        <h2 className="createacc" >Create New Account</h2>
+        <p className="aauser">
+          Already a user? <Link to="/login" style={{ color: 'rgb(10,145,255)' }}>Login here.</Link>
         </p>
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
           {({ isSubmitting, errors }) => (
             <Form className="register-form">
-              <Field type="text" name="name" placeholder="Username" />
-              <ErrorMessage name="name" component="div" style={{ color: 'red' }} />
-              <Field type="email" name="email" placeholder="Email" />
-              <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
-              
-              {/* Password input with toggle icon */}
-              <div className="password-container">
-                <Field type={showPassword ? "text" : "password"} name="password" placeholder="Password" />
-                <div
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </div>
-              </div>
-              <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+            <Field className="username" type="text" name="name" placeholder="Username" />
+            <ErrorMessage name="name" component="div" style={{ color: 'red' }} />
+            <Field type="email" name="email" placeholder="Email" />
+            <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
             
-            <section className= "button-container">
-
-              
-            </section>
-              <button type="submit" disabled={isSubmitting}>Register</button>
-              {errors.general && <div style={{ color: 'red', marginTop: '10px' }}>{errors.general}</div>}
-            </Form>
+            {/* Password input with toggle icon */}
+            <div className="password-container">
+                <Field type={showPassword ? "text" : "password"} name="password" placeholder="Password" />
+                <div className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+            </div>
+            <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+            
+            <div className="button-container">
+                <button className="google-register-btn" onClick={handleGoogleSignUp}>
+                    <FaGoogle /> Register with Google
+                </button>
+                <button type="submit" disabled={isSubmitting}>Register</button>
+                
+            </div>
+            
+            {errors.general && <div style={{ color: 'red', marginTop: '10px' }}>{errors.general}</div>}
+        </Form>
+        
           )}
         </Formik>
 
-        <button className="google-register-btn" onClick={handleGoogleSignUp}>
-          <FaGoogle /> Register with Google
-        </button>
         
-      </div>
+     
     </section>
   );
 };

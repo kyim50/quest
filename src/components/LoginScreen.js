@@ -60,8 +60,11 @@ const LoginScreen = () => {
   return (
     <div className="login-screen">
 
-      <div className="container">
+      <div className="login-container">
         <h1>Login</h1>
+        <p className="linktoregister">
+          Not a user?<Link to="/register" className="gotoregister" style={{ color: 'rgb(10,145,255)' }}>Create an account here</Link>
+        </p>
 
         
 
@@ -89,25 +92,24 @@ const LoginScreen = () => {
               </div>
               <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
 
-              <button type="submit" disabled={isSubmitting}>
+
+              <div className='buttons'>
+              <button className="google-login-btn" onClick={handleGoogleLogin} required>
+                    <img src="/google-logo.png" alt="Google" className="google-logo" />
+                </button>
+
+              <button className="loginbtn" type="submit" disabled={isSubmitting}>
                 Login
               </button>
+              </div>
+
             </Form>
           )}
         </Formik>
+          
+        
 
-        <div className="separator"></div> {/* Thin line separating the buttons */}
-          {/* Google login button */}
-          <a href="#" className="google-login-link" onClick={handleGoogleLogin}>
-          <FaGoogle /> Login with Google
-        </a>
-        <p className="or-text">or</p>
-
-        <p className="login-section">
-          <Link to="/register" className="gotoregister">
-            Register here
-          </Link>
-        </p>
+        
       </div>
     </div>
   );

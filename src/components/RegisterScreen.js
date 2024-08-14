@@ -93,7 +93,7 @@ const RegisterScreen = () => {
                 <button className="google-register-btn" onClick={handleGoogleSignUp} required>
                     <img src="/google-logo.png" alt="Google" className="google-logo" />
                 </button>
-                <button type="submit" disabled={isSubmitting}>Register</button>
+                <button className="register-btn" type="submit" disabled={isSubmitting}>Register</button>
                 
             </div>
             

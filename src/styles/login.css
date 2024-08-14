@@ -1,221 +1,135 @@
-/* Reset default margins and paddings, and set box-sizing to border-box */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Helvetica, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
- 
+.login-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 70%;
+  width: 60%;
+  border-radius: 20px;
+  min-width: 800px;
+  min-height: 300px;
+  padding: 20px 30px;
+  background-color: rgb(58, 58, 60);
 }
 
-/* Body styling */
-body {
-    overflow: hidden; /* Prevent scrolling */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /*background-color: rgb(15, 15, 150);*/
-  background-size: cover;
-  background-position: center;
-  
-}
-
-
-/* Container for the registration and login forms */
-.container {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    justify-content: center;
-    align-items: center; /* Center-align items */
-    width: 80%;
-    max-width: 500px; /* Adjust width as needed */
-    background-color: rgba(0, 0, 0, 0.85); /* Semi-transparent black background */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 6px 30px rgba(252, 251, 251, 0.21);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: rgb(246, 246, 248);
-}
-
-/* Registration and Login form styling */
 .login-form {
-    width: 100%; /* Take full width of container */
-    padding: 20px;
-    position: relative; /* To position eye icon within */
-}
-
-/* Styling for the thin separator line */
-.separator {
-    width: 90%;
-    height: 1px;
-    margin-bottom:20px;
-    background-color: #ccc; /* Thin line color */
-}
-
-/* Register and Login form input styling */
-.login-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 2px solid #0a0a0a;
-    border-radius: 300px;
-    font-size: 16px;
-    background-color: rgb(0, 0, 0);
-    color: rgb(134, 134, 134);
-    position: relative; /* To contain eye icon */
-    outline: none; /* Remove outline on focus */
-}
-
-/* Password container styling */
-.password-container {
-    position: relative;
-    width: 100%;
-    margin-bottom: 10px;
-    
-}
-
-/* Eye icon styling for password toggle */
-.password-toggle {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: rgba(28, 28, 30, 0.5); /* Eye icon color */
-    font-size: 1.25em; /* Adjust icon size */
-    pointer-events: auto; /* Ensure the icon is clickable */
-}
-
-/* Button styling */
-.login-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: rgb(16,17,17);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition on hover */
-    margin-top: 30px;
-}
-
-.login-form button:hover {
-    background-color: #0056b3;
-    transition: background-color 0.3s ease; /* Smooth transition on hover */
-}
-
-/* Or text styling */
-.or-text {
-    color: #666;
-    display: flex;
-    align-self: center;
-    padding-bottom: 10px;
-}
-
-/* Login section styling */
-.login-section {
-    width: 100%;
-    margin-top: 5px; /* Adjusted margin */
-    color: #666;
-    padding-bottom: 10px;
-}
-
-.login-section a.gotoregister {
-    display: block;
-    width: 92%; /* Make button same width as login button */
-    margin-left: 20px;
-    padding: 10px;
-    background-color: rgb(16, 17, 17);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    margin-top: 5px; /* Add margin for spacing */
-    transition: background-color 0.3s ease; /* Smooth transition on hover */
-    padding-bottom: 10px;
-}
-
-.login-section a.gotoregister:hover {
-    background-color: #080808;
-    text-decoration: none;
-}
-
-/* Google login button styling */
-.google-login-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /*padding: 10px;*/
-    /*background-color: #4285F4;*/
-    color: white;
-    text-decoration: none;
-    /*border-radius: 4px;*/
-    /*margin-top: 10px;*/
-  }
-  
-  .google-login-link:hover {
-    background-color: #cfcfcf;
-  }
-  
-  .google-login-link svg {
-    margin-right: 8px;
-  }
-  
-
-/* Forgot password section styling */
-.forgot-password-section {
-  text-align: center;
-  color: #666;
-  margin-bottom:10px;
-}
-
-.forgot-password-btn {
-  background: none;
-  border: none;
-  color: rgb(16, 17, 17);
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 14px;
-  margin-left: 5px;
-}
-
-.reset-password-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 60%;
+  margin-top: 30px;
 }
 
-.reset-password-container input {
-  width: 90%;
+.login-form input {
+  width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-  background-color: rgb(229, 229, 234);
-  color: rgb(28, 28, 30);
-}
-
-.reset-password-container button {
-  width: 90%;
-  padding: 10px;
-  background-color: rgb(69, 69, 70);
-  color: #fff;
+  height: 40px;
+  margin: 15px 0;
+  background-color: rgb(99, 99, 102);
+  
   border: none;
-  border-radius: 30px;
+  box-shadow: none;
   font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  color: white;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.reset-status {
-  margin-top: 10px;
-  color: red;
+/* Ensure consistent styling for all input fields, including the username */
+.login-form input[type="email"],
+.login-form input[type="password"] {
+  border-radius: 15px;
+  outline: none;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+
+/* Prevent color or border change on focus */
+.login-form input:focus,
+.login-form input:active {
+  background-color: rgb(99, 99, 102);
+  outline: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+/* Remove autofill background color */
+.login-form input:-webkit-autofill,
+.login-form input:-webkit-autofill:hover,
+.login-form input:-webkit-autofill:focus,
+.login-form input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgb(99, 99, 102) inset !important;
+  -webkit-text-fill-color: white !important;
+}
+
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-container input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.loginbtn {
+  padding: 10px 20px;
+  background-color: rgb(10,145,255);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  height:40px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 48%;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.loginbtn:hover{
+  background-color: rgb(9, 126, 221);
+  width:49%;
+}
+.google-login-btn:hover{
+  background-color: #d8d5d5;
+  width:49%;
+}
+.google-login-btn {
+  background-color: #fff;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 48%;
+  height:40px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.google-login-btn img{
+  height:25px;
+  width:auto;
 }

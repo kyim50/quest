@@ -92,7 +92,7 @@
     margin-top: 20px;
 }
 
-button {
+.register-btn {
     padding: 10px 20px;
     background-color: rgb(10,145,255);
     color: white;
@@ -109,7 +109,7 @@ button {
     transition: width 0.3s, background-color 0.3s;
 }
 
-button:hover{
+.register-btn:hover{
     background-color: rgb(9, 126, 221);
     width:49%;
 }
@@ -123,6 +123,7 @@ button:hover{
     border-radius: 15px;
     cursor: pointer;
     width: 48%;
+    height:40px;
     display:flex;
     justify-content: center;
     align-items: center;

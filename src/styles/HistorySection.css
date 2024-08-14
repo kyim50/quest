@@ -1,66 +1,43 @@
 /* HistorySection.css */
 
-/* General Styles */
 .history-section {
   background-color: #121212;
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Tabs */
-.MuiTabs-root {
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.MuiTab-root {
-  color: #ffffff;
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
-}
-
-.MuiTab-root.Mui-selected {
-  color: #007aff;
-  opacity: 1;
-}
-
-/* Capture Tab */
-.capture-tab {
+  height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 10px 20px;
 }
 
-/* Camera Styles */
+.profile-button, .chat-button {
+  background-color: #333333;
+  color: #ffffff;
+  border-radius: 50%;
+  padding: 10px;
+}
+
+.add-friends-button {
+  background-color: #333333;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
 .camera-container {
+  flex: 1;
   position: relative;
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 1 / 1;
-  border-radius: 28px;
-  margin: 0 auto 20px;
-  background-color: #1e1e1e;
   overflow: hidden;
-}
-
-.camera-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.camera-wrapper video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  border-radius: 20px;
+  margin: 20px;
 }
 
 .camera-controls {
@@ -71,165 +48,41 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0 20px;
-  z-index: 10;
-}
-
-.control-button {
-  background-color: rgba(0, 0, 0, 0.5);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
 }
 
 .flash-button, .flip-button {
-  width: 40px;
-  height: 40px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  border-radius: 50%;
+  padding: 10px;
 }
 
 .capture-button {
-  width: 70px;
-  height: 70px;
   background-color: #ffffff;
-  border: 3px solid #ffd700;
-}
-
-.control-button svg {
-  fill: #ffffff;
-  width: 24px;
-  height: 24px;
-}
-
-.capture-button svg {
-  fill: #000000;
-}
-
-/* Image Preview */
-.preview-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-}
-
-.captured-image {
-  width: 100%;
-  max-width: 300px;
-  height: auto;
-  border-radius: 20px;
-  margin-bottom: 20px;
-}
-
-/* Caption Bubble */
-.caption-bubble {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  padding: 10px;
-  margin-top: -40px;
-  position: relative;
-  z-index: 1;
-  width: 90%;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.caption-bubble .MuiTextField-root {
-  background-color: transparent;
-  margin-bottom: 0;
-}
-
-.caption-bubble .MuiInputBase-root {
   color: #000000;
+  border: 3px solid #ffd700;
+  border-radius: 50%;
+  padding: 20px;
 }
 
-.caption-bubble .MuiInput-underline:before,
-.caption-bubble .MuiInput-underline:after {
-  border-bottom-color: #007aff;
+.bottom-bar {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 }
 
-/* Buttons */
-.MuiButton-root {
-  background-color: #007aff;
-  color: #ffffff;
+.history-button {
+  display: flex;
+  align-items: center;
+  background-color: #333333;
   border-radius: 20px;
   padding: 10px 20px;
-  text-transform: none;
+}
+
+.history-button .icon {
+  margin-right: 10px;
+}
+
+.history-button .text {
   font-size: 16px;
-  margin: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.MuiButton-root:hover {
-  background-color: #0056b3;
-}
-
-/* Friends Feed - Pinterest Style Grid */
-.history-tab {
-  padding: 10px;
-}
-
-.MuiGrid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-}
-
-.MuiGrid-item {
-  background-color: #1e1e1e;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
-}
-
-.MuiGrid-item:hover {
-  transform: scale(1.03);
-}
-
-.post-image {
-  width: 100%;
-  height: auto;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-}
-
-.post-caption {
-  padding: 10px;
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.post-timestamp {
-  padding: 0 10px 10px;
-  font-size: 12px;
-  color: #888888;
-}
-
-/* Loading Spinner */
-.MuiCircularProgress-root {
-  color: #007aff;
-}
-
-/* Error Message */
-.error-message {
-  color: #ff3b30;
-  text-align: center;
-  margin-top: 20px;
-}
-
-/* Responsive Grid Adjustments */
-@media (max-width: 600px) {
-  .MuiGrid-item {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 400px) {
-  .MuiGrid-item {
-    grid-column: span 1;
-  }
 }

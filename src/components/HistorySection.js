@@ -1,159 +1,238 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Camera } from 'react-camera-pro';
-import { Grid, Tab, Tabs, Button, TextField, CircularProgress } from '@mui/material';
-import { FlashOn, CameraAlt, Refresh } from '@mui/icons-material';
-import {
-  auth,
-  db,
-  storage,
-  uploadImage,
-  createQuest,
-  fetchSentQuests,
-  fetchReceivedQuests
-} from '../firebase';
-import { collection, addDoc, query, where, orderBy, getDocs } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { IconButton } from '@mui/material';
+import { FlashOn, CameraAlt, Refresh, Person, ChatBubbleOutline } from '@mui/icons-material';
 
-const HistorySection = ({ currentUser }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const LocketPinterestHybrid = ({ currentUser }) => {
   const [capturedImage, setCapturedImage] = useState(null);
-  const [caption, setCaption] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [quests, setQuests] = useState([]);
-  const cameraRef = useRef(null);
   const [facingMode, setFacingMode] = useState('environment');
-
-  useEffect(() => {
-    fetchQuests();
-  }, [currentUser]);
-
-  const fetchQuests = async () => {
-    if (!currentUser) return;
-
-    setIsLoading(true);
-    try {
-      const sentQuests = await fetchSentQuests(currentUser.uid);
-      const receivedQuests = await fetchReceivedQuests(currentUser.uid);
-      setQuests([...sentQuests, ...receivedQuests].sort((a, b) => b.createdAt - a.createdAt));
-    } catch (error) {
-      console.error('Error fetching quests:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [flash, setFlash] = useState(false);
+  const [showCamera, setShowCamera] = useState(true);
+  const cameraRef = useRef(null);
 
   const handleCapture = () => {
     const imageSrc = cameraRef.current.takePhoto();
     setCapturedImage(imageSrc);
+    setShowCamera(false);
   };
 
   const handleFlipCamera = () => {
     setFacingMode(prevMode => prevMode === 'user' ? 'environment' : 'user');
   };
 
-  const handleUpload = async () => {
-    if (!capturedImage || !caption) {
-      alert('Please capture an image and add a caption');
-      return;
-    }
+  const handleFlash = () => {
+    setFlash(!flash);
+  };
 
-    setIsLoading(true);
-    try {
-      // Convert base64 to blob
-      const response = await fetch(capturedImage);
-      const blob = await response.blob();
-      
-      // Upload image to Firebase Storage
-      const imageUrl = await uploadImage(blob);
+  const toggleView = () => {
+    setShowCamera(!showCamera);
+  };
 
-      // Create a new quest
-      await createQuest(currentUser.uid, currentUser.uid, {
-        imageUrl,
-        caption,
-        createdAt: Date.now(),
-      });
+  const PinterestLayout = () => {
+    const dummyData = [
+      { size: 'small', user: 'User1' },
+      { size: 'medium', user: 'User2' },
+      { size: 'large', user: 'User3' },
+      { size: 'small', user: 'User4' },
+      { size: 'medium', user: 'User5' },
+      { size: 'large', user: 'User6' },
+    ];
 
-      setCapturedImage(null);
-      setCaption('');
-      fetchQuests(); // Refresh the quests list
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    return (
+      <div style={styles.pin_container}>
+        {dummyData.map((item, index) => (
+          <Card key={index} size={item.size} user={item.user} />
+        ))}
+      </div>
+    );
+  };
+
+  const Card = ({ size, user }) => {
+    return (
+      <div style={{
+        ...styles.card,
+        ...styles[size]
+      }}>
+        <div style={styles.userInfo}>
+          <div style={styles.avatar}></div>
+          <span style={styles.username}>@{user}</span>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="history-section">
-      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
-        <Tab label="Capture" />
-        <Tab label="History" />
-      </Tabs>
+    <div style={styles.container}>
+      <div style={styles.topBar}>
+        <IconButton style={styles.iconButton}>
+          <Person />
+        </IconButton>
+        <button style={styles.friendsButton}>
+          {showCamera ? '25 Friends' : 'Create'}
+        </button>
+        <IconButton style={styles.iconButton}>
+          <ChatBubbleOutline />
+        </IconButton>
+      </div>
 
-      {activeTab === 0 && (
-        <div className="capture-tab">
-          <div className="camera-container">
-            <div className="camera-wrapper">
-              <Camera
-                ref={cameraRef}
-                facingMode={facingMode}
-                aspectRatio={1}
-                errorMessages={{}}
-              />
-            </div>
-            <div className="camera-controls">
-              <button className="control-button flash-button">
-                <FlashOn />
-              </button>
-              <button className="control-button capture-button" onClick={handleCapture}>
-                <CameraAlt />
-              </button>
-              <button className="control-button flip-button" onClick={handleFlipCamera}>
-                <Refresh />
-              </button>
-            </div>
+      {showCamera ? (
+        <div style={styles.cameraContainer}>
+          <Camera
+            ref={cameraRef}
+            facingMode={facingMode}
+            aspectRatio="cover"
+            errorMessages={{}}
+          />
+          <div style={styles.cameraControls}>
+            <IconButton onClick={handleFlash} style={styles.controlButton}>
+              <FlashOn />
+            </IconButton>
+            <IconButton onClick={handleCapture} style={styles.captureButton}>
+              <CameraAlt />
+            </IconButton>
+            <IconButton onClick={handleFlipCamera} style={styles.controlButton}>
+              <Refresh />
+            </IconButton>
           </div>
-          {capturedImage && (
-            <div className="preview-container">
-              <img src={capturedImage} alt="Captured" className="captured-image" />
-              <div className="caption-bubble">
-                <TextField
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  placeholder="Add a caption..."
-                  fullWidth
-                  margin="normal"
-                  variant="standard"
-                />
-              </div>
-              <Button onClick={handleUpload} disabled={isLoading}>
-                {isLoading ? <CircularProgress size={24} /> : 'Upload'}
-              </Button>
-            </div>
-          )}
         </div>
+      ) : (
+        <PinterestLayout />
       )}
 
-      {activeTab === 1 && (
-        <div className="history-tab">
-          {isLoading ? (
-            <CircularProgress />
-          ) : (
-            <Grid container spacing={2}>
-              {quests.map((quest, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <img src={quest.imageUrl} alt={`Quest ${index}`} style={{ maxWidth: '100%' }} />
-                  <p>{quest.caption}</p>
-                  <p>Created: {new Date(quest.createdAt).toLocaleString()}</p>
-                </Grid>
-              ))}
-            </Grid>
-          )}
+      <div style={styles.bottomBar}>
+        <div style={styles.historyButton} onClick={toggleView}>
+          <span style={styles.icon}>🖼️</span>
+          <span style={styles.text}>{showCamera ? 'History' : 'Camera'}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default HistorySection;
+const styles = {
+  container: {
+    backgroundColor: '#121212',
+    color: '#ffffff',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  topBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 20px',
+  },
+  iconButton: {
+    backgroundColor: '#333333',
+    color: '#ffffff',
+    borderRadius: '50%',
+    padding: '10px',
+  },
+  friendsButton: {
+    backgroundColor: '#333333',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '20px',
+    padding: '10px 20px',
+    fontSize: '16px',
+  },
+  cameraContainer: {
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: '20px',
+    margin: '20px',
+  },
+  cameraControls: {
+    position: 'absolute',
+    bottom: '20px',
+    left: 0,
+    right: 0,
+    display: 'flex',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  controlButton: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    color: '#ffffff',
+    borderRadius: '50%',
+    padding: '10px',
+  },
+  captureButton: {
+    backgroundColor: '#ffffff',
+    color: '#000000',
+    border: '3px solid #ffd700',
+    borderRadius: '50%',
+    padding: '20px',
+  },
+  bottomBar: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '20px',
+  },
+  historyButton: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#333333',
+    borderRadius: '20px',
+    padding: '10px 20px',
+    cursor: 'pointer',
+  },
+  icon: {
+    marginRight: '10px',
+  },
+  text: {
+    fontSize: '16px',
+  },
+  pin_container: {
+    margin: 0,
+    padding: 0,
+    width: '80vw',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, 250px)',
+    gridAutoRows: '10px',
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    justifyContent: 'center',
+    backgroundColor: '#121212',
+  },
+  card: {
+    margin: '15px 10px',
+    padding: 0,
+    borderRadius: '16px',
+    backgroundColor: '#333333',
+    position: 'relative',
+  },
+  small: {
+    gridRowEnd: 'span 26',
+  },
+  medium: {
+    gridRowEnd: 'span 33',
+  },
+  large: {
+    gridRowEnd: 'span 45',
+  },
+  userInfo: {
+    position: 'absolute',
+    bottom: '10px',
+    left: '10px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    backgroundColor: '#ffffff',
+    marginRight: '5px',
+  },
+  username: {
+    fontSize: '12px',
+    color: '#ffffff',
+  },
+};
+
+export default LocketPinterestHybrid;

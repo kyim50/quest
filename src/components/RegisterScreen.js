@@ -67,44 +67,45 @@ const RegisterScreen = () => {
 
   return (
     <section className="register-container">
-    
-        <h2 className="createacc" >Create New Account</h2>
+      <div className="register-form-container">
+        <h2 className="createacc">Create New Account</h2>
         <p className="aauser">
           Already a user? <Link to="/login" style={{ color: 'rgb(10,145,255)' }}>Login here.</Link>
         </p>
-        <Formik initialValues={initialValues}  onSubmit={onSubmit}>
+        <Formik initialValues={initialValues} onSubmit={onSubmit}>
           {({ isSubmitting, errors }) => (
             <Form className="register-form">
-            <Field className="username" type="text" name="name" placeholder="Username" required/>
-            <ErrorMessage name="name" component="div" style={{ color: 'red' }} />
-            <Field type="email" name="email" placeholder="Email" />
-            <ErrorMessage name="email" component="div" style={{ color: 'red' }} required />
-            
-            {/* Password input with toggle icon */}
-            <div className="password-container">
+              <Field className="username" type="text" name="name" placeholder="Username" required/>
+              <ErrorMessage name="name" component="div" style={{ color: 'red' }} />
+              <Field type="email" name="email" placeholder="Email" required />
+              <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
+              
+              <div className="password-container">
                 <Field type={showPassword ? "text" : "password"} name="password" placeholder="Password" required/>
                 <div className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
-            </div>
-            <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
-            
-            <div className="button-container">
-                <button className="google-register-btn" onClick={handleGoogleSignUp} required>
-                    <img src="/google-logo.png" alt="Google" className="google-logo" />
+              </div>
+              <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+              
+              <div className="button-container">
+                <button className="google-register-btn" onClick={handleGoogleSignUp} type="button">
+                  <img src="/google-logo.png" alt="Google" className="google-logo" />
                 </button>
                 <button className="register-btn" type="submit" disabled={isSubmitting}>Register</button>
-                
-            </div>
-            
-            {errors.general && <div style={{ color: 'red', marginTop: '10px' }}>{errors.general}</div>}
-        </Form>
-        
+              </div>
+              
+              {errors.general && <div style={{ color: 'red', marginTop: '10px' }}>{errors.general}</div>}
+            </Form>
           )}
         </Formik>
-
-        
-     
+      </div>
+      
+      <div className="blue-rectangle">
+        <img className="questsimg" src="/Questslogo white.png"></img>
+        <h3>Welcome!</h3>
+        <p>Join our community today and unlock a world of possibilities. Connect, share, and grow with us!</p>
+      </div>
     </section>
   );
 };

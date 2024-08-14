@@ -8,8 +8,16 @@
     border-radius: 20px;
     min-width: 800px;
     min-height: 300px;
+    background-color: rgb(58,58,60);
+    display: flex;
+    overflow: hidden; /* This will ensure the child elements don't overflow the rounded corners */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.register-form-container {
+    width: 70%;
     padding: 20px 30px;
-    background-color: rgb(58, 58, 60);
+    z-index: 1;
 }
 
 .register-form {
@@ -17,8 +25,40 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 60%;
+    width: 100%;
     margin-top: 30px;
+}
+
+/* ... (keep all other existing styles) ... */
+
+.blue-rectangle {
+    width: 40%;
+    background: linear-gradient(135deg, rgb(10,145,255) 0%, rgb(7, 100, 177) 100%);    
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 1;
+    box-shadow: -10px 0 10px -5px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+
+.questsimg{
+    height:100px;
+    width:auto;
+}
+.blue-rectangle h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+.blue-rectangle p {
+    font-size: 16px;
+    text-align: center;
 }
 
 .register-form input {

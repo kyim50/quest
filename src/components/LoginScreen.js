@@ -58,9 +58,9 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="login-screen">
+    <section className="login-container">
 
-      <div className="login-container">
+      <div className="login-form-container">
         <h1>Login</h1>
         <p className="linktoregister">
           Not a user?<Link to="/register" className="gotoregister" style={{ color: 'rgb(10,145,255)' }}>Create an account here</Link>
@@ -108,10 +108,13 @@ const LoginScreen = () => {
         </Formik>
           
         
-
-        
       </div>
-    </div>
+      <div className="blue-rectangle">
+        <img className="questsimg" src="/Questslogo white.png"></img>
+        <h3>Welcome Back!</h3>
+        <p>We're glad to see you again. Log in to continue where you left off.</p>
+      </div>
+    </section>
   );
 };
 

@@ -27,6 +27,7 @@
     "leaflet": "^1.9.4",
     "leaflet-markercluster": "^0.2.2",
     "leaflet.markercluster": "^1.5.3",
+    "lucide-react": "^0.427.0",
     "mapbox-gl": "^3.5.2",
     "metro": "^0.80.9",
     "pg": "^8.12.0",

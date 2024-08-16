@@ -1,4 +1,4 @@
-/* General reset and body styling */
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
@@ -6,49 +6,140 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+body {
+  background-color: #1e1e2e;
+  color: #ffffff;
+  overflow: hidden;
+}
+
 ::-webkit-scrollbar {
   width: 0px; /* Hide scrollbar */
 }
 
-body {
+/* Home screen container */
+.home-screen-container {
   display: flex;
-  flex-direction: column;
-  justify-content: center; /* Center content vertically */
-  align-items: center; /* Center content horizontally */
   height: 100vh;
-  width: 100vw;
-  background-color: rgb(28,28,30); /* Dark mode background */
-  color: #FFFFFF; /* White text */
   overflow: hidden;
 }
 
-@keyframes popUp {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  80% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* Container for the map */
-.map-container {
-  width: 100vw;
+.nav-bar {
+  width: 250px;
   height: 100vh;
-  position: relative;
-  z-index: 1;
+  background-color: #252736;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  z-index: 10;
 }
 
-/* Map styling */
+.nav-header {
+  padding: 0 50px 50px; /* Increased bottom padding */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Optional: adds a subtle separator */
+}
+
+.nav-logo {
+  width: 100%;
+  max-width: 120px;
+  cursor: pointer;
+}
+
+.nav-bar nav {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 30px; /* Added top padding */
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 15px 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-button:hover, .nav-button.active {
+  background-color: #2f3142;
+}
+
+.nav-button img {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.nav-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Optional: adds a subtle separator */
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.theme-toggle img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Content area */
+/* Map container adjustment */
+.map-container {
+  width: 38%; /* Slightly reduced from 40% */
+  height: 96vh; /* Slightly reduced from 100vh */
+  position: relative;
+  margin: 2vh 1% 2vh 1%; /* Add some margin around the map */
+  border-radius: 20px; /* Rounded corners */
+  overflow: hidden; /* Ensure the map respects the rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+}
+
 #map {
   width: 100%;
   height: 100%;
-  z-index: 1;
+}
+
+/* Adjust the content area to maintain layout */
+.content-area {
+  width: calc(60% - 250px); /* Adjust based on nav-bar width */
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Responsive adjustment */
+@media (max-width: 1200px) {
+  .map-container {
+    width: 38%;
+  }
+  
+  .content-area {
+    width: calc(60% - 80px); /* Adjust based on collapsed nav-bar width */
+  }
+}
+
+@media (max-width: 768px) {
+  .map-container, .content-area {
+    width: 96%; /* Full width with small margins on mobile */
+    height: calc(48vh - 60px); /* Adjust height for mobile layout */
+    margin: 2vh 2% 2vh 2%;
+  }
 }
 
 /* Location pin styling */
@@ -62,51 +153,48 @@ body {
 
 .marker-container {
   position: relative;
-  width: 50px; /* Adjust size as needed */
-  height: 50px; /* Adjust size as needed */
-  border: 2px solid rgba(92, 92, 92, 0.7); /* Thin white outline with transparency */
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(92, 92, 92, 0.7);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
-  background-color: #1C1C1E; /* Ensure the background color is dark */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background-color: #1C1C1E;
   animation: popUp 0.5s ease-out;
 }
 
 .marker-container img {
   border-radius: 50%;
-  width: 46px; /* Adjust to fit inside the border */
+  width: 46px;
   height: 46px;
   object-fit: cover;
 }
 
 .marker-dot {
   position: absolute;
-  bottom: -15px; /* Adjust as needed to detach from the marker */
+  bottom: -15px;
   left: 50%;
   width: 10px;
   height: 10px;
-  background-color: #3c68c6; /* Apple red */
+  background-color: #3c68c6;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
-  transform: translateX(-50%); /* Center the dot horizontally */
-  animation: heartbeat 1.5s infinite; /* Apply heartbeat animation */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%);
+  animation: heartbeat 1.5s infinite;
+}
+
+@keyframes popUp {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
 }
 
 @keyframes heartbeat {
-  0% {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(-50%) scale(1.5);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateX(-50%) scale(2);
-    opacity: 0;
-  }
+  0% { transform: translateX(-50%) scale(1); opacity: 1; }
+  50% { transform: translateX(-50%) scale(1.5); opacity: 0.5; }
+  100% { transform: translateX(-50%) scale(2); opacity: 0; }
 }
 
 /* Address bar styling */
@@ -114,12 +202,12 @@ body {
   width: 80%;
   max-width: 500px;
   height: 50px;
-  padding: 10px;
-  background-color: rgb(28,28,30); /* Darker background */
-  color: rgb(229,229,234); /* White text */
+  padding: 10px 20px;
+  background-color: rgba(28,28,30,0.8);
+  color: rgb(229,229,234);
   text-align: left;
   position: absolute;
-  top: 5%;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 10px;
@@ -130,256 +218,10 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-left: 20px;
   font-weight: 550;
 }
 
-/* Rectangular container styling */
-.rectangular-container {
-  width: 90%;
-  max-width: 400px;
-  height: 70%;
-  max-height: 400px;
-  background-color:rgb(28,28,30); /* Darker background */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  position: fixed;
-  bottom: 86px;
-  left: 5%;
-  padding:0px;
-  margin:0px;
-  border-radius: 10px;
-  z-index: 10;
-  color: rgb(229,229,234); /* White text */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Hidden class for the rectangular container */
-.rectangular-container.hidden {
-  display: none;
-  opacity: 0;
-  visibility: hidden;
-}
-
-.show-section {
-  display: block;
-}
-
-.hide-section {
-  display: none;
-}
-
-/* Navigation bar styling */
-.nav-bar {
-  width: 90%;
-  max-width: 400px;
-  height: 70px;
-  background-color: rgb(28,28,30); /* Darker background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  bottom: 5%;
-  border-radius: 10px;
-  z-index: 10;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -4px 8px rgba(0, 0, 0, 0); /* Shadow on bottom and sides */
-}
-
-.current-quest {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.quest-title {
-  font-weight: bold;
-}
-
-.quest-state {
-  color: #666;
-}
-
-/* Styling for the nav element to use flexbox for centering buttons */
-.nav-bar nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-}
-
-/* Button styling for navigation */
-.nav-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-/* Initial image for each icon */
-.nav-icon {
-  opacity: 1;
-}
-
-/* Hover effect to show the alternate image */
-.nav-button:hover .nav-icon {
-  opacity: 0;
-}
-
-.nav-button:hover .nav-icon.active {
-  opacity: 1;
-  transform: scale(1.1); /* Slight zoom effect */
-}
-
-/* Display active image initially for the active section */
-.nav-icon.active {
-  opacity: 1;
-}
-
-.nav-icon:not(.active):hover {
-  opacity: 0; /* Fade out the original image */
-}
-/*
-/* Ensure the active image is displayed when hovered */
-/*
-.nav-button:nth-of-type(1):hover .nav-icon:not(.active) {
-  content: url('/profile_hover.png'); 
-  opacity: 1; 
-}
-
-.nav-button:nth-of-type(2):hover .nav-icon:not(.active) {
-  content: url('/connections_hover.png'); 
-  opacity: 1; 
-}
-
-.nav-button:nth-of-type(3):hover .nav-icon:not(.active) {
-  content: url('/quest_hover.png'); 
-  opacity: 1; 
-}
-
-.nav-button:nth-of-type(4):hover .nav-icon:not(.active) {
-  content: url('/history_hover.png'); 
-  opacity: 1; 
-}
-/*
-
-/* Image (icon) styling */
-img {
-  width: auto;
-  height: 8vw;
-}
-
-/* Media queries for icon sizes */
-@media (max-width: 768px) {
-  img {
-    width: auto;
-    height: 20px;
-  }
-
-  .address-bar {
-    width: 80%;
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .rectangular-container {
-    width: 70%;
-    max-width: 350px;
-    height: 60%;
-    max-height: 350px;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .nav-bar {
-    width: 70%;
-    max-width: 350px;
-    height: 60px;
-    bottom: 4%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  img {
-    width: auto;
-    height: 30px;
-  }
-
-  .address-bar {
-    width: 80%;
-    padding: 10px;
-    font-size: 16px;
-  }
-
-  .rectangular-container {
-    width: 80%;
-    max-width: 400px;
-    height: 70%;
-    max-height: 400px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 86px;
-  }
-
-  .nav-bar {
-    width: 80%;
-    max-width: 400px;
-    height: 70px;
-    bottom: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-}
-
-@media (min-width: 1025px) {
-  img {
-    width: auto;
-    height: 20px;
-  }
-
-  .address-bar {
-    width: 100%;
-    max-width: 800px;
-    padding: 12px;
-    font-size: 18px;
-  }
-
-  .rectangular-container {
-    width: 80%;
-    max-width: 400px;
-    height: 70%;
-    max-height: 400px;
-    left: 2%;
-    bottom: 86px;
-  }
-
-  .nav-bar {
-    width: 80%;
-    max-width: 400px;
-    height: 70px;
-    bottom: 5%;
-    left: 2.05%;
-    border-radius: 10px;
-  }
-}
-
-/* Additional styles for content sections */
-.content-section {
-  margin: 10px 0;
-  width: 100%;
-  background-color: rgb(58,58,60); /* Darker background */
-  border-radius: 10px;
-}
-
-/* Style for the profile container */
+/* Profile container styling */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -387,29 +229,27 @@ img {
   margin: 20px 0;
 }
 
-/* Profile name and bio styling */
 .profile-info {
   text-align: center;
   margin-bottom: 20px;
-  width: 100%; /* Ensure profile info takes full width */
+  width: 100%;
 }
 
 .profile-name {
   font-size: 1.5rem;
   font-weight: bold;
   margin: 5px 0;
-  word-wrap: break-word; /* Ensure long words break and wrap */
-  overflow-wrap: break-word; /* Additional property for text wrapping */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .profile-bio {
   font-size: 1rem;
-  color: #555555; /* Darker Gray */
-  word-wrap: break-word; /* Ensure long words break and wrap */
-  overflow-wrap: break-word; /* Additional property for text wrapping */
+  color: #a0a0a0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-/* Style for the profile photo */
 .profile-photo {
   margin-bottom: 15px;
 }
@@ -421,71 +261,33 @@ img {
   object-fit: cover;
 }
 
-.cancel,
-.uploadpfp {
+/* Button styles */
+.btn {
   border-radius: 50px;
-  color: #007BFF; /* Blue text color */
-  background-color: #CCC; /* Grey background color */
-  border: none; /* Removes any default border */
-  padding: 10px 20px; /* Adds padding inside the button */
-  font-size: 16px; /* Sets the font size */
-  cursor: pointer; /* Changes cursor to pointer on hover */
-  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.cancel:hover,
-.uploadpfp:hover {
-  background-color: #B3B3B3; /* Slightly darker grey for hover effect */
+.btn-primary {
+  color: #ffffff;
+  background-color: #007BFF;
+  border: none;
 }
 
-.save {
-  border-radius: 50px;
-  color: white; /* White text color */
-  background-color: #007BFF; /* Blue background color */
-  border: none; /* Removes any default border */
-  padding: 10px 20px; /* Adds padding inside the button */
-  font-size: 16px; /* Sets the font size */
-  cursor: pointer; /* Changes cursor to pointer on hover */
-  transition: background-color 0.3s ease; /* Smooth transition for background color change on hover */
+.btn-primary:hover {
+  background-color: #0056b3;
 }
 
-.save:hover {
-  background-color: #0056b3; /* Darker blue for hover effect */
+.btn-secondary {
+  color: #007BFF;
+  background-color: #CCC;
+  border: none;
 }
 
-/* Styles for the edit profile button */
-.edit-profile-btn {
-  position: absolute; /* Keep it positioned relative to the container */
-  top: 10px; /* Adjust top positioning */
-  left: 10px; /* Adjust left positioning */
-  background: transparent; /* Remove default button background */
-  border: none; /* Remove button border */
-  padding: 0; /* Remove padding */
-  cursor: pointer; /* Change cursor on hover */
-}
-
-.edit-profile-btn img {
-  width: 24px; /* Adjust size as needed */
-  height: 24px; /* Adjust size as needed */
-}
-
-/* Styles for the logout button */
-.logout-btn {
-  background: transparent; /* Remove default button background */
-  border: none; /* Remove button border */
-  padding: 0; /* Remove padding */
-  cursor: pointer; /* Change cursor on hover */
-}
-
-.logout-btn img {
-  width: 24px; /* Adjust size as needed */
-  height: 24px; /* Adjust size as needed */
-}
-
-/* Optional: Add hover effects */
-.edit-profile-btn:hover img,
-.logout-btn:hover img {
-  opacity: 0.8; /* Slightly fade the image on hover */
+.btn-secondary:hover {
+  background-color: #B3B3B3;
 }
 
 /* Form styling */
@@ -496,19 +298,19 @@ img {
   gap: 10px;
 }
 
-/* Input styling */
 input[type="text"],
 input[type="file"] {
   padding: 10px;
-  border: 1px solid #CCCCCC; /* Light Gray */
+  border: 1px solid #3c3c3c;
   border-radius: 5px;
+  background-color: #2f3142;
+  color: #ffffff;
 }
 
-/* Choose File button styling */
 .custom-file-input {
   display: inline-block;
-  background-color: #FCA311; /* Orange */
-  color: #FFFFFF; /* White */
+  background-color: #FCA311;
+  color: #FFFFFF;
   border: none;
   border-radius: 5px;
   padding: 10px 15px;
@@ -517,29 +319,18 @@ input[type="file"] {
 }
 
 .custom-file-input:hover {
-  background-color: #d88e2c; /* Darker Orange */
+  background-color: #d88e2c;
 }
 
 input[type="file"] {
   display: none;
 }
 
-/* Logout container styling */
-.logout-container {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-}
-
+/* Privacy settings styling */
 .privacy-settings {
-  position: absolute;
-  top: 20px; /* Adjust as needed */
-  right: 20px; /* Adjust as needed */
   display: flex;
   align-items: center;
-  font-family: Arial, sans-serif;
-  margin: 0;
+  margin: 20px 0;
 }
 
 .privacy-settings label {
@@ -551,10 +342,10 @@ input[type="file"] {
 .privacy-settings input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
-  background-color: #ccc;
   width: 40px;
   height: 24px;
   border-radius: 12px;
+  background-color: #ccc;
   position: relative;
   outline: none;
   transition: background-color 0.3s ease;
@@ -562,7 +353,7 @@ input[type="file"] {
 }
 
 .privacy-settings input[type="checkbox"]:checked {
-  background-color: #007bff; /* Blue color for the slider when active */
+  background-color: #007bff;
 }
 
 .privacy-settings input[type="checkbox"]:before {
@@ -578,26 +369,60 @@ input[type="file"] {
 }
 
 .privacy-settings input[type="checkbox"]:checked:before {
-  transform: translateX(16px); /* Moves the slider knob to the right */
+  transform: translateX(16px);
 }
 
-label {
+.privacy-settings label span {
   margin-left: 12px;
   font-size: 16px;
 }
 
-.status-label {
-  display: inline-block;
-  font-size: 0.9rem;
-  color: #7289da; /* Discord blue */
-  vertical-align: middle;
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .nav-bar {
+    width: 80px;
+  }
+  
+  .nav-button span, .theme-toggle span {
+    display: none;
+  }
+  
+  .content-area {
+    width: calc(60% - 80px);
+  }
+  
+  .map-container {
+    width: 40%;
+  }
 }
 
-.profile-photo img {
-  width: 100px; /* Adjust as needed */
-  height: 100px; /* Adjust as needed */
-  border-radius: 50%;
-  object-fit: cover; /* Ensures the image covers the circle */
-  display: block;
+@media (max-width: 768px) {
+  .home-screen-container {
+    flex-direction: column;
+  }
+  
+  .nav-bar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  
+  .nav-bar nav {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .content-area, .map-container {
+    width: 100%;
+    height: calc(50vh - 60px);
+  }
+  
+  .address-bar {
+    width: 90%;
+    font-size: 14px;
+  }
 }
 
+/* Additional styles for specific content sections can be added here */

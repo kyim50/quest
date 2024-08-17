@@ -47,16 +47,19 @@ const HomeScreen = () => {
   return (
     <div className="home-screen-container">
       <NavigationBar activeSection={activeSection} showSection={showSection} />
-      <div className="content-area">
-        {renderSection()}
-      </div>
-      <div className="map-container">
-        <MapComponent 
-          address={address} 
-          setAddress={setAddress} 
-          setCurrentUserIds={setCurrentUserIds}
-          setMap={setMap}
-        />
+      <div className={`main-content ${activeSection === 'profile' ? 'profile-active' : ''}`}>
+        <div className="content-area">
+          {renderSection()}
+        </div>
+        <div className="map-container">
+          <MapComponent 
+            address={address} 
+            setAddress={setAddress} 
+            setCurrentUserIds={setCurrentUserIds}
+            setMap={setMap}
+            activeSection={activeSection}  // Pass activeSection to MapComponent
+          />
+        </div>
       </div>
     </div>
   );

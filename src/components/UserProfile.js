@@ -170,24 +170,27 @@ const UserProfile = () => {
             </>
           )}
         </div>
-        <div className="profile-info">
-          {isEditing ? (
-            <div className="edit-fields">
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="profile-name-edit" />
-              <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="profile-bio-edit" maxLength={150} />
-              <p className="char-count">{bio.length}/150</p>
-            </div>
-          ) : (
-            <>
-              <h2 className="profile-name">{name}</h2>
-              <p className="profile-status"><span className="status-dot"></span> Active</p>
-              <p className="profile-bio">{bio}</p>
-            </>
-          )}
+        <div className="profile-name-status">
+          <h2 className="profile-name">{name}</h2>
+          <p className="profile-status"><span className="status-dot"></span> Active</p>
         </div>
         <div className="privacy-icon">
           <Privacy isPrivate={isPrivate} onPrivacyChange={handlePrivacyModeChange} />
         </div>
+      </div>
+
+      <div className="profile-section">
+        <h3 className="section-title">Bio</h3>
+        {isEditing ? (
+          <textarea 
+            value={bio} 
+            onChange={(e) => setBio(e.target.value)} 
+            className="profile-bio-edit" 
+            maxLength={150}
+          />
+        ) : (
+          <p className="profile-bio">{bio}</p>
+        )}
       </div>
 
       <div className="profile-actions">
@@ -206,19 +209,22 @@ const UserProfile = () => {
         </div>
       </div>
 
-      <div className="tags-container">
-        {tags.map((tag) => (
-          <div key={tag} className="tag">
-            {predefinedTags.find(t => t.value === tag).text}
-            <button onClick={() => handleRemoveTag(tag)}>x</button>
-          </div>
-        ))}
+      <div className="profile-section">
+        <h3 className="section-title">Tags</h3>
+        <div className="tags-container">
+          {tags.map((tag) => (
+            <div key={tag} className="tag">
+              {predefinedTags.find(t => t.value === tag).text}
+              {isEditing && <button onClick={() => handleRemoveTag(tag)}>x</button>}
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="active-quests">
-        <h3>Active Quests</h3>
+      <div className="profile-section">
+        <h3 className="section-title">Active Quests</h3>
         {activeQuest ? (
-          <div className="active-quest-item">
+          <div className="quest-item">
             <p>"{activeQuest.title}" with</p>
             <div className="quest-partner">
               <img src={activeQuest.partnerPhoto} alt={activeQuest.partnerName} className="partner-photo" />
@@ -226,23 +232,23 @@ const UserProfile = () => {
             </div>
           </div>
         ) : (
-          <div className="no-active-quests">
+          <div className="no-quests">
             <p>No quests ongoing. Ready to start a new adventure?</p>
           </div>
         )}
       </div>
 
-      <div className="recent-quests">
-        <h3>Recent Quests</h3>
+      <div className="profile-section">
+        <h3 className="section-title">Recent Quests</h3>
         {recentQuests.length > 0 ? (
           recentQuests.map(quest => (
-            <div key={quest.id} className="recent-quest-item">
+            <div key={quest.id} className="quest-item">
               <p>{quest.title}</p>
-              <p>with {quest.targetUser}</p>
+              <p>with {quest.targetUser.name}</p>
             </div>
           ))
         ) : (
-          <div className="no-recent-quests">
+          <div className="no-quests">
             <p>No recent quests. Time to explore!</p>
           </div>
         )}

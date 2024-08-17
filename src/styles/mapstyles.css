@@ -32,19 +32,20 @@ body {
   padding: 20px 0;
   z-index: 10;
   transition: width 0.3s ease;
-  border-right: none; /* Remove the right border */
+  border-right: none;
 }
 
 .nav-header {
-  padding: 50px 20px 30px;
-  border-bottom: none; /* Remove the bottom border */
+  top: 50%;
+  padding: 30px 20px;
   display: flex;
-  justify-content: center; /* Center the logo */
+  justify-content: center;
 }
 
 .logo {
+  top: 100%;
   width: 100%;
-  max-width: 60px;
+  max-width: 140px;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
@@ -53,47 +54,47 @@ nav {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 20px; /* Reduced top padding */
+  padding-top: 20px;
 }
 
 .nav-button {
   display: flex;
   align-items: center;
-  width: 100%;
+  width: 90%;
+  margin: 0 auto 10px;
   padding: 12px 20px;
   background: none;
   border: none;
-  color: #ffffff; /* White text */
+  color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 5px; /* Reduced margin */
+  transition: all 0.3s ease;
+  border-radius: 10px;
 }
 
 .nav-button:hover {
-  background-color: #3a3a3a; /* Slightly darker on hover */
+  background-color: #3a3a3a;
 }
 
 .nav-button.active {
-  background-color: #4a4a4a; /* Even darker when active */
+  background-color: #4a4a4a;
 }
 
 .nav-button img {
-  width: 24px;
+  width: 15%;
   height: 24px;
   margin-right: 15px;
-  filter: brightness(0) invert(1); /* Make icons white */
+  filter: brightness(0) invert(1);
 }
 
 .nav-button span {
-  color: #ffffff; /* Ensure text is white */
+  color: #ffffff;
 }
 
 .nav-footer {
   padding: 20px;
-  border-top: none; /* Remove the top border */
 }
 
 .theme-toggle {
@@ -101,7 +102,7 @@ nav {
   align-items: center;
   background: none;
   border: none;
-  color: #ffffff; /* White text */
+  color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
   font-weight: 600;
   font-size: 14px;
@@ -112,74 +113,34 @@ nav {
   width: 20px;
   height: 20px;
   margin-right: 10px;
-  filter: brightness(0) invert(1); /* Make icon white */
+  filter: brightness(0) invert(1);
 }
 
-/* Responsive design */
-@media (max-width: 1200px) {
-  .nav-bar {
-    width: 80px;
-  }
-
-  .nav-button span, 
-  .theme-toggle span {
-    display: none;
-  }
-
-  .nav-button {
-    justify-content: center;
-  }
-
-  .nav-button img {
-    margin-right: 0;
-  }
-
-  .logo {
-    max-width: 60px;
-  }
+/* Main content area */
+.main-content {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .nav-bar {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    padding: 10px;
-  }
-
-  .nav-header {
-    padding: 0 10px;
-  }
-
-  nav {
-    flex-direction: row;
-    padding-top: 0;
-    justify-content: space-around;
-  }
-
-  .nav-button {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  .nav-button img {
-    margin-right: 0;
-    margin-bottom: 5px;
-  }
-
-  .nav-footer {
-    display: none;
-  }
+.content-area {
+  width: calc(60% - 250px);
+  height: 96vh;
+  margin: 2vh 1%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.3s ease;
 }
+
 /* Map container adjustment */
 .map-container {
-  width: 38%; /* Slightly reduced from 40% */
-  height: 96vh; /* Slightly reduced from 100vh */
+  flex-grow: 1;
+  height: 96vh;
+  margin: 2vh 1% 2vh 0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  margin: 2vh 1% 2vh 1%; /* Add some margin around the map */
-  border-radius: 20px; /* Rounded corners */
-  overflow: hidden; /* Ensure the map respects the rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
 }
 
 #map {
@@ -187,30 +148,18 @@ nav {
   height: 100%;
 }
 
-/* Adjust the content area to maintain layout */
-.content-area {
-  width: calc(60% - 250px); /* Adjust based on nav-bar width */
-  padding: 20px;
-  overflow-y: auto;
+/* Profile active state */
+.profile-active .content-area {
+  width: 400px;
+  flex-shrink: 0;
 }
 
-/* Responsive adjustment */
-@media (max-width: 1200px) {
-  .map-container {
-    width: 38%;
-  }
-  
-  .content-area {
-    width: calc(60% - 80px); /* Adjust based on collapsed nav-bar width */
-  }
+.profile-active .map-container {
+  flex-grow: 1;
 }
 
-@media (max-width: 768px) {
-  .map-container, .content-area {
-    width: 96%; /* Full width with small margins on mobile */
-    height: calc(48vh - 60px); /* Adjust height for mobile layout */
-    margin: 2vh 2% 2vh 2%;
-  }
+.profile-active #map {
+  width: 100%;
 }
 
 /* Location pin styling */
@@ -292,178 +241,43 @@ nav {
   font-weight: 550;
 }
 
-/* Profile container styling */
-.profile-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px 0;
-}
-
-.profile-info {
-  text-align: center;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-.profile-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin: 5px 0;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.profile-bio {
-  font-size: 1rem;
-  color: #a0a0a0;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.profile-photo {
-  margin-bottom: 15px;
-}
-
-.profile-photo img {
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-}
-
-/* Button styles */
-.btn {
-  border-radius: 50px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.btn-primary {
-  color: #ffffff;
-  background-color: #007BFF;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  color: #007BFF;
-  background-color: #CCC;
-  border: none;
-}
-
-.btn-secondary:hover {
-  background-color: #B3B3B3;
-}
-
-/* Form styling */
-#profile-form {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 10px;
-}
-
-input[type="text"],
-input[type="file"] {
-  padding: 10px;
-  border: 1px solid #3c3c3c;
-  border-radius: 5px;
-  background-color: #2f3142;
-  color: #ffffff;
-}
-
-.custom-file-input {
-  display: inline-block;
-  background-color: #FCA311;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.custom-file-input:hover {
-  background-color: #d88e2c;
-}
-
-input[type="file"] {
-  display: none;
-}
-
-/* Privacy settings styling */
-.privacy-settings {
-  display: flex;
-  align-items: center;
-  margin: 20px 0;
-}
-
-.privacy-settings label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.privacy-settings input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 40px;
-  height: 24px;
-  border-radius: 12px;
-  background-color: #ccc;
-  position: relative;
-  outline: none;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
-}
-
-.privacy-settings input[type="checkbox"]:checked {
-  background-color: #007bff;
-}
-
-.privacy-settings input[type="checkbox"]:before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: white;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.3s ease;
-}
-
-.privacy-settings input[type="checkbox"]:checked:before {
-  transform: translateX(16px);
-}
-
-.privacy-settings label span {
-  margin-left: 12px;
-  font-size: 16px;
-}
-
-/* Responsive adjustments */
+/* Responsive design */
 @media (max-width: 1200px) {
   .nav-bar {
     width: 80px;
   }
-  
-  .nav-button span, .theme-toggle span {
+
+  .nav-button span, 
+  .theme-toggle span {
     display: none;
   }
-  
+
+  .nav-button {
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    padding: 0;
+  }
+
+  .nav-button img {
+    margin-right: 0;
+  }
+
+  .logo {
+    max-width: 40px;
+  }
+
   .content-area {
     width: calc(60% - 80px);
   }
-  
-  .map-container {
-    width: 40%;
+
+  .profile-active .content-area {
+    width: 375px;
+  }
+
+  .profile-active .map-container {
+    flex-grow: 1;
   }
 }
 
@@ -471,29 +285,56 @@ input[type="file"] {
   .home-screen-container {
     flex-direction: column;
   }
-  
+
   .nav-bar {
     width: 100%;
     height: auto;
     flex-direction: row;
-    justify-content: space-between;
     padding: 10px;
   }
-  
-  .nav-bar nav {
-    display: flex;
+
+  .nav-header {
+    padding: 0 10px;
+  }
+
+  nav {
     flex-direction: row;
+    padding-top: 0;
+    justify-content: space-around;
   }
-  
-  .content-area, .map-container {
-    width: 100%;
-    height: calc(50vh - 60px);
+
+  .nav-button {
+    flex-direction: column;
+    padding: 10px;
+    margin: 0 5px;
+    width: auto;
+    height: auto;
   }
-  
+
+  .nav-button img {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  .nav-footer {
+    display: none;
+  }
+
+  .main-content {
+    flex-direction: column;
+  }
+
+  .content-area,
+  .map-container,
+  .profile-active .content-area,
+  .profile-active .map-container {
+    width: 96%;
+    height: calc(48vh - 30px);
+    margin: 1vh 2%;
+  }
+
   .address-bar {
     width: 90%;
     font-size: 14px;
   }
 }
-
-/* Additional styles for specific content sections can be added here */

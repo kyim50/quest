@@ -1,39 +1,35 @@
 .profile-container {
+    background-color: rgb(38, 38, 40);
+    border-radius: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 375px;
+    height: 96vh;
+    margin: 2vh 1%;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    background-color: rgb(28, 28, 30);
-    padding: 20px;
-    border-radius: 10px;
     color: #fffcf2;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
 }
 
 .profile-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    position: relative;
-    width: 100%;
     margin-bottom: 20px;
 }
 
 .profile-photo-container {
     position: relative;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid white;
-    cursor: pointer;
-    margin-bottom: 15px;
+    width: 80px;
+    height: 80px;
+    margin-right: 20px;
+    flex-shrink: 0;
 }
 
 .profile-photo {
     width: 100%;
     height: 100%;
+    border-radius: 50%;
     object-fit: cover;
 }
 
@@ -52,15 +48,16 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     text-align: center;
+    font-size: 12px;
+    cursor: pointer;
 }
 
 .profile-photo-container:hover .edit-photo-overlay {
     opacity: 1;
 }
 
-.profile-info {
-    text-align: center;
-    width: 100%;
+.profile-name-status {
+    flex-grow: 1;
 }
 
 .profile-name {
@@ -70,9 +67,8 @@
 }
 
 .profile-status {
-    font-size: 16px;
+    font-size: 14px;
     color: #ccc5b9;
-    margin-bottom: 10px;
 }
 
 .status-dot {
@@ -84,17 +80,44 @@
     margin-right: 8px;
 }
 
+.privacy-icon {
+    cursor: pointer;
+}
+
+.profile-section {
+    background-color: rgb(48, 48, 50);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fffcf2;
+}
+
 .profile-bio {
     font-size: 14px;
     color: #ccc5b9;
-    margin-bottom: 15px;
+}
+
+.profile-bio-edit {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: rgb(58, 58, 60);
+    color: #fffcf2;
+    font-size: 14px;
+    resize: vertical;
 }
 
 .profile-actions {
     display: flex;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
+    justify-content: space-between;
     margin-bottom: 20px;
 }
 
@@ -108,8 +131,6 @@
     cursor: pointer;
     border: none;
     transition: background-color 0.3s;
-    flex: 1;
-    max-width: 150px;
 }
 
 .edit-profile-button:hover,
@@ -119,69 +140,6 @@
 
 .edit-profile-button i {
     margin-right: 10px;
-}
-
-.edit-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-}
-
-.edit-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    text-align: left;
-}
-
-.profile-name-edit,
-.profile-bio-edit {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
-}
-
-.char-count {
-    font-size: 12px;
-    color: #888;
-    text-align: right;
-}
-
-.privacy-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
-
-.tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.tag {
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
-    padding: 5px 10px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    height: 30px;
-}
-
-.tag button {
-    background: none;
-    border: none;
-    color: rgb(10, 145, 255);
-    margin-left: 5px;
-    cursor: pointer;
-    font-size: 14px;
 }
 
 .add-tag {
@@ -216,35 +174,44 @@
     background-color: rgb(84, 84, 85);
 }
 
-.active-quests,
-.recent-quests {
-    width: 100%;
-    margin-bottom: 20px;
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.active-quests h3,
-.recent-quests h3 {
-    margin-bottom: 10px;
-    font-size: 18px;
+.tag {
+    background-color: rgb(58, 58, 60);
     color: #fffcf2;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
 }
 
-.active-quest-item,
-.recent-quest-item {
+.tag button {
+    background: none;
+    border: none;
+    color: rgb(10, 145, 255);
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.quest-item {
     background-color: rgb(58, 58, 60);
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 10px;
 }
 
-.active-quest-item p,
-.recent-quest-item p {
+.quest-item p {
     margin: 0;
     font-size: 14px;
 }
 
-.active-quest-item p:first-child,
-.recent-quest-item p:first-child {
+.quest-item p:first-child {
     font-weight: bold;
     margin-bottom: 5px;
 }
@@ -262,9 +229,8 @@
     margin-right: 10px;
 }
 
-.no-active-quests,
-.no-recent-quests {
-    background-color: rgb(48, 48, 50);
+.no-quests {
+    background-color: rgb(58, 58, 60);
     padding: 15px;
     border-radius: 5px;
     text-align: center;
@@ -272,37 +238,26 @@
     color: #ccc5b9;
 }
 
+@media (max-width: 1200px) {
+    .profile-container {
+        width: calc(60% - 80px);
+    }
+}
+
 @media (max-width: 768px) {
     .profile-container {
-        padding: 15px;
+        width: 96%;
+        height: auto;
+        margin: 2vh 2%;
     }
-
-    .profile-photo-container {
-        width: 100px;
-        height: 100px;
-    }
-
-    .profile-name {
-        font-size: 20px;
-    }
-
-    .profile-bio {
-        font-size: 12px;
-    }
-
-    .edit-profile-button,
-    .add-tag button {
-        font-size: 14px;
-        padding: 8px 15px;
-    }
-
+    
     .profile-actions {
         flex-direction: column;
-        align-items: center;
+        gap: 10px;
     }
-
+    
     .edit-profile-button,
     .add-tag button {
-        max-width: 100%;
+        width: 100%;
     }
 }

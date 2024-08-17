@@ -8,7 +8,7 @@ import Quests from './Quests';
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap }) => {
+const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection }) => {
   const mapContainerRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -53,7 +53,24 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap }) => {
     };
   }, [mapLoaded, mapInstance, setAddress, setCurrentUserIds]);
 
-  
+  useEffect(() => {
+    if (mapInstance && mapLoaded) {
+      const handleResize = () => {
+        mapInstance.resize();
+      };
+
+      // Resize immediately when the component mounts or when activeSection changes
+      handleResize();
+
+      // Add event listener for window resize
+      window.addEventListener('resize', handleResize);
+
+      // Clean up
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [mapInstance, mapLoaded, activeSection]);
 
   const handleQuestAccepted = async (quest) => {
     if (mapInstance && quest.senderLocation) {

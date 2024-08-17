@@ -26,26 +26,25 @@ body {
 .nav-bar {
   width: 250px;
   height: 100vh;
-  background-color: #2a2a2a;
+  background-color: #1a1a1a;
   display: flex;
   flex-direction: column;
   padding: 20px 0;
   z-index: 10;
   transition: width 0.3s ease;
-  border-right: none;
+  border-right: 1px solid #333;
 }
 
 .nav-header {
-  top: 50%;
-  padding: 30px 20px;
+  padding: 20px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .logo {
-  top: 100%;
   width: 100%;
-  max-width: 140px;
+  max-width: 120px;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
@@ -54,36 +53,37 @@ nav {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 20px;
+  padding-top: 30px;
 }
 
 .nav-button {
   display: flex;
   align-items: center;
-  width: 90%;
-  margin: 0 auto 10px;
+  width: 85%;
+  margin: 0 auto 15px;
   padding: 12px 20px;
   background: none;
   border: none;
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .nav-button:hover {
-  background-color: #3a3a3a;
+  background-color: #2c2c2c;
 }
 
 .nav-button.active {
-  background-color: #4a4a4a;
+  background-color: #3a3a3a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav-button img {
-  width: 15%;
+  width: 24px;
   height: 24px;
   margin-right: 15px;
   filter: brightness(0) invert(1);
@@ -141,6 +141,7 @@ nav {
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
+  transition: flex-grow 0.3s ease;
 }
 
 #map {
@@ -158,10 +159,6 @@ nav {
   flex-grow: 1;
 }
 
-.profile-active #map {
-  width: 100%;
-}
-
 /* Location pin styling */
 .location-pin {
   position: absolute;
@@ -173,8 +170,8 @@ nav {
 
 .marker-container {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border: 2px solid rgba(92, 92, 92, 0.7);
   border-radius: 50%;
   display: flex;
@@ -187,17 +184,17 @@ nav {
 
 .marker-container img {
   border-radius: 50%;
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
   object-fit: cover;
 }
 
 .marker-dot {
   position: absolute;
-  bottom: -15px;
+  bottom: -18px;
   left: 50%;
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background-color: #3c68c6;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -247,25 +244,28 @@ nav {
     width: 80px;
   }
 
+  .nav-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    justify-content: center;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+
+  .nav-button img {
+    margin-right: 0;
+    width: 28px;
+    height: 28px;
+  }
+
   .nav-button span, 
   .theme-toggle span {
     display: none;
   }
 
-  .nav-button {
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    padding: 0;
-  }
-
-  .nav-button img {
-    margin-right: 0;
-  }
-
   .logo {
-    max-width: 40px;
+    max-width: 50px;
   }
 
   .content-area {

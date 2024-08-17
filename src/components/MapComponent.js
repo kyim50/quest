@@ -59,15 +59,19 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
         mapInstance.resize();
       };
 
-      // Resize immediately when the component mounts or when activeSection changes
+      // Resize immediately when activeSection changes
       handleResize();
 
       // Add event listener for window resize
       window.addEventListener('resize', handleResize);
 
+      // Use a timeout to ensure the resize happens after layout changes
+      const resizeTimeout = setTimeout(handleResize, 300);
+
       // Clean up
       return () => {
         window.removeEventListener('resize', handleResize);
+        clearTimeout(resizeTimeout);
       };
     }
   }, [mapInstance, mapLoaded, activeSection]);

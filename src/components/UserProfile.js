@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { auth, uploadImage, updateUserProfile, fetchUserData } from '../firebase';
+import { auth, uploadImage, updateUserProfile, fetchUserData, db } from '../firebase';
 import { useNotification } from '../NotificationContext';
 import { Privacy } from './Privacy';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import '../styles/profile.css';
 
 const UserProfile = () => {
@@ -14,6 +15,8 @@ const UserProfile = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [tags, setTags] = useState([]);
   const [showTagOptions, setShowTagOptions] = useState(false);
+  const [recentQuests, setRecentQuests] = useState([]);
+  const [activeQuest, setActiveQuest] = useState(null);
   const fileInputRef = useRef(null);
   const { showNotification } = useNotification();
 
@@ -27,6 +30,8 @@ const UserProfile = () => {
 
   useEffect(() => {
     fetchUserDataAndUpdate();
+    fetchRecentQuests();
+    fetchActiveQuest();
   }, []);
 
   const fetchUserDataAndUpdate = async () => {
@@ -42,6 +47,47 @@ const UserProfile = () => {
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+    }
+  };
+
+  const fetchRecentQuests = async () => {
+    try {
+      const questsQuery = query(
+        collection(db, 'quests'),
+        where('uid', '==', auth.currentUser.uid),
+        orderBy('createdAt', 'desc'),
+        limit(5)
+      );
+      const questsSnapshot = await getDocs(questsQuery);
+      const quests = questsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setRecentQuests(quests);
+    } catch (error) {
+      console.error('Error fetching recent quests:', error);
+    }
+  };
+
+  const fetchActiveQuest = async () => {
+    try {
+      const activeQuestQuery = query(
+        collection(db, 'quests'),
+        where('uid', '==', auth.currentUser.uid),
+        where('status', '==', 'accepted')
+      );
+      const activeQuestSnapshot = await getDocs(activeQuestQuery);
+      if (!activeQuestSnapshot.empty) {
+        const activeQuestData = activeQuestSnapshot.docs[0].data();
+        const partnerUserData = await fetchUserData(activeQuestData.targetUser);
+        setActiveQuest({
+          ...activeQuestData,
+          partnerName: partnerUserData.name,
+          partnerPhoto: partnerUserData.profilePhoto,
+          partnerUsername: partnerUserData.username
+        });
+      } else {
+        setActiveQuest(null);
+      }
+    } catch (error) {
+      console.error('Error fetching active quest:', error);
     }
   };
 
@@ -62,7 +108,6 @@ const UserProfile = () => {
     try {
       let photoURL = profilePhoto;
       if (selectedPhoto) {
-        // Upload the new photo to Firebase Storage
         photoURL = await uploadImage(selectedPhoto);
       }
 
@@ -114,98 +159,95 @@ const UserProfile = () => {
   };
 
   return (
-    <section id="profile-section" className="content-section show-section">
-      <div className="profile-container">
-        <div className="profile-header">
-          <div className="profile-photo-container" onClick={handleProfilePhotoClick}>
-            <img
-              src={profilePhoto}
-              alt="Profile"
-              className="profile-photo"
-            />
-            {isEditing && (
-              <>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handlePhotoChange}
-                  style={{ display: 'none' }}
-                />
-                <div className="edit-photo-overlay">
-                  Edit Profile Photo
-                </div>
-              </>
-            )}
-          </div>
-          <div className="profile-info">
-            {isEditing ? (
-              <div className="edit-fields">
-                <label className="edit-label">Name:</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="profile-name-edit"
-                />
-                <label className="edit-label">Bio:</label>
-                <textarea
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  className="profile-bio-edit"
-                  maxLength={150}
-                />
-                <p className="char-count">{bio.length}/150</p>
-              </div>
-            ) : (
-              <>
-                <h2 className="profile-name">{name}</h2>
-                <p className="profile-status">
-                  <span className="status-dot"></span> Active
-                </p>
-                <p className="profile-bio">{bio}</p>
-              </>
-            )}
-          </div>
-          <div className="privacy-icon">
-            <Privacy isPrivate={isPrivate} onPrivacyChange={handlePrivacyModeChange} />
-          </div>
-        </div>
-
-        <div className="tags-container">
-          {tags.map((tag) => (
-            <div key={tag} className="tag">
-              {predefinedTags.find(t => t.value === tag).text}
-              <button onClick={() => handleRemoveTag(tag)}>x</button>
-            </div>
-          ))}
-          {tags.length < 3 && (
-            <div className="add-tag">
-              <button onClick={toggleTagOptions}>
-                Add Tags
-              </button>
-              {showTagOptions && (
-                <div className="tag-options">
-                  {predefinedTags.map(({ text, value }) => (
-                    <button key={value} onClick={() => handleAddTag(value)}>
-                      {text}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+    <div className="profile-container">
+      <div className="profile-header">
+        <div className="profile-photo-container" onClick={handleProfilePhotoClick}>
+          <img src={profilePhoto} alt="Profile" className="profile-photo" />
+          {isEditing && (
+            <>
+              <input type="file" ref={fileInputRef} onChange={handlePhotoChange} style={{ display: 'none' }} />
+              <div className="edit-photo-overlay">Edit Profile Photo</div>
+            </>
           )}
         </div>
+        <div className="profile-info">
+          {isEditing ? (
+            <div className="edit-fields">
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="profile-name-edit" />
+              <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="profile-bio-edit" maxLength={150} />
+              <p className="char-count">{bio.length}/150</p>
+            </div>
+          ) : (
+            <>
+              <h2 className="profile-name">{name}</h2>
+              <p className="profile-status"><span className="status-dot"></span> Active</p>
+              <p className="profile-bio">{bio}</p>
+            </>
+          )}
+        </div>
+        <div className="privacy-icon">
+          <Privacy isPrivate={isPrivate} onPrivacyChange={handlePrivacyModeChange} />
+        </div>
+      </div>
 
+      <div className="profile-actions">
         <button className="edit-profile-button" onClick={isEditing ? handleSaveProfile : handleEditProfile}>
           <i className="fas fa-user-edit"></i> {isEditing ? 'Save Profile' : 'Edit Profile'}
         </button>
-        {isEditing && (
-          <button className="cancel-edit-button" onClick={handleEditProfile}>
-            Cancel
-          </button>
+        <div className="add-tag">
+          <button onClick={toggleTagOptions}>Add Tags</button>
+          {showTagOptions && (
+            <div className="tag-options">
+              {predefinedTags.map(({ text, value }) => (
+                <button key={value} onClick={() => handleAddTag(value)}>{text}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="tags-container">
+        {tags.map((tag) => (
+          <div key={tag} className="tag">
+            {predefinedTags.find(t => t.value === tag).text}
+            <button onClick={() => handleRemoveTag(tag)}>x</button>
+          </div>
+        ))}
+      </div>
+
+      <div className="active-quests">
+        <h3>Active Quests</h3>
+        {activeQuest ? (
+          <div className="active-quest-item">
+            <p>"{activeQuest.title}" with</p>
+            <div className="quest-partner">
+              <img src={activeQuest.partnerPhoto} alt={activeQuest.partnerName} className="partner-photo" />
+              <p>{activeQuest.partnerName} @{activeQuest.partnerUsername}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="no-active-quests">
+            <p>No quests ongoing. Ready to start a new adventure?</p>
+          </div>
         )}
       </div>
-    </section>
+
+      <div className="recent-quests">
+        <h3>Recent Quests</h3>
+        {recentQuests.length > 0 ? (
+          recentQuests.map(quest => (
+            <div key={quest.id} className="recent-quest-item">
+              <p>{quest.title}</p>
+              <p>with {quest.targetUser}</p>
+            </div>
+          ))
+        ) : (
+          <div className="no-recent-quests">
+            <p>No recent quests. Time to explore!</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

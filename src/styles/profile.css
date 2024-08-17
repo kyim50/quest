@@ -7,9 +7,8 @@
     border-radius: 10px;
     color: #fffcf2;
     width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    overflow-x: hidden;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .profile-header {
@@ -18,6 +17,7 @@
     align-items: center;
     position: relative;
     width: 100%;
+    margin-bottom: 20px;
 }
 
 .profile-photo-container {
@@ -28,6 +28,7 @@
     overflow: hidden;
     border: 3px solid white;
     cursor: pointer;
+    margin-bottom: 15px;
 }
 
 .profile-photo {
@@ -59,16 +60,19 @@
 
 .profile-info {
     text-align: center;
+    width: 100%;
 }
 
 .profile-name {
     font-size: 24px;
     font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .profile-status {
     font-size: 16px;
     color: #ccc5b9;
+    margin-bottom: 10px;
 }
 
 .status-dot {
@@ -83,11 +87,19 @@
 .profile-bio {
     font-size: 14px;
     color: #ccc5b9;
-    margin-top: 5px;
+    margin-bottom: 15px;
 }
 
-.edit-profile-button {
-    margin-top: 20px;
+.profile-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.edit-profile-button,
+.add-tag button {
     background-color: rgb(58, 58, 60);
     color: #fffcf2;
     padding: 10px 20px;
@@ -95,16 +107,13 @@
     font-size: 16px;
     cursor: pointer;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 300px;
-    transition: background-color 0.5s;
-
+    transition: background-color 0.3s;
+    flex: 1;
+    max-width: 150px;
 }
 
-.edit-profile-button:hover {
+.edit-profile-button:hover,
+.add-tag button:hover {
     background-color: rgb(84, 84, 85);
 }
 
@@ -116,10 +125,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
-
-.cancel-edit-button {
-    margin-top: 20px;
+    width: 100%;
 }
 
 .edit-label {
@@ -133,12 +139,21 @@
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: rgb(58, 58, 60);
+    color: #fffcf2;
 }
 
 .char-count {
     font-size: 12px;
     color: #888;
-    margin-top: 5px;
+    text-align: right;
+}
+
+.privacy-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
 }
 
 .tags-container {
@@ -146,12 +161,13 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 5px;
-    margin: 10px 0;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 .tag {
     background-color: rgb(58, 58, 60);
-    color: #252422;
+    color: #fffcf2;
     padding: 5px 10px;
     border-radius: 30px;
     display: flex;
@@ -163,162 +179,130 @@
     background: none;
     border: none;
     color: rgb(10, 145, 255);
-    margin-left: 0px;
+    margin-left: 5px;
     cursor: pointer;
     font-size: 14px;
 }
 
 .add-tag {
-    display: inline-block;
     position: relative;
 }
 
-.add-tag button {
-    background-color: rgb(10, 145, 255);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 .tag-options {
-    display: flex;
-    flex-wrap: wrap;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #FFFCF2;
-    border: 1px solid #CCC5B9;
+    background-color: rgb(58, 58, 60);
+    border: 1px solid #ccc5b9;
     border-radius: 5px;
     padding: 5px;
     z-index: 10;
-    max-width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-}
-
-.tag-options button {
-    background-color: #FFFCF2;
-    color: #403D39;
-    padding: 5px 8px;
-    margin: 2px;
-    border: 1px solid #CCC5B9;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.tag-options button:hover {
-    background-color: #CCC5B9;
-}
-
-.privacy-settings {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
-
-.privacy-settings svg {
-    width: 24px;
-    height: 24px;
-    color: #333;
-}
-
-/* ... (previous styles remain the same) */
-
-.custom-popup .profile-container {
-    width: 300px;
-    background-color: rgb(28, 28, 30);
-    border-radius: 10px;
-    padding: 15px;
-    color: #fffcf2;
-  }
-  
-  .custom-popup .profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  
-  .custom-popup .profile-photo-container {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 15px;
-  }
-  
-  .custom-popup .profile-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .custom-popup .profile-info {
-    flex: 1;
-  }
-  
-  .custom-popup .profile-name {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0 0 5px 0;
-  }
-  
-  .custom-popup .profile-status {
-    font-size: 14px;
-    color: #ccc5b9;
-    margin: 0 0 5px 0;
-  }
-  
-  .custom-popup .profile-bio {
-    font-size: 14px;
-    color: #ccc5b9;
-    margin: 0;
-  }
-  
-  .custom-popup .tags-container {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    margin-bottom: 15px;
-  }
-  
-  .custom-popup .tag {
-    background-color: rgb(58, 58, 60);
+}
+
+.tag-options button {
+    background-color: rgb(68, 68, 70);
     color: #fffcf2;
-    padding: 3px 8px;
-    border-radius: 15px;
-    font-size: 12px;
-  }
-  
-  .custom-popup .add-friend-button {
-    width: 100%;
-    background-color: rgb(10, 145, 255);
-    color: white;
     border: none;
-    padding: 8px 0;
-    border-radius: 5px;
+    padding: 5px 10px;
+    border-radius: 3px;
     cursor: pointer;
-    font-size: 14px;
     transition: background-color 0.3s;
-  }
-  
-  .custom-popup .add-friend-button:hover {
-    background-color: rgb(0, 122, 255);
-  }
-  
-  .custom-popup .add-friend-button:disabled {
-    background-color: #ccc5b9;
-    cursor: not-allowed;
-  }
-  
-  /* Override mapboxgl popup styles */
-  .mapboxgl-popup-content {
-    padding: 0 !important;
-    background: none !important;
-    box-shadow: none !important;
-  }
-  
-  .mapboxgl-popup-tip {
-    display: none !important;
-  }
+}
+
+.tag-options button:hover {
+    background-color: rgb(84, 84, 85);
+}
+
+.active-quests,
+.recent-quests {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.active-quests h3,
+.recent-quests h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #fffcf2;
+}
+
+.active-quest-item,
+.recent-quest-item {
+    background-color: rgb(58, 58, 60);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.active-quest-item p,
+.recent-quest-item p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.active-quest-item p:first-child,
+.recent-quest-item p:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.quest-partner {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.partner-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.no-active-quests,
+.no-recent-quests {
+    background-color: rgb(48, 48, 50);
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-style: italic;
+    color: #ccc5b9;
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 15px;
+    }
+
+    .profile-photo-container {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-name {
+        font-size: 20px;
+    }
+
+    .profile-bio {
+        font-size: 12px;
+    }
+
+    .edit-profile-button,
+    .add-tag button {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .edit-profile-button,
+    .add-tag button {
+        max-width: 100%;
+    }
+}

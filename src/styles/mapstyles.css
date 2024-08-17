@@ -26,59 +26,74 @@ body {
 .nav-bar {
   width: 250px;
   height: 100vh;
-  background-color: #252736;
+  background-color: #2a2a2a;
   display: flex;
   flex-direction: column;
   padding: 20px 0;
   z-index: 10;
+  transition: width 0.3s ease;
+  border-right: none; /* Remove the right border */
 }
 
 .nav-header {
-  padding: 0 50px 50px; /* Increased bottom padding */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Optional: adds a subtle separator */
+  padding: 50px 20px 30px;
+  border-bottom: none; /* Remove the bottom border */
+  display: flex;
+  justify-content: center; /* Center the logo */
 }
 
-.nav-logo {
+.logo {
   width: 100%;
-  max-width: 120px;
+  max-width: 60px;
   cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-.nav-bar nav {
+nav {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding-top: 30px; /* Added top padding */
+  padding-top: 20px; /* Reduced top padding */
 }
 
 .nav-button {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 15px 20px;
+  padding: 12px 20px;
   background: none;
   border: none;
-  color: #ffffff;
+  color: #ffffff; /* White text */
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.3s;
+  margin-bottom: 5px; /* Reduced margin */
 }
 
-.nav-button:hover, .nav-button.active {
-  background-color: #2f3142;
+.nav-button:hover {
+  background-color: #3a3a3a; /* Slightly darker on hover */
+}
+
+.nav-button.active {
+  background-color: #4a4a4a; /* Even darker when active */
 }
 
 .nav-button img {
   width: 24px;
   height: 24px;
   margin-right: 15px;
+  filter: brightness(0) invert(1); /* Make icons white */
+}
+
+.nav-button span {
+  color: #ffffff; /* Ensure text is white */
 }
 
 .nav-footer {
   padding: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Optional: adds a subtle separator */
+  border-top: none; /* Remove the top border */
 }
 
 .theme-toggle {
@@ -86,7 +101,7 @@ body {
   align-items: center;
   background: none;
   border: none;
-  color: #ffffff;
+  color: #ffffff; /* White text */
   font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', sans-serif;
   font-weight: 600;
   font-size: 14px;
@@ -97,9 +112,65 @@ body {
   width: 20px;
   height: 20px;
   margin-right: 10px;
+  filter: brightness(0) invert(1); /* Make icon white */
 }
 
-/* Content area */
+/* Responsive design */
+@media (max-width: 1200px) {
+  .nav-bar {
+    width: 80px;
+  }
+
+  .nav-button span, 
+  .theme-toggle span {
+    display: none;
+  }
+
+  .nav-button {
+    justify-content: center;
+  }
+
+  .nav-button img {
+    margin-right: 0;
+  }
+
+  .logo {
+    max-width: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    padding: 10px;
+  }
+
+  .nav-header {
+    padding: 0 10px;
+  }
+
+  nav {
+    flex-direction: row;
+    padding-top: 0;
+    justify-content: space-around;
+  }
+
+  .nav-button {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-button img {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  .nav-footer {
+    display: none;
+  }
+}
 /* Map container adjustment */
 .map-container {
   width: 38%; /* Slightly reduced from 40% */

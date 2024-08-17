@@ -1,38 +1,37 @@
 import React from 'react';
+import '../styles/mapstyles.css';
 
 const NavigationBar = ({ activeSection, showSection }) => {
+  const navItems = [
+    { id: 'profile', icon: '/profile.png', label: 'Profile' },
+    { id: 'connections', icon: '/connections.png', label: 'Connections' },
+    { id: 'quests', icon: '/quest.png', label: 'Quests' },
+    { id: 'history', icon: '/history.png', label: 'History' },
+  ];
+
   return (
     <div className="nav-bar">
       <div className="nav-header">
-      <img src="quests logo.png" alt="Quests Logo" className="logo" 
+        <img 
+          src="Questslogo white.png" 
+          alt="Quests Logo" 
+          className="logo" 
           onClick={() => showSection('home')}
         />
       </div>
       <nav>
-        <button onClick={() => showSection('profile')} className={`nav-button ${activeSection === 'profile' ? 'active' : ''}`}>
-          <img src="/profile.png" alt="Profile" />
-          <span>Profile</span>
-        </button>
-        <button onClick={() => showSection('connections')} className={`nav-button ${activeSection === 'connections' ? 'active' : ''}`}>
-          <img src="/connections.png" alt="Connections" />
-          <span>Connections</span>
-        </button>
-        <button onClick={() => showSection('quests')} className={`nav-button ${activeSection === 'quests' ? 'active' : ''}`}>
-          <img src="/quest.png" alt="Quests" />
-          <span>Quests</span>
-        </button>
-        <button onClick={() => showSection('history')} className={`nav-button ${activeSection === 'history' ? 'active' : ''}`}>
-          <img src="/history.png" alt="History" />
-          <span>History</span>
-        </button>
+        {navItems.map((item) => (
+          <button 
+            key={item.id}
+            onClick={() => showSection(item.id)} 
+            className={`nav-button ${activeSection === item.id ? 'active' : ''}`}
+          >
+            <img src={item.icon} alt={item.label} />
+            <span>{item.label}</span>
+          </button>
+        ))}
       </nav>
-      <div className="nav-footer">
-        <button className="theme-toggle">
-          <img src="/night-mode-icon.png" alt="Night Mode" />
-          <span>Night Mode</span>
-        </button>
       </div>
-    </div>
   );
 };
 

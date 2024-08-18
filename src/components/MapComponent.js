@@ -134,4 +134,4 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
   );
 };
 
-export default MapComponent;
+export default MapComponent; 

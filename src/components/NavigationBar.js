@@ -13,9 +13,9 @@ const NavigationBar = ({ activeSection, showSection }) => {
     <div className="nav-bar">
       <div className="nav-header">
         <img 
-          src="Quests Logo.png" 
+          src="Questslogo blue.png" 
           alt="Quests Logo" 
-          className="logo" 
+          className="qlogo" 
           onClick={() => showSection('home')}
         />
       </div>

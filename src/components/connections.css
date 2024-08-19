@@ -11,6 +11,66 @@
   color: #F0F0F5;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.connections-container.user-locked {
+  max-width: 400px;
+}
+
+.profile-container {
+  background-color: #2C2C2E;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.add-friend-btn,
+.chat-btn,
+.unlock-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-friend-btn {
+  background-color: #007AFF;
+  color: white;
+}
+
+.add-friend-btn:hover {
+  background-color: #0056b3;
+}
+
+.chat-btn {
+  background-color: #34C759;
+  color: white;
+}
+
+.chat-btn:hover {
+  background-color: #2da84e;
+}
+
+.unlock-btn {
+  background-color: #FF3B30;
+  color: white;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.unlock-btn:hover {
+  background-color: #d63429;
 }
 
 /* Section styling */
@@ -75,7 +135,7 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 15px;
-  border: 2px solid #007AFF;
+  border: 2px solid #181819;
   transition: transform 0.2s ease;
 }
 
@@ -179,7 +239,7 @@
   z-index: 1000;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.4);
   text-align: center;
   animation: fadeIn 0.3s ease;
 }
@@ -603,3 +663,5 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+

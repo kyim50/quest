@@ -6,11 +6,11 @@
     height: 70%;
     width: 60%;
     border-radius: 20px;
-    min-width: 800px;
+    min-width: 300px;
     min-height: 300px;
     background-color: rgb(58,58,60);
     display: flex;
-    overflow: hidden; /* This will ensure the child elements don't overflow the rounded corners */
+    overflow: hidden;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -29,45 +29,12 @@
     margin-top: 30px;
 }
 
-/* ... (keep all other existing styles) ... */
-
-.blue-rectangle {
-    width: 40%;
-    background: linear-gradient(135deg, rgb(10,145,255) 0%, rgb(7, 100, 177) 100%);    
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    z-index: 1;
-    box-shadow: -10px 0 10px -5px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-
-.questsimg{
-    height:100px;
-    width:auto;
-}
-.blue-rectangle h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    margin-top: 20px;
-}
-
-.blue-rectangle p {
-    font-size: 16px;
-    text-align: center;
-}
-
 .register-form input {
     width: 100%;
     padding: 10px;
     height: 40px;
     margin: 15px 0;
     background-color: rgb(99, 99, 102);
-    
     border: none;
     box-shadow: none;
     font-size: 16px;
@@ -78,7 +45,6 @@
     appearance: none;
 }
 
-/* Ensure consistent styling for all input fields, including the username */
 .register-form input[type="text"],
 .register-form input[type="email"],
 .register-form input[type="password"] {
@@ -88,7 +54,6 @@
     border: 1px solid transparent;
 }
 
-/* Prevent color or border change on focus */
 .register-form input:focus,
 .register-form input:active {
     background-color: rgb(99, 99, 102);
@@ -97,7 +62,6 @@
     border-color: transparent;
 }
 
-/* Remove autofill background color */
 .register-form input:-webkit-autofill,
 .register-form input:-webkit-autofill:hover,
 .register-form input:-webkit-autofill:focus,
@@ -138,42 +102,45 @@
     color: white;
     border: none;
     border-radius: 15px;
-    height:40px;
+    height: 40px;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     width: 48%;
-    display:flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     transition: width 0.3s, background-color 0.3s;
 }
 
-.register-btn:hover{
+.register-btn:hover {
     background-color: rgb(9, 126, 221);
-    width:49%;
+    width: 49%;
 }
-.google-register-btn:hover{
+
+.google-register-btn:hover {
     background-color: #d8d5d5;
-    width:49%;
+    width: 49%;
 }
+
 .google-register-btn {
     background-color: #fff;
     border: none;
     border-radius: 15px;
     cursor: pointer;
     width: 48%;
-    height:40px;
-    display:flex;
+    height: 40px;
+    display: flex;
     justify-content: center;
     align-items: center;
     transition: width 0.3s, background-color 0.3s;
 }
 
-.google-register-btn img{
-    height:25px;
-    width:auto;
+.google-register-btn img {
+    height: 25px;
+    width: auto;
 }
+
 .createacc {
     font-size: 28px;
     text-align: left;
@@ -185,4 +152,81 @@
     text-align: left;
     width: 100%;
     margin-bottom: 20px;
+}
+
+.blue-rectangle {
+    width: 40%;
+    background: linear-gradient(135deg, rgb(10,145,255) 0%, rgb(7, 100, 177) 100%);    
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 1;
+    box-shadow: -10px 0 10px -5px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.questsimg {
+    height: 100px;
+    width: auto;
+}
+
+.blue-rectangle h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+
+.blue-rectangle p {
+    font-size: 16px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .register-container {
+        width: 90%;
+        height: auto;
+        flex-direction: column;
+    }
+
+    .register-form-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .blue-rectangle {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .register-btn,
+    .google-register-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-container {
+        min-width: 0;
+    }
+
+    .createacc {
+        font-size: 24px;
+    }
+
+    .register-form input {
+        font-size: 14px;
+    }
+
+    .register-btn,
+    .google-register-btn {
+        font-size: 16px;
+    }
 }

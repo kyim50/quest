@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { setupUserLocationsListener, trackUserLocation } from './UserLocationService';
+import { setupUserLocationsListener, trackUserLocation, centerMapOnUser } from './UserLocationService';
 import QuestsComponent from './QuestsComponent';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Quests from './Quests';
@@ -8,11 +8,12 @@ import Quests from './Quests';
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection }) => {
+const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection, lockedUser }) => {
   const mapContainerRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [currentUserIds, setLocalCurrentUserIds] = useState([]);
+  const markersRef = useRef({});
 
   useEffect(() => {
     if (!mapInstance) {
@@ -40,9 +41,10 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
     let unsubscribe;
     if (mapLoaded && mapInstance) {
       trackUserLocation(mapInstance, setAddress);
-      unsubscribe = setupUserLocationsListener(mapInstance, (ids) => {
+      unsubscribe = setupUserLocationsListener(mapInstance, (ids, markers) => {
         setLocalCurrentUserIds(ids);
         setCurrentUserIds(ids);
+        markersRef.current = markers;
       });
     }
 
@@ -59,22 +61,39 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
         mapInstance.resize();
       };
 
-      // Resize immediately when activeSection changes
       handleResize();
-
-      // Add event listener for window resize
       window.addEventListener('resize', handleResize);
-
-      // Use a timeout to ensure the resize happens after layout changes
       const resizeTimeout = setTimeout(handleResize, 300);
 
-      // Clean up
       return () => {
         window.removeEventListener('resize', handleResize);
         clearTimeout(resizeTimeout);
       };
     }
   }, [mapInstance, mapLoaded, activeSection]);
+
+  useEffect(() => {
+    if (mapInstance && mapLoaded && lockedUser) {
+      centerMapOnUser(mapInstance, lockedUser);
+
+      // Update markers to show/hide lock indicator
+      Object.keys(markersRef.current).forEach(userId => {
+        const marker = markersRef.current[userId];
+        const element = marker.getElement();
+        const arrow = element.querySelector('.lock-indicator');
+
+        if (userId === lockedUser) {
+          if (!arrow) {
+            const newArrow = document.createElement('div');
+            newArrow.className = 'lock-indicator';
+            element.appendChild(newArrow);
+          }
+        } else if (arrow) {
+          element.removeChild(arrow);
+        }
+      });
+    }
+  }, [mapInstance, mapLoaded, lockedUser]);
 
   const handleQuestAccepted = async (quest) => {
     if (mapInstance && quest.senderLocation) {
@@ -134,4 +153,4 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
   );
 };
 
-export default MapComponent; 
+export default MapComponent;

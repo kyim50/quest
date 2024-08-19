@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, serverTimestamp, arrayRemove, getDoc, arrayUnion, query, where, orderBy, limit } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import './connections.css';
+import { centerMapOnUser } from './UserLocationService';
 
-const Connections = ({ currentUserIds = [] }) => {
+const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) =>  {
   const [people, setPeople] = useState([]);
   const [friends, setFriends] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -16,7 +17,9 @@ const Connections = ({ currentUserIds = [] }) => {
   const [chatHistory, setChatHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
+  const [lockedUser, setLockedUser] = useState(null);
 
+  // Fetch active users who are not friends
   // Fetch active users who are not friends
   const fetchPeople = useCallback(async () => {
     if (!auth.currentUser) {
@@ -25,17 +28,18 @@ const Connections = ({ currentUserIds = [] }) => {
     }
 
     const usersCollection = collection(db, 'users');
-    const querySnapshot = await getDocs(usersCollection);
+    const activeUsersQuery = query(usersCollection, where('isActive', '==', true));
+    const querySnapshot = await getDocs(activeUsersQuery);
     const usersList = querySnapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
       .filter(user =>
         user.id !== auth.currentUser.uid &&
         !friends.some(friend => friend.id === user.id) &&
-        user.isActive // Check if user is active
+        currentUserIds.includes(user.id)
       );
 
     setPeople(usersList);
-  }, [friends]);
+  }, [friends, currentUserIds]);
 
   // Fetch friends of the current user
   const fetchFriends = useCallback(async () => {
@@ -192,9 +196,20 @@ const Connections = ({ currentUserIds = [] }) => {
     }
   };
 
-  const handleUserClick = (user) => {
-    console.log('User clicked:', user);
-    setSelectedUser(user);
+  const handleUserClick = async (user) => {
+    if (lockedUser === user.id) {
+      setLockedUserId(null);
+      if (map && auth.currentUser) {
+        centerMapOnUser(map, auth.currentUser.uid);
+      }
+    } else {
+      setLockedUser(user.id);
+      const userDoc = await getDoc(doc(db, 'users', user.id));
+      const userData = userDoc.data();
+      if (userData && userData.location && map) {
+        centerMapOnUser(map, user.id);
+      }
+    }
   };
 
   const handleClosePopup = () => {
@@ -331,61 +346,134 @@ const Connections = ({ currentUserIds = [] }) => {
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const renderLockedUserProfile = () => {
+    if (!lockedUser) return null;
+
+    const user = people.find(p => p.id === lockedUser) || friends.find(f => f.id === lockedUser);
+    if (!user) return null;
+
+    return (
+      <div className="profile-container">
+        <div className="profile-header">
+          <div className="profile-photo-container">
+            <img src={user.profilePhoto} alt="Profile" className="profile-photo" />
+          </div>
+          <div className="profile-name-status">
+            <h2 className="profile-name">{user.name}</h2>
+            <p className="profile-status"><span className="status-dot"></span> Active</p>
+          </div>
+        </div>
+
+        <div className="profile-section">
+          <h3 className="section-title">Bio</h3>
+          <p className="profile-bio">{user.bio || "No bio available"}</p>
+        </div>
+
+        <div className="profile-section">
+          <h3 className="section-title">Tags</h3>
+          <div className="tags-container">
+            {user.tags && user.tags.map((tag) => (
+              <div key={tag} className="tag">
+                {tag}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="profile-actions">
+          <button className="add-friend-btn" onClick={() => handleAddFriend(user.id)}>
+            Add Friend
+          </button>
+          <button className="chat-btn" onClick={() => handleChatClick(user)}>
+            Chat
+          </button>
+        </div>
+
+        <button className="unlock-btn" onClick={() => setLockedUser(null)}>
+          Unlock User
+        </button>
+      </div>
+    );
+  };
+
   return (
-    <div className="connections-container">
+    <div className={`connections-container ${lockedUser ? 'user-locked' : ''}`}>
       {notification && <div className="notification">{notification}</div>}
 
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </div>
-
-      <div className="friends-section">
-        <h2>Friends</h2>
-        {friends.map(friend => (
-          <div key={friend.id} className="friend-item">
-            <img src={friend.profilePhoto} alt="Friend" />
-            <div>{friend.name}</div>
-            <div className="button-group">
-              <button className="remove-friend-btn" onClick={() => handleRemoveFriend(friend.id)}>Remove</button>
-              <button className="chat-btn" onClick={() => handleChatClick(friend)}>Chat</button>
-            </div>
+      {lockedUser ? (
+        renderLockedUserProfile()
+      ) : (
+        <>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
-        ))}
-      </div>
 
-      <div className="pending-requests-section">
-        <h2>Pending Requests</h2>
-        {pendingRequests.map(request => (
-          <div key={request.id} className="pending-request">
-            <img src={request.senderPhoto} alt="User" />
-            <div>{request.senderName}</div>
-            <div className="button-group">
-              <button className="accept-btn" onClick={() => handleAcceptRequest(request.id, request.senderId)}>Accept</button>
-              <button className="decline-btn" onClick={() => handleDeclineRequest(request.id)}>Decline</button>
-            </div>
+          <div className="friends-section">
+            <h2>Friends</h2>
+            {friends.map(friend => (
+              <div key={friend.id} className="friend-item" onClick={() => handleUserClick(friend)}>
+                <img src={friend.profilePhoto} alt="Friend" />
+                <div>{friend.name}</div>
+                <div className="button-group">
+                  <button className="remove-friend-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveFriend(friend.id);
+                  }}>Remove</button>
+                  <button className="chat-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    handleChatClick(friend);
+                  }}>Chat</button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className="people-section">
-        <h2>People</h2>
-        {filteredPeople.map(user => (
-          <div key={user.id} className="people-item">
-            <img src={user.profilePhoto} alt="User" />
-            <div>{user.name}</div>
-            <div className="button-group">
-              <button className="view-profile-btn" onClick={() => handleButtonClick(user)}>+</button>
-              <button className="chat-btn" onClick={() => handleChatClick(user)}>Chat</button>
-            </div>
+          <div className="pending-requests-section">
+            <h2>Pending Requests</h2>
+            {pendingRequests.map(request => (
+              <div key={request.id} className="pending-request">
+                <img src={request.senderPhoto} alt="User" />
+                <div>{request.senderName}</div>
+                <div className="button-group">
+                  <button className="accept-btn" onClick={() => handleAcceptRequest(request.id, request.senderId)}>Accept</button>
+                  <button className="decline-btn" onClick={() => handleDeclineRequest(request.id)}>Decline</button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
+          <div className="people-section">
+            <h2>People</h2>
+            {filteredPeople.map(user => (
+              <div 
+                key={user.id} 
+                className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
+                onClick={() => handleUserClick(user)}
+              >
+                <img src={user.profilePhoto} alt="User" />
+                <div>{user.name}</div>
+                <div className="button-group">
+                  <button className="add-friend-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddFriend(user.id);
+                  }}>
+                    Add Friend
+                  </button>
+                  <button className="chat-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    handleChatClick(user);
+                  }}>Chat</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
       {selectedUser && (
         <div className="user-popup">
           <button className="close-popup" onClick={handleClosePopup}>×</button>

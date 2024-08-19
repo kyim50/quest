@@ -373,6 +373,32 @@ export const removeRoute = (map) => {
     }
   });
 };
+
+export const centerMapOnUser = async (map, userId) => {
+  if (!map) {
+    console.error('Map object is not available');
+    return;
+  }
+
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    const userData = userDoc.data();
+
+    if (userData && userData.location) {
+      map.flyTo({
+        center: [userData.location.longitude, userData.location.latitude],
+        zoom: 15,
+        duration: 1000
+      });
+    } else {
+      console.warn(`No location data found for user ${userId}`);
+    }
+  } catch (error) {
+    console.error('Error centering map on user:', error);
+  }
+};
+
+
 export const setUserIsActive = async (isActive) => {
   if (auth.currentUser) {
     const userDocRef = doc(db, 'users', auth.currentUser.uid);

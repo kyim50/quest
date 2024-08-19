@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/mapstyles.css';
 
-const NavigationBar = ({ activeSection, showSection }) => {
+const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
   const navItems = [
     { id: 'profile', icon: '/profile.png', label: 'Profile' },
     { id: 'connections', icon: '/connections.png', label: 'Connections' },
@@ -31,7 +31,13 @@ const NavigationBar = ({ activeSection, showSection }) => {
           </button>
         ))}
       </nav>
+      <div className="nav-footer">
+        <button className="nav-button logout-button" onClick={handleLogout}>
+          <img src="/logout.png" alt="Logout" />
+          <span>Logout</span>
+        </button>
       </div>
+    </div>
   );
 };
 

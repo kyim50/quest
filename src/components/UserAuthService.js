@@ -1,5 +1,6 @@
 import { auth } from '../firebase';
 import { setUserIsActive } from './UserLocationService';
+import { showNotification } from '../NotificationDisplay'
 
 export const checkAuthStatus = (navigate) => {
   return auth.onAuthStateChanged(user => {

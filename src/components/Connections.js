@@ -18,6 +18,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [lockedUser, setLockedUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('friends');
 
   const fetchPeople = useCallback(async () => {
     if (!auth.currentUser) {
@@ -386,23 +387,10 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
     );
   };
 
-  return (
-    <div className={`connections-container ${lockedUser ? 'user-locked' : ''}`}>
-      {notification && <div className="notification">{notification}</div>}
-
-      {lockedUser ? (
-        renderLockedUserProfile()
-      ) : (
-        <>
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </div>
-
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'friends':
+        return (
           <div className="friends-section">
             <h2>Friends</h2>
             {friends.map(friend => (
@@ -422,7 +410,9 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
               </div>
             ))}
           </div>
-
+        );
+      case 'pending':
+        return (
           <div className="pending-requests-section">
             <h2>Pending Requests</h2>
             {pendingRequests.map(request => (
@@ -436,7 +426,9 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
               </div>
             ))}
           </div>
-
+        );
+      case 'people':
+        return (
           <div className="people-section">
             <h2>People</h2>
             {filteredPeople.map(user => (
@@ -462,6 +454,69 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
               </div>
             ))}
           </div>
+        );
+      case 'recentChats':
+        return (
+          <div className="recent-chats-section">
+            <h2>Recent Chats</h2>
+            {chatHistory.map(user => (
+              <div key={user.id} className="chat-history-item" onClick={() => handleChatClick(user)}>
+                <img src={user.profilePhoto} alt="Profile" />
+                <div>{user.name}</div>
+              </div>
+            ))}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className={`connections-container ${lockedUser ? 'user-locked' : ''}`}>
+      {notification && <div className="notification">{notification}</div>}
+
+      {lockedUser ? (
+        renderLockedUserProfile()
+      ) : (
+        <>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <div className="tabs">
+            <button 
+              className={`tab-button ${activeTab === 'friends' ? 'active' : ''}`}
+              onClick={() => setActiveTab('friends')}
+            >
+              Friends
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveTab('pending')}
+            >
+              Pending Requests
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'people' ? 'active' : ''}`}
+              onClick={() => setActiveTab('people')}
+            >
+              People
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'recentChats' ? 'active' : ''}`}
+              onClick={() => setActiveTab('recentChats')}
+            >
+              Recent Chats
+            </button>
+          </div>
+
+          {renderTabContent()}
         </>
       )}
 
@@ -476,7 +531,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
         </div>
       )}
 
-      {chatUser ? (
+      {chatUser && (
         <div className="chat-container">
           <div className="chat-header">
             <button className="back-btn" onClick={handleCloseChat}>← Back</button>
@@ -506,16 +561,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
             />
             <button onClick={handleSendMessage}>Send</button>
           </div>
-        </div>
-      ) : (
-        <div className="chat-history">
-          <h3>Recent Chats</h3>
-          {chatHistory.map(user => (
-            <div key={user.id} className="chat-history-item" onClick={() => handleChatClick(user)}>
-              <img src={user.profilePhoto} alt="Profile" />
-              <div>{user.name}</div>
-            </div>
-          ))}
         </div>
       )}
     </div>

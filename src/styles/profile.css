@@ -261,3 +261,40 @@
         width: 100%;
     }
 }
+
+.tag {
+    background-color: rgb(58, 58, 60);
+    color: #fffcf2;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tag button {
+    background: none;
+    border: none;
+    color: rgb(10, 145, 255);
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 5px;
+}
+
+.logout-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: auto;
+}
+
+.logout-button:hover {
+    background-color: #ff3333;
+}

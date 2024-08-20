@@ -125,27 +125,27 @@ nav {
   display: flex;
   flex-grow: 1;
   overflow: hidden;
+  height: 100vh;
 }
 
 .content-area {
   width: calc(60% - 250px);
-  height: 96vh;
-  margin: 2vh 1%;
+  height: 100%;
+  margin: 0 1%;
   overflow-y: auto;
   overflow-x: hidden;
   transition: width 0.3s ease;
 }
 
-/* Map container adjustment */
 .map-container {
   flex-grow: 1;
-  height: 96vh;
-  margin: 2vh 1% 2vh 0;
+  height: 100%;
+  margin: 0 1% 0 0;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  transition: flex-grow 0.3s ease;
+  transition: width 0.3s ease, flex-grow 0.3s ease;
 }
 
 #map {
@@ -153,14 +153,31 @@ nav {
   height: 100%;
 }
 
-/* Profile active state */
-.profile-active .content-area {
+.connections-active .content-area,
+.connections-locked-active .content-area {
   width: 400px;
   flex-shrink: 0;
 }
 
-.profile-active .map-container {
+.connections-active .map-container,
+.connections-locked-active .map-container {
+  width: calc(100% - 420px); /* 400px for content + 20px for margins */
+  flex-grow: 0;
+}
+
+/* Profile active state */
+.profile-active .content-area,
+.privacy-active .content-area,
+.connections-locked-active .content-area {
+  width: 400px;
+  flex-shrink: 0;
+}
+
+.profile-active .map-container,
+.privacy-active .map-container,
+.connections-locked-active .map-container {
   flex-grow: 1;
+  width: calc(100% - 400px);
 }
 
 /* Location pin styling */
@@ -295,12 +312,26 @@ nav {
     width: calc(60% - 80px);
   }
 
-  .profile-active .content-area {
+  .connections-active .content-area,
+  .connections-locked-active .content-area {
     width: 375px;
   }
 
-  .profile-active .map-container {
-    flex-grow: 1;
+  .connections-active .map-container,
+  .connections-locked-active .map-container {
+    width: calc(100% - 395px); /* 375px for content + 20px for margins */
+  }
+  
+  .profile-active .content-area,
+  .privacy-active .content-area,
+  .connections-locked-active .content-area {
+    width: 375px;
+  }
+  
+  .profile-active .map-container,
+  .privacy-active .map-container,
+  .connections-locked-active .map-container {
+    width: calc(100% - 375px);
   }
 }
 

@@ -1,0 +1,153 @@
+.privacy-container {
+    color: white;
+    font-weight: bold;
+    background-color: rgb(38, 38, 40);
+    border-radius: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 375px;
+    height: 96vh;
+    margin: 2vh 1%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    color: #fffcf2;
+}
+
+.privacy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.privacy-container h2,
+.privacy-container h3,
+.privacy-container span {
+  color: white;
+}
+
+.privacy-section {
+    background-color: rgb(48, 48, 50);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fffcf2;
+}
+
+.privacy-option {
+    margin-bottom: 15px;
+}
+
+.privacy-option label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+  
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+.search-user {
+    margin-bottom: 15px;
+}
+
+.search-user input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: rgb(58, 58, 60);
+    color: #fffcf2;
+}
+
+.search-results {
+    margin-top: 10px;
+}
+
+.search-result-item, .custom-list-item {
+    display: flex;
+    align-items: center;
+    background-color: rgb(58, 58, 60);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.custom-list-item button {
+    margin-left: auto;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+/* Ensure the map expands when in the privacy section */
+.main-content.privacy-active .map-container {
+    width: calc(100% - 375px);
+}

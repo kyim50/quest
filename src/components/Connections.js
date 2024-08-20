@@ -4,7 +4,7 @@ import { db, auth } from '../firebase';
 import './connections.css';
 import { centerMapOnUser } from './UserLocationService';
 
-const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) =>  {
+const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
   const [people, setPeople] = useState([]);
   const [friends, setFriends] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -19,8 +19,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [lockedUser, setLockedUser] = useState(null);
 
-  // Fetch active users who are not friends
-  // Fetch active users who are not friends
   const fetchPeople = useCallback(async () => {
     if (!auth.currentUser) {
       console.error('User is not authenticated');
@@ -41,7 +39,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
     setPeople(usersList);
   }, [friends, currentUserIds]);
 
-  // Fetch friends of the current user
   const fetchFriends = useCallback(async () => {
     if (!auth.currentUser) {
       console.error('User is not authenticated');
@@ -53,7 +50,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       const userDoc = await getDoc(userDocRef);
       const userData = userDoc.data();
 
-      // Ensure friends list exists and is an array
       const friendsList = userData?.friends || [];
       const friendsDetails = await Promise.all(
         friendsList.map(async friendId => {
@@ -75,7 +71,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       return;
     }
 
-    // Subscribe to friend requests and friends updates
     const unsubscribeRequests = onSnapshot(collection(db, 'friend_requests'), async (snapshot) => {
       const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       const pending = requests.filter(req => req.status === 'pending' && req.receiverId === auth.currentUser.uid);
@@ -105,11 +100,9 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
 
       setPendingRequests(pendingRequestsDetails);
 
-      // Update people list whenever friends list changes
       fetchPeople();
     });
 
-    // Fetch friends initially
     fetchFriends();
 
     return () => unsubscribeRequests();
@@ -154,7 +147,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
     try {
       await updateDoc(doc(db, 'friend_requests', requestId), { status: 'accepted' });
 
-      // Update both users' friends lists
       await updateDoc(doc(db, 'users', auth.currentUser.uid), {
         friends: arrayUnion(senderId)
       });
@@ -180,7 +172,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
 
   const handleRemoveFriend = async (friendId) => {
     try {
-      // Remove friend from both users' friend lists
       await updateDoc(doc(db, 'users', auth.currentUser.uid), {
         friends: arrayRemove(friendId)
       });
@@ -188,7 +179,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
         friends: arrayRemove(auth.currentUser.uid)
       });
 
-      // Update the friends state
       setFriends(prevFriends => prevFriends.filter(friend => friend.id !== friendId));
       setNotification('Friend removed!');
     } catch (error) {
@@ -198,9 +188,10 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
 
   const handleUserClick = async (user) => {
     if (lockedUser === user.id) {
-      setLockedUserId(null);
+      setLockedUser(null);
       if (map && auth.currentUser) {
         centerMapOnUser(map, auth.currentUser.uid);
+        setTimeout(() => map.resize(), 300); // Trigger resize after animation
       }
     } else {
       setLockedUser(user.id);
@@ -208,10 +199,11 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       const userData = userDoc.data();
       if (userData && userData.location && map) {
         centerMapOnUser(map, user.id);
+        setTimeout(() => map.resize(), 300); // Trigger resize after animation
       }
     }
   };
-
+  
   const handleClosePopup = () => {
     setSelectedUser(null);
   };
@@ -291,18 +283,15 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   const handleInputChange = (e) => {
     setNewMessage(e.target.value);
     
-    // Clear any existing timeout
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
 
-    // Update user's typing status in Firestore
     updateDoc(doc(db, 'users', auth.currentUser.uid), { isTyping: true });
 
-    // Set a new timeout
     const newTimeout = setTimeout(() => {
       updateDoc(doc(db, 'users', auth.currentUser.uid), { isTyping: false });
-    }, 2000); // Stop showing typing indicator after 2 seconds of inactivity
+    }, 2000);
 
     setTypingTimeout(newTimeout);
   };
@@ -322,7 +311,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
         }
       );
 
-      // Subscribe to typing indicator
       const unsubscribeTyping = onSnapshot(
         doc(db, 'users', chatUser.id),
         (doc) => {
@@ -351,6 +339,8 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
 
     const user = people.find(p => p.id === lockedUser) || friends.find(f => f.id === lockedUser);
     if (!user) return null;
+
+    const isFriend = friends.some(friend => friend.id === user.id);
 
     return (
       <div className="profile-container">
@@ -474,6 +464,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
           </div>
         </>
       )}
+
       {selectedUser && (
         <div className="user-popup">
           <button className="close-popup" onClick={handleClosePopup}>×</button>

@@ -5,7 +5,7 @@ import { Privacy } from './Privacy';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import '../styles/profile.css';
 
-const UserProfile = () => {
+const UserProfile = ({ handleLogout }) => {
   const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
   const [name, setName] = useState('Default Name');
   const [bio, setBio] = useState('Default Bio');
@@ -215,7 +215,7 @@ const UserProfile = () => {
           {tags.map((tag) => (
             <div key={tag} className="tag">
               {predefinedTags.find(t => t.value === tag).text}
-              {isEditing && <button onClick={() => handleRemoveTag(tag)}>x</button>}
+              <button onClick={() => handleRemoveTag(tag)}>x</button>
             </div>
           ))}
         </div>
@@ -253,6 +253,11 @@ const UserProfile = () => {
           </div>
         )}
       </div>
+
+      <button className="logout-button" onClick={handleLogout}>
+        <img src="/logout.png" alt="Logout" />
+        <span>Logout</span>
+      </button>
     </div>
   );
 };

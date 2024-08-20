@@ -7,6 +7,7 @@ const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
     { id: 'connections', icon: '/connections.png', label: 'Connections' },
     { id: 'quests', icon: '/quest.png', label: 'Quests' },
     { id: 'history', icon: '/history.png', label: 'History' },
+    { id: 'privacy', icon: '/privacy.png', label: 'Privacy' }, // New Privacy section
   ];
 
   return (
@@ -31,12 +32,6 @@ const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
           </button>
         ))}
       </nav>
-      <div className="nav-footer">
-        <button className="nav-button logout-button" onClick={handleLogout}>
-          <img src="/logout.png" alt="Logout" />
-          <span>Logout</span>
-        </button>
-      </div>
     </div>
   );
 };

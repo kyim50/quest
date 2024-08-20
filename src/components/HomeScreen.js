@@ -6,7 +6,9 @@ import MapComponent from './MapComponent';
 import UserProfile from './UserProfile';
 import QuestsComponent from './QuestsComponent';
 import ConnectionsComponent from './ConnectionsComponent';
+import Connections from './Connections'
 import HistorySection from './HistorySection';
+import PrivacySection from './PrivacySection';
 import NavigationBar from './NavigationBar';
 import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
@@ -71,19 +73,21 @@ const HomeScreen = () => {
   const renderSection = () => {
     switch(activeSection) {
       case 'profile':
-        return <UserProfile />;
+        return <UserProfile handleLogout={handleLogoutClick} />;
       case 'quests':
         return <QuestsComponent currentUserIds={currentUserIds} map={map} />;
       case 'connections':
-        return <ConnectionsComponent 
+        return <Connections 
           currentUserIds={currentUserIds}
           map={map}
+          setLockedUser={setLockedUser}
           lockedUser={lockedUser}
-          setLockedUser={handleSetLockedUser}
           lockedUserData={lockedUserData}
         />;
       case 'history':
         return <HistorySection currentUser={auth.currentUser} />;
+      case 'privacy':
+        return <PrivacySection />;
       default:
         return null;
     }
@@ -100,14 +104,23 @@ const HomeScreen = () => {
     }
   };
 
+  const getActiveClass = () => {
+    if (activeSection === 'profile' || activeSection === 'privacy') {
+      return `${activeSection}-active`;
+    }
+    if (activeSection === 'connections') {
+      return lockedUser ? 'connections-locked-active' : 'connections-active';
+    }
+    return '';
+  };
+
   return (
     <div className="home-screen-container">
       <NavigationBar 
         activeSection={activeSection} 
         showSection={showSection} 
-        handleLogout={handleLogoutClick}
       />
-      <div className={`main-content ${activeSection === 'profile' ? 'profile-active' : ''}`}>
+      <div className={`main-content ${getActiveClass()}`}>
         <div className="content-area">
           {renderSection()}
         </div>

@@ -4,7 +4,7 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  max-width: 800px;
+  max-width: 450px;
   margin: 0 auto;
   padding: 20px;
   border-radius: 0;
@@ -692,7 +692,6 @@
   color:white;
   cursor: pointer;
   border-right: solid 1px rgb(28,28,30);
-
   transition: background-color 0.3s;
 }
 

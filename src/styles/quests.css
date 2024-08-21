@@ -3,7 +3,7 @@
   background-color: #1C1C1E;
   color: #F0F0F5;
   min-height: 100vh;
-  max-width: 800px;
+  width:500px;
   margin: 0 auto;
   overflow-x: hidden;
 }

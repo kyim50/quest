@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import '../styles/mapstyles.css';
 import '../styles/HomeScreen.css';
+import '../styles/profile.css';
 import MapComponent from './MapComponent';
 import UserProfile from './UserProfile';
 import QuestsComponent from './QuestsComponent';
@@ -12,10 +13,10 @@ import PrivacySection from './PrivacySection';
 import NavigationBar from './NavigationBar';
 import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { Camera } from 'react-camera-pro';
 import { IconButton } from '@mui/material';
-import { ArrowBack, CameraAlt, Refresh, Person, ChatBubbleOutline } from '@mui/icons-material';
+import { ArrowBack, CameraAlt, Refresh, Person, LocationOn, Close } from '@mui/icons-material';
 
 const HomeScreen = () => {
   const [activeSection, setActiveSection] = useState('');
@@ -28,6 +29,13 @@ const HomeScreen = () => {
   const [facingMode, setFacingMode] = useState('environment');
   const [flash, setFlash] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [userProfileData, setUserProfileData] = useState(null);
+  const [showFullMap, setShowFullMap] = useState(false);
+  const [isLocationLocked, setIsLocationLocked] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [photoSize, setPhotoSize] = useState('medium');
+  const [friendsList, setFriendsList] = useState([]);
   const cameraRef = useRef(null);
 
   const navigate = useNavigate();
@@ -38,8 +46,33 @@ const HomeScreen = () => {
     return () => unsubscribeAuth();
   }, [navigate]);
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (auth.currentUser) {
+        const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+        if (userDoc.exists()) {
+          setUserProfileData(userDoc.data());
+        }
+      }
+    };
+    fetchUserProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      if (auth.currentUser) {
+        const friendsRef = collection(db, 'users', auth.currentUser.uid, 'friends');
+        const friendsSnapshot = await getDocs(friendsRef);
+        const friendIds = friendsSnapshot.docs.map(doc => doc.id);
+        setFriendsList(friendIds);
+      }
+    };
+    fetchFriends();
+  }, []);
+
   const showSection = (sectionId) => {
     setActiveSection(sectionId === activeSection ? '' : sectionId);
+    setShowFullMap(false);
   };
 
   const handleSetLockedUser = useCallback(async (userId) => {
@@ -80,7 +113,7 @@ const HomeScreen = () => {
 
   const handleCapture = () => {
     const imageSrc = cameraRef.current.takePhoto();
-    setCapturedImage(imageSrc);
+    setPhotoPreview(imageSrc);
     setShowCamera(false);
   };
 
@@ -92,31 +125,73 @@ const HomeScreen = () => {
     setShowCamera(!showCamera);
   };
 
+  const toggleProfilePopup = () => {
+    setShowProfilePopup(!showProfilePopup);
+  };
+
+  const toggleFullMap = () => {
+    setShowFullMap(!showFullMap);
+    if (!showFullMap && map && userProfileData?.location) {
+      map.flyTo({
+        center: [userProfileData.location.longitude, userProfileData.location.latitude],
+        zoom: 15,
+        duration: 2000
+      });
+    }
+  };
+
+  const toggleLocationLock = () => {
+    setIsLocationLocked(!isLocationLocked);
+    // Implement the location locking logic here
+  };
+
+  const handleUploadPhoto = async () => {
+    if (auth.currentUser && photoPreview) {
+      try {
+        const photoRef = doc(collection(db, 'photos'));
+        await setDoc(photoRef, {
+          userId: auth.currentUser.uid,
+          username: auth.currentUser.displayName,
+          image: photoPreview,
+          size: photoSize,
+          timestamp: new Date(),
+        });
+        showNotification('Photo uploaded successfully');
+        setPhotoPreview(null);
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        showNotification('Failed to upload photo. Please try again.');
+      }
+    }
+  };
+
   const PinterestLayout = () => {
-    const dummyData = [
-      { size: 'small', user: 'User1' },
-      { size: 'medium', user: 'User2' },
-      { size: 'large', user: 'User3' },
-      { size: 'small', user: 'User4' },
-      { size: 'medium', user: 'User5' },
-      { size: 'large', user: 'User6' },
-      { size: 'medium', user: 'User7' },
-      { size: 'large', user: 'User8' },
-      { size: 'small', user: 'User9' },
-    ];
+    const [gridData, setGridData] = useState([]);
+
+    useEffect(() => {
+      const fetchGridData = async () => {
+        const photosRef = collection(db, 'photos');
+        const q = query(photosRef, where('userId', 'in', [auth.currentUser.uid, ...friendsList]));
+        const photosSnapshot = await getDocs(q);
+        const photos = photosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setGridData(photos);
+      };
+      fetchGridData();
+    }, [friendsList]);
 
     return (
       <div className="pin-container">
-        {dummyData.map((item, index) => (
-          <Card key={index} size={item.size} user={item.user} />
+        {gridData.map((item, index) => (
+          <Card key={index} size={item.size} user={item.username} image={item.image} />
         ))}
       </div>
     );
   };
 
-  const Card = ({ size, user }) => {
+  const Card = ({ size, user, image }) => {
     return (
       <div className={`card ${size}`}>
+        <img src={image} alt={`Photo by ${user}`} className="card-image" />
         <div className="user-info">
           <div className="avatar"></div>
           <span className="username">@{user}</span>
@@ -125,14 +200,39 @@ const HomeScreen = () => {
     );
   };
 
+  const ProfilePopup = () => (
+    <div className="profile-popup">
+      <div className="profile-popup-content">
+        <IconButton onClick={toggleProfilePopup} className="close-button">
+          <Close />
+        </IconButton>
+        <div className="profile-header">
+          <div className="profile-photo-container">
+            <img src={userProfileData?.profileImage || 'default-profile-image.jpg'} alt="Profile" className="profile-photo" />
+          </div>
+          <div className="profile-name-status">
+            <h2 className="profile-name">{userProfileData?.name || 'User Name'}</h2>
+            <p className="profile-status">
+              <span className="status-dot"></span>
+              Active now
+            </p>
+          </div>
+        </div>
+        <div className="profile-section">
+          <p className="profile-bio">{userProfileData?.bio || 'No bio available'}</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderHomeContent = () => (
     <div className="home-content">
       <div className="top-bar">
-        <IconButton className="profile-button">
+        <IconButton className="profile-button" onClick={toggleProfilePopup}>
           <Person />
         </IconButton>
-        <IconButton className="chat-button">
-          <ChatBubbleOutline />
+        <IconButton className="location-lock-button" onClick={toggleLocationLock}>
+          <LocationOn color={isLocationLocked ? "primary" : "inherit"} />
         </IconButton>
       </div>
 
@@ -167,7 +267,7 @@ const HomeScreen = () => {
               <span>Open Camera</span>
             </div>
           )}
-          <div className="mini-map">
+          <div className="mini-map" onClick={toggleFullMap}>
             <MapComponent 
               address={address} 
               setAddress={setAddress} 
@@ -176,10 +276,49 @@ const HomeScreen = () => {
               activeSection={activeSection}
               lockedUser={lockedUser}
               showAddressBar={false}
+              isFullScreen={false}
+              isLocationLocked={isLocationLocked}
             />
           </div>
         </div>
       </div>
+
+      {showProfilePopup && <ProfilePopup />}
+      {photoPreview && (
+        <div className="photo-preview-overlay">
+          <div className="photo-preview-container">
+            <img src={photoPreview} alt="Captured" className="photo-preview" />
+            <div className="photo-preview-controls">
+              <select value={photoSize} onChange={(e) => setPhotoSize(e.target.value)}>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
+              <button onClick={handleUploadPhoto}>Upload</button>
+              <button onClick={() => setPhotoPreview(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderFullMap = () => (
+    <div className="full-map-container">
+      <IconButton onClick={toggleFullMap} className="back-button">
+        <ArrowBack />
+      </IconButton>
+      <MapComponent 
+        address={address} 
+        setAddress={setAddress} 
+        setCurrentUserIds={setCurrentUserIds}
+        setMap={setMap}
+        activeSection={activeSection}
+        lockedUser={lockedUser}
+        showAddressBar={true}
+        isFullScreen={true}
+        isLocationLocked={isLocationLocked}
+      />
     </div>
   );
 
@@ -237,7 +376,22 @@ const HomeScreen = () => {
         showSection={showSection} 
       />
       <div className={`main-content ${getActiveClass()}`}>
-        {renderSection()}
+        {showFullMap ? renderFullMap() : renderSection()}
+        {activeSection !== '' && !showFullMap && (
+          <div className="map-container">
+            <MapComponent 
+              address={address} 
+              setAddress={setAddress} 
+              setCurrentUserIds={setCurrentUserIds}
+              setMap={setMap}
+              activeSection={activeSection}
+              lockedUser={lockedUser}
+              showAddressBar={true}
+              isFullScreen={false}
+              isLocationLocked={isLocationLocked}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

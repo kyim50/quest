@@ -8,7 +8,7 @@ import Quests from './Quests';
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection, lockedUser }) => {
+const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection, lockedUser, showAddressBar, isFullScreen }) => {
   const mapContainerRef = useRef(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -70,7 +70,7 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
         clearTimeout(resizeTimeout);
       };
     }
-  }, [mapInstance, mapLoaded, activeSection]);
+  }, [mapInstance, mapLoaded, activeSection, isFullScreen]);
 
   useEffect(() => {
     if (mapInstance && mapLoaded && lockedUser) {
@@ -146,8 +146,8 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
 
   return (
     <>
-      <div ref={mapContainerRef} className="map-placeholder" style={{ width: '100%', height: '100%' }}></div>
-      <div className="address-bar" id="address-bar">{address}</div>
+      <div ref={mapContainerRef} className={`map-placeholder ${isFullScreen ? 'full-screen' : ''}`} style={{ width: '100%', height: '100%' }}></div>
+      {showAddressBar && <div className="address-bar" id="address-bar">{address}</div>}
       {mapInstance && <QuestsComponent map={mapInstance} currentUserIds={currentUserIds} onQuestAccepted={handleQuestAccepted} />}
     </>
   );

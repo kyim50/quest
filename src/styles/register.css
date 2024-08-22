@@ -184,33 +184,41 @@
     text-align: center;
 }
 
+
 @media (max-width: 768px) {
     .register-container {
-        width: 90%;
-        height: auto;
-        flex-direction: column;
+      width: 90%;
+      height: auto;
+      flex-direction: column-reverse;  /* Change to column-reverse */
+      max-height: 90vh;  /* Add max-height to prevent overflow */
+      overflow-y: auto;  /* Allow scrolling if content exceeds max-height */
     }
-
+  
     .register-form-container {
-        width: 100%;
-        padding: 20px;
+      width: 100%;
+      padding: 20px;
     }
-
+  
     .blue-rectangle {
-        width: 100%;
-        padding: 20px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.3);  /* Change shadow direction */
     }
-
-    .button-container {
-        flex-direction: column;
-        gap: 10px;
+  
+    .register-form {
+      margin-top: 30px;
     }
-
+  
+    .buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
     .register-btn,
     .google-register-btn {
-        width: 100%;
+      width: 100%;
     }
-}
+  }
 
 @media (max-width: 480px) {
     .register-container {

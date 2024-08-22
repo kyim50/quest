@@ -40,10 +40,30 @@ const HomeScreen = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [gridData, setGridData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const cameraRef = useRef(null);
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+
+  useEffect(() => {
+    const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setCurrentUser({ uid: user.uid, ...userDoc.data() });
+        } else {
+          console.error("User document not found");
+        }
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
 
   useEffect(() => {
     const unsubscribeAuth = checkAuthStatus(navigate);
@@ -207,10 +227,14 @@ const HomeScreen = () => {
   const ProfileDisplay = () => (
     <div className="profile-display">
       <div className="profile-photo-container">
-        <img src={userProfileData?.profileImage || 'default-profile-image.jpg'} alt="Profile" className="profile-photo" />
+        <img 
+          src={currentUser?.profileImage || 'default-profile-image.jpg'} 
+          alt={currentUser?.name || 'Profile'} 
+          className="profile-photo" 
+        />
       </div>
       <div className="profile-name-status">
-        <h2 className="profile-name">{userProfileData?.name || 'User Name'}</h2>
+        <h2 className="profile-name">{currentUser?.name || 'Loading...'}</h2>
         <p className="profile-status">
           <span className="status-dot"></span>
           Active now
@@ -264,15 +288,31 @@ const HomeScreen = () => {
 
   const PinterestLayout = () => {
     useEffect(() => {
-      const fetchGridData = async () => {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        setIsLoading(false);
+        if (user) {
+          fetchGridData();
+        } else {
+          setGridData([]);
+        }
+      });
+
+      return () => unsubscribe();
+    }, [friendsList]);
+
+    const fetchGridData = async () => {
+      if (auth.currentUser) {
         const photosRef = collection(db, 'photos');
         const q = query(photosRef, where('userId', 'in', [auth.currentUser.uid, ...friendsList]));
         const photosSnapshot = await getDocs(q);
         const photos = photosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setGridData(photos);
-      };
-      fetchGridData();
-    }, [friendsList]);
+      }
+    };
+
+    if (isLoading) {
+      return <div>Loading...</div>;
+    }
 
     return (
       <div className="pin-container">
@@ -367,7 +407,7 @@ const HomeScreen = () => {
           <div className="photo-preview-container">
             <img src={photoPreview} alt="Captured" className="photo-preview" />
             <div className="photo-preview-controls">
-              <select value={photoSize} onChange={(e) => setPhotoSize(e.target.value)}>
+            <select value={photoSize} onChange={(e) => setPhotoSize(e.target.value)}>
                 <option value="small">Small</option>
                 <option value="medium">Medium</option>
                 <option value="large">Large</option>

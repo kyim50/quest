@@ -174,7 +174,9 @@
   .login-container {
     width: 90%;
     height: auto;
-    flex-direction: column;
+    flex-direction: column-reverse;  /* Change to column-reverse */
+    max-height: 90vh;  /* Add max-height to prevent overflow */
+    overflow-y: auto;  /* Allow scrolling if content exceeds max-height */
   }
 
   .login-form-container {
@@ -185,6 +187,7 @@
   .blue-rectangle {
     width: 100%;
     padding: 20px;
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.3);  /* Change shadow direction */
   }
 
   .login-form {

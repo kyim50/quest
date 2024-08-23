@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginScreen from "../src/components/LoginScreen";
 import RegisterScreen from "../src/components/RegisterScreen";
@@ -6,8 +6,13 @@ import HomeScreen from "../src/components/HomeScreen";
 import { NotificationProvider } from "./NotificationContext";
 import NotificationDisplay from "./NotificationDisplay";
 import LandingPage from "./LandingPage";
+import { initializeTheme } from "./theme-toggle"; // Import the initializeTheme function
 
 function App() {
+  useEffect(() => {
+    initializeTheme();
+  }, []);
+
   return (
     <NotificationProvider>
       <Router>

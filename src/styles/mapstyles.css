@@ -441,3 +441,32 @@ nav {
   filter: brightness(0) invert(1);
   object-fit: contain;
 }
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.nav-bar {
+  background-color: var(--nav-background);
+  border-right: 1px solid var(--border-color);
+}
+
+.nav-button {
+  color: var(--text-color);
+}
+
+.nav-button:hover {
+  background-color: var(--hover-color);
+}
+
+.nav-button.active {
+  background-color: var(--accent-color);
+}
+
+.address-bar {
+  background-color: var(--card-background);
+  color: var(--text-color);
+}
+
+/* ... rest of the CSS remains the same ... */

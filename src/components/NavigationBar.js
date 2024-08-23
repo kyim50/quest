@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/mapstyles.css';
+import { toggleTheme } from '../theme-toggle'; // Import the toggleTheme function
 
 const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
   const navItems = [
@@ -7,7 +8,7 @@ const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
     { id: 'connections', icon: '/connections.png', label: 'Connections' },
     { id: 'quests', icon: '/quest.png', label: 'Quests' },
     { id: 'history', icon: '/history.png', label: 'History' },
-    { id: 'privacy', icon: '/privacy.png', label: 'Privacy' }, // New Privacy section
+    { id: 'privacy', icon: '/privacy.png', label: 'Privacy' },
   ];
 
   return (
@@ -31,6 +32,13 @@ const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
             <span>{item.label}</span>
           </button>
         ))}
+        <button 
+          onClick={toggleTheme} 
+          className="nav-button"
+        >
+          <img src="/theme-icon.png" alt="Toggle Theme" />
+          <span>Toggle Theme</span>
+        </button>
       </nav>
     </div>
   );

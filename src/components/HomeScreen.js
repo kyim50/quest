@@ -15,7 +15,7 @@ import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, deleteDoc, addDoc } from 'firebase/firestore';
 import { Camera } from 'react-camera-pro';
-import { IconButton, TextField, Button } from '@mui/material';
+import { IconButton, TextField, Button, Select, MenuItem } from '@mui/material';
 import { ArrowBack, CameraAlt, Refresh, Person, Close, Search, Delete, Send } from '@mui/icons-material';
 
 const HomeScreen = () => {
@@ -206,6 +206,7 @@ const HomeScreen = () => {
         await setDoc(photoRef, {
           userId: auth.currentUser.uid,
           username: auth.currentUser.displayName,
+          userProfileImage: currentUser.profileImage,
           image: photoPreview,
           size: photoSize,
           caption: caption,
@@ -215,7 +216,16 @@ const HomeScreen = () => {
         setPhotoPreview(null);
         setCaption('');
         // Refresh the grid data
-        const newPhoto = { id: photoRef.id, userId: auth.currentUser.uid, username: auth.currentUser.displayName, image: photoPreview, size: photoSize, caption: caption, timestamp: new Date() };
+        const newPhoto = { 
+          id: photoRef.id, 
+          userId: auth.currentUser.uid, 
+          username: auth.currentUser.displayName,
+          userProfileImage: currentUser.profileImage,
+          image: photoPreview, 
+          size: photoSize, 
+          caption: caption, 
+          timestamp: new Date() 
+        };
         setGridData([newPhoto, ...gridData]);
       } catch (error) {
         console.error('Error uploading photo:', error);
@@ -243,48 +253,149 @@ const HomeScreen = () => {
     </div>
   );
 
-  const ImagePreview = () => (
-    <div className="image-preview-overlay">
-      <div className="image-preview-content">
-        <div className="image-preview-main">
-          <img src={selectedImage?.image} alt="Preview" className="preview-image" />
-        </div>
-        <div className="image-preview-sidebar">
-          <div className="image-preview-header">
-            <div className="user-info">
-              <img src={selectedImage?.userProfileImage || 'default-profile-image.jpg'} alt="User" className="user-avatar" />
-              <span className="username">{selectedImage?.username}</span>
-            </div>
-            <IconButton onClick={() => toggleImagePreview(null)} className="close-button">
-              <Close />
-            </IconButton>
+  const Card = ({ size, user, image, caption, onClick }) => {
+    const truncateCaption = (text, maxLength = 50) => {
+      if (text.length <= maxLength) return text;
+      return text.substr(0, maxLength - 3) + '...';
+    };
+  
+    return (
+      <div className={`card ${size}`} onClick={onClick}>
+        <img src={image} alt={`Photo by ${user.name}`} className="card-image" />
+        {caption && (
+          <div className="card-caption">
+            {truncateCaption(caption)}
           </div>
-          <p className="image-caption">{selectedImage?.caption}</p>
-          <div className="comments-section">
-            {comments.map(comment => (
-              <div key={comment.id} className="comment">
-                <strong>{comment.username}: </strong>{comment.text}
+        )}
+        <div className="card-user-info">
+          <img src={user.profileImage} alt={user.name} className="card-user-avatar" />
+          <span className="card-username">{user.name}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const ImagePreview = ({ selectedImage, comments, onClose, onAddComment, onDeletePost }) => {
+    const [newComment, setNewComment] = useState('');
+  
+    return (
+      <div className="image-preview-overlay" onClick={onClose}>
+        <div className="image-preview-content" onClick={e => e.stopPropagation()}>
+          <div className="image-preview-main">
+            <img src={selectedImage?.image} alt="Preview" className="preview-image" />
+          </div>
+          <div className="image-preview-sidebar">
+            <div className="image-preview-header">
+              <div className="user-info">
+                <img src={selectedImage?.userProfileImage || 'default-profile-image.jpg'} alt="User" className="user-avatar" />
+                <span className="username">@{selectedImage?.username}</span>
               </div>
-            ))}
-          </div>
-          <div className="add-comment">
-            <TextField
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              fullWidth
-            />
-            <IconButton onClick={handleAddComment}>
-              <Send />
-            </IconButton>
+              <IconButton onClick={onClose} className="close-button">
+                <Close />
+              </IconButton>
+            </div>
+            {selectedImage?.caption && (
+              <p className="image-caption">{selectedImage.caption}</p>
+            )}
+            <div className="comments-section">
+              {comments.map(comment => (
+                <div key={comment.id} className="comment">
+                  <strong>{comment.username}: </strong>{comment.text}
+                </div>
+              ))}
+            </div>
+            <div className="add-comment">
+              <TextField
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add a comment..."
+                fullWidth
+                InputProps={{
+                  style: { color: 'white' }
+                }}
+              />
+              <IconButton onClick={() => {
+                onAddComment(newComment);
+                setNewComment('');
+              }}>
+                <Send />
+              </IconButton>
+            </div>
+            {selectedImage?.userId === auth.currentUser.uid && (
+              <Button
+                startIcon={<Delete />}
+                onClick={onDeletePost}
+                className="delete-button"
+              >
+                Delete Post
+              </Button>
+            )}
           </div>
         </div>
       </div>
-      <div className="related-images">
-        {/* Add logic to display related images here */}
+    );
+  };
+
+  const PhotoUploadPreview = ({ photoPreview, photoSize, setPhotoSize, caption, setCaption, onUpload, onCancel }) => {
+    const [previewPosition, setPreviewPosition] = useState({ x: 0, y: 0 });
+    
+    const handleImageMove = (e) => {
+      const container = e.currentTarget;
+      const image = container.querySelector('img');
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      setPreviewPosition({
+        x: Math.max(0, Math.min(x, container.offsetWidth - image.width)),
+        y: Math.max(0, Math.min(y, container.offsetHeight - image.height))
+      });
+    };
+  
+    return (
+      <div className="photo-upload-preview-overlay">
+        <div className="photo-upload-preview-container">
+          <div 
+            className={`photo-preview-box ${photoSize}`}
+            onMouseMove={handleImageMove}
+          >
+            <img 
+              src={photoPreview} 
+              alt="Upload preview" 
+              style={{
+                transform: `translate(${previewPosition.x}px, ${previewPosition.y}px)`
+              }}
+            />
+          </div>
+          <div className="photo-upload-controls">
+            <Select
+              value={photoSize}
+              onChange={(e) => setPhotoSize(e.target.value)}
+              className="size-select"
+            >
+              <MenuItem value="small">Small</MenuItem>
+              <MenuItem value="medium">Medium</MenuItem>
+              <MenuItem value="large">Large</MenuItem>
+            </Select>
+            <TextField
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Add a caption..."
+              fullWidth
+              margin="normal"
+              InputProps={{
+                style: { color: 'white' }
+              }}
+            />
+            <div className="button-group">
+              <Button onClick={onUpload} variant="contained" color="primary">Upload</Button>
+              <Button onClick={onCancel} variant="outlined">Cancel</Button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const PinterestLayout = () => {
     useEffect(() => {
@@ -317,20 +428,15 @@ const HomeScreen = () => {
     return (
       <div className="pin-container">
         {gridData.map((item, index) => (
-          <Card key={index} size={item.size} user={item.username} image={item.image} onClick={() => toggleImagePreview(item)} />
+          <Card 
+            key={index} 
+            size={item.size} 
+            user={{name: item.username, profileImage: item.userProfileImage}} 
+            image={item.image} 
+            caption={item.caption}
+            onClick={() => toggleImagePreview(item)} 
+          />
         ))}
-      </div>
-    );
-  };
-
-  const Card = ({ size, user, image, onClick }) => {
-    return (
-      <div className={`card ${size}`} onClick={onClick}>
-        <img src={image} alt={`Photo by ${user}`} className="card-image" />
-        <div className="user-info">
-          <div className="avatar"></div>
-          <span className="username">@{user}</span>
-        </div>
       </div>
     );
   };
@@ -401,29 +507,25 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      {showImagePreview && <ImagePreview />}
+      {showImagePreview && (
+        <ImagePreview 
+          selectedImage={selectedImage}
+          comments={comments}
+          onClose={() => setShowImagePreview(false)}
+          onAddComment={handleAddComment}
+          onDeletePost={handleDeletePost}
+        />
+      )}
       {photoPreview && (
-        <div className="photo-preview-overlay">
-          <div className="photo-preview-container">
-            <img src={photoPreview} alt="Captured" className="photo-preview" />
-            <div className="photo-preview-controls">
-            <select value={photoSize} onChange={(e) => setPhotoSize(e.target.value)}>
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-              </select>
-              <TextField
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                placeholder="Add a caption..."
-                fullWidth
-                margin="normal"
-              />
-              <Button onClick={handleUploadPhoto} variant="contained" color="primary">Upload</Button>
-              <Button onClick={() => setPhotoPreview(null)} variant="outlined">Cancel</Button>
-            </div>
-          </div>
-        </div>
+        <PhotoUploadPreview
+          photoPreview={photoPreview}
+          photoSize={photoSize}
+          setPhotoSize={setPhotoSize}
+          caption={caption}
+          setCaption={setCaption}
+          onUpload={handleUploadPhoto}
+          onCancel={() => setPhotoPreview(null)}
+        />
       )}
     </div>
   );

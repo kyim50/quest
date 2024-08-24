@@ -48,8 +48,6 @@
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -58,6 +56,13 @@
   background-color: #007AFF;
   color: white;
 }
+
+.icon-img {
+  width: auto;  /* Adjust this value to make the image smaller or larger */
+  height: 12px; /* Adjust this value to make the image smaller or larger */
+  object-fit: contain;
+}
+
 
 .add-friend-btn:hover {
   background-color: #0056b3;
@@ -109,8 +114,7 @@
   font-size: 1.5em;
   margin-bottom: 15px;
   color: #F0F0F5;
-  border-bottom: 2px solid #3A3A3C;
-  padding-bottom: 10px;
+ 
 }
 
 /* Item styling */
@@ -145,7 +149,6 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 15px;
-  border: 2px solid #181819;
   transition: transform 0.2s ease;
 }
 

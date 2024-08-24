@@ -1,12 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { db, auth, getDocs } from '../firebase';
-import { collection, query, where, onSnapshot, deleteDoc, updateDoc, setDoc, doc, getDoc, arrayUnion, arrayRemove, } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, serverTimestamp, arrayRemove, getDoc, arrayUnion, query, where, orderBy, limit, setDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
 import '../styles/quests.css';
-import { useNotification } from '../NotificationContext';
+import { centerMapOnUser } from './UserLocationService';
+import addFriendIcon from '../assets/addfriend.png';
 import mapboxgl from 'mapbox-gl';
-import { removeRoute } from './UserLocationService';
+import { useNotification } from '../NotificationContext';
 
-const Quests = ({ map, currentUserIds }) => {
+const removeRoute = (map) => {
+  if (map.getLayer('route')) {
+    map.removeLayer('route');
+  }
+  if (map.getSource('route')) {
+    map.removeSource('route');
+  }
+};
+
+const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -25,6 +35,7 @@ const Quests = ({ map, currentUserIds }) => {
   const [selectedAcceptor, setSelectedAcceptor] = useState(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [activeQuests, setActiveQuests] = useState([]);
+  const [activeTab, setActiveTab] = useState('public');
 
   const { showNotification } = useNotification();
 
@@ -56,7 +67,6 @@ const Quests = ({ map, currentUserIds }) => {
 
   useEffect(() => {
     if (auth.currentUser) {
-      // Fetch quests
       const fetchQuests = async () => {
         try {
           const publicQuestsQuery = query(collection(db, 'quests'), where('isPublic', '==', true));
@@ -181,20 +191,16 @@ const Quests = ({ map, currentUserIds }) => {
       const questData = questDoc.data();
 
       if (!questData.isPublic && questData.targetUser === auth.currentUser.uid) {
-        // For private quests, delete the quest entirely
         await deleteDoc(questRef);
         setQuests(quests.filter(quest => quest.id !== questId));
         showNotification('Quest declined!', 'success');
       } else if (questData.isPublic) {
-        // For public quests, add the current user to the declinedBy array
         await updateDoc(questRef, {
           declinedBy: arrayUnion(auth.currentUser.uid)
         });
-        // Remove the quest from the local state for this user
         setQuests(quests.filter(quest => quest.id !== questId));
         showNotification('Quest declined!', 'success');
       } else {
-        // For quests where the current user is not the target and it's not public
         const updatedAcceptedBy = questData.acceptedBy.filter(id => id !== auth.currentUser.uid);
         await updateDoc(questRef, { acceptedBy: updatedAcceptedBy });
         setQuests(quests.map(q => q.id === questId ? { ...q, acceptedBy: updatedAcceptedBy } : q));
@@ -205,7 +211,6 @@ const Quests = ({ map, currentUserIds }) => {
       showNotification('Failed to decline quest.', 'error');
     }
   };
-
 
   const handleAcceptQuest = async (quest) => {
     if (!auth.currentUser) {
@@ -269,7 +274,6 @@ const Quests = ({ map, currentUserIds }) => {
   
       setQuests(prevQuests => prevQuests.map(q => q.id === quest.id ? updatedQuest : q));
       
-      // Only add to activeQuests and display route for private quests
       if (!quest.isPublic) {
         setActiveQuests(prevActiveQuests => [...prevActiveQuests, updatedQuest]);
         
@@ -280,7 +284,6 @@ const Quests = ({ map, currentUserIds }) => {
   
       showNotification('Quest accepted!', 'success');
   
-      // If it's a public quest, notify the quest creator
       if (quest.isPublic) {
         const notificationRef = doc(collection(db, 'notifications'));
         await setDoc(notificationRef, {
@@ -379,7 +382,6 @@ const Quests = ({ map, currentUserIds }) => {
     }
   }, [auth.currentUser, map, displayRoute]);
 
-
   const handleApproveAcceptor = async (questId, acceptor) => {
     console.log('Approving acceptor:', acceptor);
   
@@ -436,7 +438,6 @@ const Quests = ({ map, currentUserIds }) => {
       setQuests(prevQuests => prevQuests.map(q => q.id === questId ? { ...q, ...updatedQuest } : q));
       setActiveQuests(prevActiveQuests => [...prevActiveQuests, { ...questData, ...updatedQuest, id: questId }]);
   
-      // Display route after approving the acceptor
       if (updatedQuest.routeInfo && map) {
         displayRoute(map, updatedQuest.routeInfo.senderLocation, updatedQuest.routeInfo.receiverLocation);
       }
@@ -456,7 +457,6 @@ const Quests = ({ map, currentUserIds }) => {
       setQuests(quests.filter(quest => quest.id !== questId));
       setActiveQuests(activeQuests.filter(quest => quest.id !== questId));
       
-      // Remove the route from the map
       if (map) {
         removeRoute(map);
       }
@@ -467,54 +467,6 @@ const Quests = ({ map, currentUserIds }) => {
       showNotification('Failed to complete quest.', 'error');
     }
   };
-
-  useEffect(() => {
-    if (auth.currentUser && map) {
-      const unsubscribe = onSnapshot(
-        query(
-          collection(db, 'quests'),
-          where('status', 'in', ['approved', 'pending']),
-          where('uid', '==', auth.currentUser.uid)
-        ),
-        (snapshot) => {
-          const userQuests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setActiveQuests(userQuests);
-
-          userQuests.forEach(quest => {
-            if (quest.routeInfo) {
-              displayRoute(quest.routeInfo.senderLocation, quest.routeInfo.receiverLocation);
-            }
-          });
-        }
-      );
-
-      return () => unsubscribe();
-    }
-  }, [auth.currentUser, map]);
-
-  useEffect(() => {
-    if (auth.currentUser && map) {
-      const unsubscribe = onSnapshot(
-        query(
-          collection(db, 'quests'),
-          where('status', '==', 'approved'),
-          where('acceptedBy', 'array-contains', auth.currentUser.uid)
-        ),
-        (snapshot) => {
-          const acceptedQuests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setActiveQuests(prevActiveQuests => [...prevActiveQuests, ...acceptedQuests]);
-
-          acceptedQuests.forEach(quest => {
-            if (quest.routeInfo) {
-              displayRoute(quest.routeInfo.senderLocation, quest.routeInfo.receiverLocation);
-            }
-          });
-        }
-      );
-
-      return () => unsubscribe();
-    }
-  }, [auth.currentUser, map]);
 
   const handleCancelQuest = async (questId) => {
     try {
@@ -566,13 +518,13 @@ const Quests = ({ map, currentUserIds }) => {
     setSearchTerm(e.target.value);
   };
 
-const filteredQuests = quests.filter(quest => {
-  if (quest.isPublic) {
-    return quest.uid === auth.currentUser?.receiverId || quest.approvedUser === auth.currentUser?.receiverId;
-  } else {
-    return quest.targetUser === auth.currentUser?.receiverId || quest.uid === auth.currentUser?.receiverId;
-  }
-});
+  const filteredQuests = quests.filter(quest => {
+    if (quest.isPublic) {
+      return quest.uid === auth.currentUser?.uid || quest.approvedUser === auth.currentUser?.uid;
+    } else {
+      return quest.targetUser === auth.currentUser?.uid || quest.uid === auth.currentUser?.uid;
+    }
+  });
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
@@ -633,12 +585,177 @@ const filteredQuests = quests.filter(quest => {
     setSelectedProfile(null);
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'public':
+        return (
+          <div className="quests-column">
+            <h3>Public Quests</h3>
+            {filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser?.uid))).length > 0 ? (
+              filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser?.uid))).map((quest) => {
+                const sender = users.find(user => user.id === quest.uid) || {};
+                const senderName = sender.name || '';
+
+                return (
+                  <div key={quest.id} className="quest-item">
+                    <p><strong>Title:</strong> {quest.title}</p>
+                    <p><strong>Description:</strong> {quest.description}</p>
+                    <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+                    <p><strong>Sender:</strong> {senderName}</p>
+
+                    {quest.isPublic && 
+                     auth.currentUser?.uid !== quest.uid && 
+                     !(Array.isArray(quest.acceptedBy) && quest.acceptedBy.includes(auth.currentUser?.uid)) && 
+                     !(Array.isArray(quest.pendingAcceptors) && quest.pendingAcceptors.includes(auth.currentUser?.uid)) && (
+                      <div className="quest-actions">
+                        <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
+                        <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
+                      </div>
+                    )}
+
+                    {quest.uid === auth.currentUser?.uid && (
+                      <div className="quest-actions">
+                        <button className="select-button" onClick={() => handleViewAcceptors(quest)}>View Pending Acceptors</button>
+                        <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel Quest</button>
+                      </div>
+                    )}
+
+                    {Array.isArray(quest.acceptedBy) && quest.acceptedBy.includes(auth.currentUser?.uid) && (
+                      <div className="quest-actions">
+                        <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <p>No public quests.</p>
+            )}
+          </div>
+        );
+      case 'received':
+        return (
+          <div className="quests-column">
+            <h3>Received Quests</h3>
+            {quests.filter(quest => quest.targetUser === auth.currentUser?.uid && !quest.isPublic).length > 0 ? (
+              quests.filter(quest => quest.targetUser === auth.currentUser?.uid && !quest.isPublic).map((quest) => {
+                const sender = users.find(user => user.id === quest.uid) || {};
+                const senderName = sender.name || '';
+                const isRecipient = quest.targetUser === auth.currentUser?.uid;
+                const isSender = quest.uid === auth.currentUser?.uid;
+
+                return (
+                  <div key={quest.id} className="quest-item">
+                    <p><strong>Title:</strong> {quest.title}</p>
+                    <p><strong>Description:</strong> {quest.description}</p>
+                    <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+                    <p><strong>Sender:</strong> {senderName}</p>
+                    {isRecipient && quest.status === 'accepted' && (
+                      <div className="quest-actions">
+                        <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
+                        <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel</button>
+                      </div>
+                    )}
+                    {isRecipient && quest.status === 'pending' && (
+                      <div className="quest-actions">
+                        <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
+                        <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
+                      </div>
+                    )}
+                    {isSender && (
+                      <p>Status: {quest.status}</p>
+                    )}
+                    {quest.acceptedBy && (
+                      <div>
+                        <p><strong>Accepted By:</strong> {users.find(user => user.id === quest.acceptedBy)?.name || 'Pending acceptance'}</p>
+                        <img src={users.find(user => user.id === quest.acceptedBy)?.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <p>No received quests.</p>
+            )}
+          </div>
+        );
+      case 'sent':
+        return (
+          <div className="quests-column">
+            <h3>Sent Quests</h3>
+            {quests.filter(quest => quest.uid === auth.currentUser?.uid && !quest.isPublic).length > 0 ? (
+              quests.filter(quest => quest.uid === auth.currentUser?.uid && !quest.isPublic).map((quest) => {
+                const acceptor = users.find(user => user.id === quest.acceptedBy) || {};
+                const acceptorName = acceptor.name || '';
+                const pendingAcceptors = users.filter(user => quest.pendingAcceptors && quest.pendingAcceptors.includes(user.id));
+
+                return (
+                  <div key={quest.id} className="quest-item">
+                    <p><strong>Title:</strong> {quest.title}</p>
+                    <p><strong>Description:</strong> {quest.description}</p>
+                    <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
+                    <p><strong>Status:</strong> {quest.status}</p>
+                    {pendingAcceptors.length > 0 && (
+                      <div>
+                        <p><strong>Pending Acceptors:</strong></p>
+                        <ul>
+                          {pendingAcceptors.map(user => (
+                            <li key={user.id} onClick={() => handleSelectAcceptor(quest, user)}>
+                              {user.name}
+                              <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {quest.acceptedBy && (
+                      <div>
+                        <p><strong>Accepted By:</strong> {acceptorName}</p>
+                        <img src={acceptor.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <p>No sent quests.</p>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="quests-page">
       <div className="quests-header">
         <h2>Quests</h2>
         <button onClick={togglePopup}>+</button>
+        </div>
+
+      <div className="tabs">
+        <button 
+          className={`tab-button ${activeTab === 'public' ? 'active' : ''}`}
+          onClick={() => setActiveTab('public')}
+        >
+          Public Quests
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'received' ? 'active' : ''}`}
+          onClick={() => setActiveTab('received')}
+        >
+          Received Quests
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'sent' ? 'active' : ''}`}
+          onClick={() => setActiveTab('sent')}
+        >
+          Sent Quests
+        </button>
       </div>
+
+      {renderTabContent()}
 
       {isPopupOpen && (
         <div className="modal-overlay">
@@ -708,7 +825,7 @@ const filteredQuests = quests.filter(quest => {
             )}
             <div className="modal-actions">
               <button className="confirm-button" onClick={handleCreateQuest}>Prepare Quest</button>
-              <button className="cancel-button" onClick={() => setIsPopupOpen(false)}>Cancel</button>
+              <button className="cancel-button" onClick={togglePopup}>Cancel</button>
             </div>
           </div>
         </div>
@@ -766,139 +883,8 @@ const filteredQuests = quests.filter(quest => {
           </div>
         </div>
       )}
-
-<div className="quests-list">
-  <div className="quests-column">
-    <h3>Public Quests</h3>
-    {filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser?.uid))).length > 0 ? (
-      filteredQuests.filter(quest => quest.isPublic && (!quest.declinedBy || !quest.declinedBy.includes(auth.currentUser?.uid))).map((quest) => {
-        const sender = users.find(user => user.id === quest.uid) || {};
-        const senderName = sender.name || '';
-
-        return (
-          <div key={quest.id} className="quest-item">
-            <p><strong>Title:</strong> {quest.title}</p>
-            <p><strong>Description:</strong> {quest.description}</p>
-            <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-            <p><strong>Sender:</strong> {senderName}</p>
-
-            {quest.isPublic && 
-             auth.currentUser?.uid !== quest.uid && 
-             !(Array.isArray(quest.acceptedBy) && quest.acceptedBy.includes(auth.currentUser?.uid)) && 
-             !(Array.isArray(quest.pendingAcceptors) && quest.pendingAcceptors.includes(auth.currentUser?.uid)) && (
-              <div className="quest-actions">
-                <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
-                <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
-              </div>
-            )}
-
-            {quest.uid === auth.currentUser?.uid && (
-              <div className="quest-actions">
-                <button className="select-button" onClick={() => handleViewAcceptors(quest)}>View Pending Acceptors</button>
-                <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel Quest</button>
-              </div>
-            )}
-
-            {Array.isArray(quest.acceptedBy) && quest.acceptedBy.includes(auth.currentUser?.uid) && (
-              <div className="quest-actions">
-                <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
-              </div>
-            )}
-          </div>
-        );
-      })
-    ) : (
-      <p>No public quests.</p>
-          )}
-        </div>
-
-        <div className="quests-column">
-          <h3>Received Quests</h3>
-          {quests.filter(quest => quest.targetUser === auth.currentUser?.uid && !quest.isPublic).length > 0 ? (
-            quests.filter(quest => quest.targetUser === auth.currentUser?.uid && !quest.isPublic).map((quest) => {
-              const sender = users.find(user => user.id === quest.uid) || {};
-              const senderName = sender.name || '';
-              const isRecipient = quest.targetUser === auth.currentUser?.uid;
-              const isSender = quest.uid === auth.currentUser?.uid;
-
-              return (
-                <div key={quest.id} className="quest-item">
-                  <p><strong>Title:</strong> {quest.title}</p>
-                  <p><strong>Description:</strong> {quest.description}</p>
-                  <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-                  <p><strong>Sender:</strong> {senderName}</p>
-                  {isRecipient && quest.status === 'accepted' && (
-                    <div className="quest-actions">
-                      <button className="confirm-button" onClick={() => handleCompleteQuest(quest.id)}>Complete</button>
-                      <button className="cancel-button" onClick={() => handleCancelQuest(quest.id)}>Cancel</button>
-                    </div>
-                  )}
-                  {isRecipient && quest.status === 'pending' && (
-                    <div className="quest-actions">
-                      <button className="confirm-button" onClick={() => handleAcceptQuest(quest)}>Accept</button>
-                      <button className="cancel-button" onClick={() => handleDeclineQuest(quest.id)}>Decline</button>
-                    </div>
-                  )}
-                  {isSender && (
-                    <p>Status: {quest.status}</p>
-                  )}
-                  {quest.acceptedBy && (
-                    <div>
-                      <p><strong>Accepted By:</strong> {users.find(user => user.id === quest.acceptedBy)?.name || 'Pending acceptance'}</p>
-                      <img src={users.find(user => user.id === quest.acceptedBy)?.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <p>No received quests.</p>
-          )}
-        </div>
-
-        <div className="quests-column">
-          <h3>Sent Quests</h3>
-          {quests.filter(quest => quest.uid === auth.currentUser?.uid && !quest.isPublic).length > 0 ? (
-            quests.filter(quest => quest.uid === auth.currentUser?.uid && !quest.isPublic).map((quest) => {
-              const acceptor = users.find(user => user.id === quest.acceptedBy) || {};
-              const acceptorName = acceptor.name || '';
-              const pendingAcceptors = users.filter(user => quest.pendingAcceptors && quest.pendingAcceptors.includes(user.id));
-
-              return (
-                <div key={quest.id} className="quest-item">
-                  <p><strong>Title:</strong> {quest.title}</p>
-                  <p><strong>Description:</strong> {quest.description}</p>
-                  <p><strong>Time Frame:</strong> {quest.timeFrame}</p>
-                  <p><strong>Status:</strong> {quest.status}</p>
-                  {pendingAcceptors.length > 0 && (
-                    <div>
-                      <p><strong>Pending Acceptors:</strong></p>
-                      <ul>
-                        {pendingAcceptors.map(user => (
-                          <li key={user.receiverId} onClick={() => handleSelectAcceptor(quest, user)}>
-                            {user.name}
-                            <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {quest.acceptedBy && (
-                    <div>
-                      <p><strong>Accepted By:</strong> {acceptorName}</p>
-                      <img src={acceptor.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <p>No sent quests.</p>
-          )}
-        </div>
-      </div>
     </div>
   );
-}
+};
 
 export default Quests;

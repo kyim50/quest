@@ -3,6 +3,8 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, ser
 import { db, auth } from '../firebase';
 import './connections.css';
 import { centerMapOnUser } from './UserLocationService';
+import addFriendIcon from '../assets/addfriend.png';
+// import chatIcon from '../assets/chaticon.png';
 
 const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
   const [people, setPeople] = useState([]);
@@ -444,12 +446,15 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
                     e.stopPropagation();
                     handleAddFriend(user.id);
                   }}>
-                    Add Friend
+                  <img src={addFriendIcon} alt="Add friend" className='icon-img'/>
                   </button>
                   <button className="chat-btn" onClick={(e) => {
                     e.stopPropagation();
                     handleChatClick(user);
-                  }}>Chat</button>
+                  }}>
+                   <img src="chaticon.png" alt ="chat " className='icon-img'></img>
+
+                  </button>
                 </div>
               </div>
             ))}

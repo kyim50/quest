@@ -3,8 +3,7 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, ser
 import { db, auth } from '../firebase';
 import './connections.css';
 import { centerMapOnUser } from './UserLocationService';
-import addFriendIcon from '../assets/addfriend.png';
-// import chatIcon from '../assets/chaticon.png';
+import chatIcon from './chatbubble.png';
 
 const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
   const [people, setPeople] = useState([]);
@@ -429,37 +428,36 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
             ))}
           </div>
         );
-      case 'people':
-        return (
-          <div className="people-section">
-            <h2>People</h2>
-            {filteredPeople.map(user => (
-              <div 
-                key={user.id} 
-                className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
-                onClick={() => handleUserClick(user)}
-              >
-                <img src={user.profilePhoto} alt="User" />
-                <div>{user.name}</div>
-                <div className="button-group">
-                  <button className="add-friend-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddFriend(user.id);
-                  }}>
-                  <img src={addFriendIcon} alt="Add friend" className='icon-img'/>
-                  </button>
-                  <button className="chat-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    handleChatClick(user);
-                  }}>
-                   <img src="chaticon.png" alt ="chat " className='icon-img'></img>
-
-                  </button>
-                </div>
+        case 'people':
+      return (
+        <div className="people-section">
+          <h2>People</h2>
+          {filteredPeople.map(user => (
+            <div 
+              key={user.id} 
+              className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
+              onClick={() => handleUserClick(user)}
+            >
+              <img src={user.profilePhoto} alt="User" />
+              <div>{user.name}</div>
+              <div className="button-group">
+                <button className="add-friend-btn1" onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddFriend(user.id);
+                }}>
+                  Add Friend
+                </button>
+                <button className="chat-btn1" onClick={(e) => {
+                  e.stopPropagation();
+                  handleChatClick(user);
+                }}>
+                  <img src={chatIcon} alt="Chat" className='icon-img' />
+                </button>
               </div>
-            ))}
-          </div>
-        );
+            </div>
+          ))}
+        </div>
+      );
       case 'recentChats':
         return (
           <div className="recent-chats-section">
@@ -478,14 +476,14 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   };
 
   return (
-    <div className={`connections-container ${lockedUser ? 'user-locked' : ''}`}>
-      {notification && <div className="notification">{notification}</div>}
+    <div className={`connections-container1 ${lockedUser ? 'user-locked1' : ''}`}>
+      {notification && <div className="notification1">{notification}</div>}
 
       {lockedUser ? (
         renderLockedUserProfile()
       ) : (
         <>
-          <div className="search-bar">
+          <div className="search-bar1">
             <input
               type="text"
               placeholder="Search users..."
@@ -494,27 +492,27 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
             />
           </div>
 
-          <div className="tabs">
+          <div className="tabs1">
             <button 
-              className={`tab-button ${activeTab === 'friends' ? 'active' : ''}`}
+              className={`tab-button1 ${activeTab === 'friends' ? 'active1' : ''}`}
               onClick={() => setActiveTab('friends')}
             >
               Friends
             </button>
             <button 
-              className={`tab-button ${activeTab === 'pending' ? 'active' : ''}`}
+              className={`tab-button1 ${activeTab === 'pending' ? 'active1' : ''}`}
               onClick={() => setActiveTab('pending')}
             >
               Pending Requests
             </button>
             <button 
-              className={`tab-button ${activeTab === 'people' ? 'active' : ''}`}
+              className={`tab-button1 ${activeTab === 'people' ? 'active1' : ''}`}
               onClick={() => setActiveTab('people')}
             >
               People
             </button>
             <button 
-              className={`tab-button ${activeTab === 'recentChats' ? 'active' : ''}`}
+              className={`tab-button1 ${activeTab === 'recentChats' ? 'active1' : ''}`}
               onClick={() => setActiveTab('recentChats')}
             >
               Recent Chats
@@ -526,38 +524,38 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       )}
 
       {selectedUser && (
-        <div className="user-popup">
-          <button className="close-popup" onClick={handleClosePopup}>×</button>
+        <div className="user-popup1">
+          <button className="close-popup1" onClick={handleClosePopup}>×</button>
           <img src={selectedUser.profilePhoto} alt="Profile" />
           <div>{selectedUser.name}</div>
           <div>{selectedUser.bio}</div>
-          <button className="view-profile-btn" onClick={() => handleAddFriend(selectedUser.id)}>Add Friend</button>
-          <button className="remove-friend-btn" onClick={() => handleRemoveFriend(selectedUser.id)}>Remove</button>
+          <button className="view-profile-btn1" onClick={() => handleAddFriend(selectedUser.id)}>Add Friend</button>
+          <button className="remove-friend-btn1" onClick={() => handleRemoveFriend(selectedUser.id)}>Remove</button>
         </div>
       )}
 
       {chatUser && (
-        <div className="chat-container">
-          <div className="chat-header">
-            <button className="back-btn" onClick={handleCloseChat}>← Back</button>
+        <div className="chat-container1">
+          <div className="chat-header1">
+            <button className="back-btn1" onClick={handleCloseChat}>← Back</button>
             <img src={chatUser.profilePhoto} alt="Profile" />
             <div>{chatUser.name}</div>
           </div>
-          <div className="chat-messages">
+          <div className="chat-messages1">
             {messages.map(msg => (
-              <div key={msg.id} className={`message ${msg.senderId === auth.currentUser.uid ? 'sent' : 'received'}`}>
+              <div key={msg.id} className={`message1 ${msg.senderId === auth.currentUser.uid ? 'sent1' : 'received1'}`}>
                 <div>{msg.content}</div>
               </div>
             ))}
             {isTyping && (
-              <div className="typing-indicator">
+              <div className="typing-indicator1">
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
             )}
           </div>
-          <div className="chat-input">
+          <div className="chat-input1">
             <input
               type="text"
               placeholder="Type a message..."

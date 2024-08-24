@@ -1,4 +1,4 @@
-.home-screen-container {
+.home-screen-container2 {
   display: flex;
   height: 100vh;
   overflow: hidden;
@@ -19,7 +19,7 @@
   padding: 20px 0;
 }
 
-.main-content {
+.main-content2 {
   display: flex;
   flex-grow: 1;
   overflow: hidden;
@@ -47,32 +47,32 @@
   align-items: center;
 }
 
-.profile-photo-container {
+.profile-photo-container4 {
   width: 32px;
   height: 32px;
   margin-right: 10px;
 }
 
-.profile-photo {
+.profile-photo4 {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.profile-name-status {
+.profile-name-status4 {
   display: flex;
   flex-direction: column;
 }
 
-.profile-name {
+.profile-name4 {
   font-size: 14px;
   font-weight: bold;
   margin: 0;
   color: #ffffff;
 }
 
-.profile-status {
+.profile-status4 {
   font-size: 12px;
   color: #ccc5b9;
   display: flex;
@@ -80,7 +80,7 @@
   margin: 0;
 }
 
-.status-dot {
+.status-dot4 {
   width: 6px;
   height: 6px;
   background-color: #4CAF50;
@@ -475,7 +475,7 @@
 }
 
 @media (max-width: 768px) {
-  .home-screen-container {
+  .home-screen-container2 {
     flex-direction: column;
   }
 
@@ -487,7 +487,7 @@
     padding: 0;
   }
 
-  .main-content {
+  .main-content2 {
     height: calc(100vh - 60px);
   }
 
@@ -556,4 +556,3 @@
     width: 95%;
   }
 }
-

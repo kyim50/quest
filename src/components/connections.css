@@ -1,5 +1,5 @@
 /* General container styling */
-.connections-container {
+.connections-container1 {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -16,14 +16,14 @@
   overflow-y: auto;
 }
 
-.connections-container.user-locked {
+.connections-container1.user-locked1 {
   max-width: 400px;
   margin: 0;
   height: 100vh;
   border-radius: 20px;
 }
 
-.profile-container {
+.profile-container4 {
   background-color: #2C2C2E;
   border-radius: 12px;
   padding: 20px;
@@ -32,19 +32,19 @@
   font-weight: bold;
 }
 
-.connections-container.user-locked .chat-history {
+.connections-container1.user-locked1 .chat-history1 {
   display: none;
 }
 
-.profile-actions {
+.profile-actions4 {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.add-friend-btn,
-.chat-btn,
-.unlock-btn {
+.add-friend-btn1,
+.chat-btn1,
+.unlock-btn1 {
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -52,39 +52,50 @@
   transition: all 0.3s ease;
 }
 
-.add-friend-btn {
+.add-friend-btn1 {
   background-color: #007AFF;
   color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  width: 120px; /* Set a fixed width for Add Friend button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.icon-img {
-  width: auto;  /* Adjust this value to make the image smaller or larger */
-  height: 12px; /* Adjust this value to make the image smaller or larger */
-  object-fit: contain;
-}
-
-
-.add-friend-btn:hover {
+.add-friend-btn1:hover {
   background-color: #0056b3;
 }
 
-.chat-btn {
-  background-color: #34C759;
-  color: white;
+.chat-btn1 {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  width:auto;
+  height: 40px; /* Set a fixed height to match the width */
 }
 
-.chat-btn:hover {
-  background-color: #2da84e;
+.chat-btn1:hover {
+  transform: scale(1.1);
 }
 
-.unlock-btn {
+
+.unlock-btn1 {
   background-color: #FF3B30;
   color: white;
   width: 100%;
   margin-top: 20px;
 }
 
-.unlock-btn:hover {
+.unlock-btn1:hover {
   background-color: #d63429;
 }
 
@@ -114,7 +125,6 @@
   font-size: 1.5em;
   margin-bottom: 15px;
   color: #F0F0F5;
- 
 }
 
 /* Item styling */
@@ -122,6 +132,7 @@
 .people-item,
 .pending-request {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 15px 0;
   border-bottom: 1px solid #3A3A3C;
@@ -159,11 +170,10 @@
 }
 
 /* Button styling */
-.view-profile-btn,
-.remove-friend-btn,
+.view-profile-btn1,
+.remove-friend-btn1,
 .accept-btn,
-.decline-btn,
-.chat-btn {
+.decline-btn {
   background-color: #2C2C2E;
   color: #FFFFFF;
   border: 1px solid #3A3A3C;
@@ -179,17 +189,16 @@
   height: 36px;
 }
 
-.view-profile-btn:hover,
-.remove-friend-btn:hover,
+.view-profile-btn1:hover,
+.remove-friend-btn1:hover,
 .accept-btn:hover,
-.decline-btn:hover,
-.chat-btn:hover {
+.decline-btn:hover {
   background-color: #3A3A3C;
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.view-profile-btn {
+.view-profile-btn1 {
   position: relative;
   overflow: hidden;
   background-color: transparent;
@@ -200,16 +209,8 @@
   width: 36px;
 }
 
-.view-profile-btn:hover {
+.view-profile-btn1:hover {
   background-color: rgba(0, 122, 255, 0.1);
-}
-
-.chat-btn {
-  background-color: #1C1C1E;
-}
-
-.chat-btn:hover {
-  background-color: #2C2C2E;
 }
 
 .accept-btn {
@@ -222,13 +223,13 @@
 }
 
 .decline-btn,
-.remove-friend-btn {
+.remove-friend-btn1 {
   background-color: #FF3B30;
   border-color: #D63429;
 }
 
 .decline-btn:hover,
-.remove-friend-btn:hover {
+.remove-friend-btn1:hover {
   background-color: #D63429;
 }
 
@@ -237,10 +238,18 @@
   gap: 8px;
   margin-left: auto;
   align-items: center;
+  width: 160px; /* Set a fixed width for the button group */
+  justify-content: flex-end; /* Align buttons to the right */
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 /* Popup styling */
-.user-popup {
+.user-popup1 {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -263,7 +272,7 @@
 }
 
 /* Close button styling */
-.user-popup .close-popup {
+.user-popup1 .close-popup1 {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -275,12 +284,12 @@
   transition: color 0.2s ease;
 }
 
-.user-popup .close-popup:hover {
+.user-popup1 .close-popup1:hover {
   color: #0051A1;
 }
 
 /* Popup image styling */
-.user-popup img {
+.user-popup1 img {
   width: 100px;
   height: 100px;
   border-radius: 50%;
@@ -289,7 +298,7 @@
 }
 
 /* Search bar styling */
-.search-bar {
+.search-bar1 {
   padding: 15px;
   background-color: #2C2C2E;
   border-radius: 12px;
@@ -297,7 +306,7 @@
   margin-bottom: 20px;
 }
 
-.search-bar input {
+.search-bar1 input {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
@@ -308,18 +317,18 @@
   transition: all 0.2s ease;
 }
 
-.search-bar input:focus {
+.search-bar1 input:focus {
   outline: none;
   border-color: #007AFF;
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
 
-.search-bar input::placeholder {
+.search-bar1 input::placeholder {
   color: #6C6C6C;
 }
 
 /* Chat container styling */
-.chat-container {
+.chat-container1 {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -341,7 +350,7 @@
   to { transform: translateY(0); }
 }
 
-.chat-header {
+.chat-header1 {
   display: flex;
   align-items: center;
   padding: 15px;
@@ -351,7 +360,7 @@
   border-top-right-radius: 16px;
 }
 
-.chat-header img {
+.chat-header1 img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -359,7 +368,7 @@
   border: 2px solid #007AFF;
 }
 
-.chat-header .back-btn {
+.chat-header1 .back-btn1 {
   background-color: #007AFF;
   color: white;
   border: none;
@@ -371,11 +380,11 @@
   transition: all 0.2s ease;
 }
 
-.chat-header .back-btn:hover {
+.chat-header1 .back-btn1:hover {
   background-color: #0051A1;
 }
 
-.chat-messages {
+.chat-messages1 {
   flex-grow: 1;
   padding: 15px;
   overflow-y: auto;
@@ -384,7 +393,7 @@
   flex-direction: column;
 }
 
-.message {
+.message1 {
   max-width: 70%;
   margin-bottom: 10px;
   padding: 10px 15px;
@@ -399,21 +408,21 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.message.sent {
+.message1.sent1 {
   align-self: flex-end;
   background-color: #007AFF;
   color: white;
   border-bottom-right-radius: 4px;
 }
 
-.message.received {
+.message1.received1 {
   align-self: flex-start;
   background-color: #3A3A3C;
   color: white;
   border-bottom-left-radius: 4px;
 }
 
-.chat-input {
+.chat-input1 {
   display: flex;
   padding: 15px;
   border-top: 1px solid #333;
@@ -422,7 +431,7 @@
   border-bottom-right-radius: 16px;
 }
 
-.chat-input input {
+.chat-input1 input {
   flex: 1;
   padding: 10px 15px;
   border: 1px solid #333;
@@ -433,13 +442,13 @@
   transition: all 0.2s ease;
 }
 
-.chat-input input:focus {
+.chat-input1 input:focus {
   outline: none;
   border-color: #007AFF;
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
 
-.chat-input button {
+.chat-input1 button {
   background-color: #007AFF;
   color: white;
   border: none;
@@ -451,12 +460,12 @@
   transition: all 0.2s ease;
 }
 
-.chat-input button:hover {
+.chat-input1 button:hover {
   background-color: #0051A1;
 }
 
 /* Chat history styling */
-.chat-history {
+.chat-history1 {
   max-height: 300px;
   overflow-y: auto;
   border-top: 1px solid #333;
@@ -466,7 +475,7 @@
   margin-top: 20px;
 }
 
-.chat-history h3 {
+.chat-history1 h3 {
   font-size: 1.2em;
   margin-bottom: 15px;
   color: #F0F0F5;
@@ -496,14 +505,14 @@
 }
 
 /* Typing indicator */
-.typing-indicator {
+.typing-indicator1 {
   display: flex;
   align-items: center;
   margin-top: 5px;
   margin-bottom: 10px;
 }
 
-.typing-indicator span {
+.typing-indicator1 span {
   height: 8px;
   width: 8px;
   background-color: #999;
@@ -513,11 +522,11 @@
   animation: typing 1s infinite;
 }
 
-.typing-indicator span:nth-child(2) {
+.typing-indicator1 span:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.typing-indicator span:nth-child(3) {
+.typing-indicator1 span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
@@ -529,11 +538,11 @@
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-  .connections-container {
+  .connections-container1 {
     padding: 15px;
   }
   
-  .connections-container.user-locked {
+  .connections-container1.user-locked1 {
     max-width: 100%;
     border-radius: 0;
   }
@@ -559,22 +568,38 @@
   }
 
   .button-group {
+    width: 140px; /* Slightly smaller for medium screens */
     margin-top: 10px;
     margin-left: 0;
   }
 
-  .chat-container {
+  .chat-container1 {
     width: 100%;
     height: 100%;
     bottom: 0;
     right: 0;
     border-radius: 0;
   }
+
+  .add-friend-btn1 {
+    width: 100px; /* Slightly smaller for medium screens */
+    font-size: 12px;
+  }
+
+  .chat-btn1 {
+    width: 36px; /* Slightly smaller for medium screens */
+    height: 36px;
+  }
+
+  .icon-img {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 @media (max-width: 480px) {
-  .connections-container {
-    padding: 0px;
+  .connections-container1 {
+    padding: 10px;
   }
 
   .friends-section,
@@ -589,26 +614,26 @@
     padding: 8px 0;
   }
 
-  .view-profile-btn,
-  .remove-friend-btn,
+  .view-profile-btn1,
+  .remove-friend-btn1,
   .accept-btn,
   .decline-btn,
-  .chat-btn {
+  .chat-btn1 {
     font-size: 0.8em;
     padding: 6px 12px;
   }
 
-  .user-popup {
+  .user-popup1 {
     width: 95%;
     padding: 20px;
   }
 
-  .user-popup img {
+  .user-popup1 img {
     width: 80px;
     height: 80px;
   }
 
-  .chat-container {
+  .chat-container1 {
     width: 100%;
     height: 100%;
     bottom: 0;
@@ -616,35 +641,54 @@
     border-radius: 0;
   }
 
-  .chat-header {
+  .chat-header1 {
     padding: 10px;
   }
 
-  .chat-header img {
+  .chat-header1 img {
     width: 30px;
     height: 30px;
   }
 
-  .chat-messages {
+  .chat-messages1 {
     padding: 10px;
   }
 
-  .chat-input {
+  .chat-input1 {
     padding: 10px;
   }
 
-  .chat-input input {
+  .chat-input1 input {
     font-size: 12px;
   }
 
-  .chat-input button {
+  .chat-input1 button {
     padding: 8px 15px;
     font-size: 12px;
+  }
+
+  .button-group {
+    width: 120px; /* Even smaller for very small screens */
+  }
+
+  .add-friend-btn1 {
+    width: 80px; /* Even smaller for very small screens */
+    font-size: 11px;
+  }
+
+  .chat-btn1 {
+    width: 32px; /* Even smaller for very small screens */
+    height: 32px;
+  }
+
+  .icon-img {
+    width: 16px;
+    height: 16px;
   }
 }
 
 /* Notification styling */
-.notification {
+.notification1 {
   position: fixed;
   top: 20px;
   left: 50%;
@@ -682,45 +726,41 @@
   background: #555;
 }
 
-.tabs {
+.tabs1 {
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
 }
 
-.tab-button {
+.tab-button1 {
   padding: 10px 20px;
   border: none;
   background-color: rgb(58,58,60);
-  color:white;
+  color: white;
   cursor: pointer;
   border-right: solid 1px rgb(28,28,30);
   transition: background-color 0.3s;
 }
 
-.tab-button:hover {
+.tab-button1:hover {
   background-color: rgb(44, 44, 48);
 }
 
-.tab-button:nth-of-type(1){
+.tab-button1:nth-of-type(1) {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
-
 }
 
-.tab-button:nth-of-type(4){
+.tab-button1:nth-of-type(4) {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
-
 }
 
-.tab-button.active {
+.tab-button1.active1 {
   background-color: #007bff;
   color: white;
 }
 
-
-
-.tab-button.active:hover {
+.tab-button1.active1:hover {
   background-color: #0056b3;
 }

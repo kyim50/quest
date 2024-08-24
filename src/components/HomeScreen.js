@@ -596,15 +596,15 @@ const HomeScreen = () => {
   };
 
   return (
-    <div className="home-screen-container">
+    <div className="home-screen-container2">
       <NavigationBar 
         activeSection={activeSection} 
         showSection={showSection} 
       />
-      <div className={`main-content ${getActiveClass()}`}>
+      <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}
         {activeSection !== '' && !showFullMap && (
-          <div className="map-container">
+          <div className="map-container2">
             <MapComponent 
               address={address} 
               setAddress={setAddress} 

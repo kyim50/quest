@@ -17,7 +17,7 @@ body {
 }
 
 /* Home screen container */
-.home-screen-container {
+.home-screen-container2 {
   display: flex;
   height: 100vh;
   overflow: hidden;
@@ -121,7 +121,7 @@ nav {
 }
 
 /* Main content area */
-.main-content {
+.main-content2 {
   display: flex;
   flex-grow: 1;
   overflow: hidden;
@@ -137,7 +137,7 @@ nav {
   transition: width 0.3s ease;
 }
 
-.map-container {
+.map-container2 {
   flex-grow: 1;
   height: 100%;
   margin: 0 1% 0 0;
@@ -159,8 +159,8 @@ nav {
   flex-shrink: 0;
 }
 
-.connections-active .map-container,
-.connections-locked-active .map-container {
+.connections-active .map-container2,
+.connections-locked-active .map-container2 {
   width: calc(100% - 420px); /* 400px for content + 20px for margins */
   flex-grow: 0;
 }
@@ -173,9 +173,9 @@ nav {
   flex-shrink: 0;
 }
 
-.profile-active .map-container,
-.privacy-active .map-container,
-.connections-locked-active .map-container {
+.profile-active .map-container2,
+.privacy-active .map-container2,
+.connections-locked-active .map-container2 {
   flex-grow: 1;
   width: calc(100% - 400px);
 }
@@ -317,8 +317,8 @@ nav {
     width: 375px;
   }
 
-  .connections-active .map-container,
-  .connections-locked-active .map-container {
+  .connections-active .map-container2,
+  .connections-locked-active .map-container2 {
     width: calc(100% - 395px); /* 375px for content + 20px for margins */
   }
   
@@ -328,15 +328,15 @@ nav {
     width: 375px;
   }
   
-  .profile-active .map-container,
-  .privacy-active .map-container,
-  .connections-locked-active .map-container {
+  .profile-active .map-container2,
+  .privacy-active .map-container2,
+  .connections-locked-active .map-container2 {
     width: calc(100% - 375px);
   }
 }
 
 @media (max-width: 768px) {
-  .home-screen-container {
+  .home-screen-container2 {
     flex-direction: column;
   }
 
@@ -392,15 +392,15 @@ nav {
     display: none;
   }
 
-  .main-content {
+  .main-content2 {
     flex-direction: column-reverse;
     padding-bottom: 60px; /* Add space for the bottom nav bar */
   }
 
   .content-area,
-  .map-container,
+  .map-container2,
   .profile-active .content-area,
-  .profile-active .map-container {
+  .profile-active .map-container2 {
     width: 100%;
     height: calc(50vh - 30px);
     margin: 0;
@@ -413,7 +413,7 @@ nav {
   }
 }
 
-.logout-button {
+.logout-button4 {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -430,11 +430,11 @@ nav {
   border-radius: 12px;
 }
 
-.logout-button:hover {
+.logout-button4:hover {
   background-color: #2c2c2c;
 }
 
-.logout-button img {
+.logout-button4 img {
   width: auto;
   height: 24px;
   margin-right: 15px;
@@ -461,7 +461,7 @@ body {
 }
 
 .nav-button.active {
-  background-color: var(--accent-color);
+  background-color: rgb(10,145,255);
 }
 
 .address-bar {
@@ -469,4 +469,61 @@ body {
   color: var(--text-color);
 }
 
-/* ... rest of the CSS remains the same ... */
+/* Dark mode specific styles */
+:root {
+  --background-color: #1e1e2e;
+  --text-color: #ffffff;
+  --nav-background: #1a1a1a;
+  --border-color: #333;
+  --hover-color: #2c2c2c;
+  --accent-color: #3a3a3a;
+  --card-background: rgba(28,28,30,0.8);
+}
+
+/* Light mode specific styles */
+body.light-mode {
+  --background-color: #f0f0f5;
+  --text-color: #1e1e2e;
+  --nav-background: #ffffff;
+  --border-color: #e0e0e0;
+  --hover-color: #f5f5f5;
+  --accent-color: #e0e0e0;
+  --card-background: rgba(255,255,255,0.8);
+}
+
+/* Transition for smooth theme switching */
+body, .nav-bar, .nav-button, .address-bar {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Additional styles for better visibility in light mode */
+body.light-mode .nav-button img,
+body.light-mode .logout-button4 img {
+  filter: none;
+}
+
+body.light-mode .marker-container {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .marker-dot {
+  background-color: #007AFF;
+}
+
+body.light-mode .lock-indicator {
+  border-bottom-color: #FF3B30;
+}
+
+/* Adjust scrollbar for light mode */
+body.light-mode ::-webkit-scrollbar-track {
+  background: #f0f0f5;
+}
+
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+}
+
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}

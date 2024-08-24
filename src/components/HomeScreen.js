@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import '../styles/mapstyles.css';
@@ -15,8 +15,9 @@ import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
 import { doc, getDoc, setDoc, collection, query, where, getDocs, deleteDoc, addDoc } from 'firebase/firestore';
 import { Camera } from 'react-camera-pro';
-import { IconButton, TextField, Button, Select, MenuItem } from '@mui/material';
+import { IconButton, TextField, Button, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { ArrowBack, CameraAlt, Refresh, Person, Close, Search, Delete, Send } from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const HomeScreen = () => {
   const [activeSection, setActiveSection] = useState('');
@@ -94,10 +95,10 @@ const HomeScreen = () => {
     fetchFriends();
   }, []);
 
-  const showSection = (sectionId) => {
+  const showSection = useCallback((sectionId) => {
     setActiveSection(sectionId === activeSection ? '' : sectionId);
     setShowFullMap(false);
-  };
+  }, [activeSection]);
 
   const handleSetLockedUser = useCallback(async (userId) => {
     console.log("Setting locked user:", userId);
@@ -135,48 +136,51 @@ const HomeScreen = () => {
     }
   }, [map]);
 
-  const handleCapture = () => {
+  const handleCapture = useCallback(() => {
     const imageSrc = cameraRef.current.takePhoto();
     setPhotoPreview(imageSrc);
     setShowCamera(false);
-  };
+  }, []);
 
-  const handleFlipCamera = () => {
+  const handleFlipCamera = useCallback(() => {
     setFacingMode(prevMode => prevMode === 'user' ? 'environment' : 'user');
-  };
+  }, []);
 
-  const toggleCamera = () => {
-    setShowCamera(!showCamera);
-  };
+  const toggleCamera = useCallback(() => {
+    setShowCamera(prev => !prev);
+  }, []);
 
-  const toggleFullMap = () => {
-    setShowFullMap(!showFullMap);
-    if (!showFullMap && map && userProfileData?.location) {
-      map.flyTo({
-        center: [userProfileData.location.longitude, userProfileData.location.latitude],
-        zoom: 15,
-        duration: 2000
-      });
-    }
-  };
+  const toggleFullMap = useCallback(() => {
+    setShowFullMap(prev => {
+      const newState = !prev;
+      if (!newState && map && userProfileData?.location) {
+        map.flyTo({
+          center: [userProfileData.location.longitude, userProfileData.location.latitude],
+          zoom: 15,
+          duration: 2000
+        });
+      }
+      return newState;
+    });
+  }, [map, userProfileData]);
 
-  const toggleImagePreview = (image) => {
+  const toggleImagePreview = useCallback((image) => {
     console.log("Image clicked:", image);
     setSelectedImage(image);
-    setShowImagePreview(!showImagePreview);
+    setShowImagePreview(prev => !prev);
     if (image) {
       fetchComments(image.id);
     }
-  };
+  }, []);
 
-  const fetchComments = async (imageId) => {
+  const fetchComments = useCallback(async (imageId) => {
     const commentsRef = collection(db, 'photos', imageId, 'comments');
     const commentsSnapshot = await getDocs(commentsRef);
     const fetchedComments = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     setComments(fetchedComments);
-  };
+  }, []);
 
-  const handleAddComment = async () => {
+  const handleAddComment = useCallback(async () => {
     if (newComment.trim() && selectedImage) {
       const commentRef = await addDoc(collection(db, 'photos', selectedImage.id, 'comments'), {
         text: newComment,
@@ -184,29 +188,27 @@ const HomeScreen = () => {
         username: auth.currentUser.displayName,
         timestamp: new Date()
       });
-      setComments([...comments, { id: commentRef.id, text: newComment, userId: auth.currentUser.uid, username: auth.currentUser.displayName, timestamp: new Date() }]);
+      setComments(prev => [...prev, { id: commentRef.id, text: newComment, userId: auth.currentUser.uid, username: auth.currentUser.displayName, timestamp: new Date() }]);
       setNewComment('');
     }
-  };
+  }, [newComment, selectedImage]);
 
-  const handleDeletePost = async () => {
+  const handleDeletePost = useCallback(async () => {
     if (selectedImage && selectedImage.userId === auth.currentUser.uid) {
       await deleteDoc(doc(db, 'photos', selectedImage.id));
       setShowImagePreview(false);
-      // Refresh the grid data
-      const updatedGridData = gridData.filter(item => item.id !== selectedImage.id);
-      setGridData(updatedGridData);
+      setGridData(prev => prev.filter(item => item.id !== selectedImage.id));
     }
-  };
+  }, [selectedImage]);
 
-  const handleUploadPhoto = async () => {
+  const handleUploadPhoto = useCallback(async () => {
     if (auth.currentUser && photoPreview) {
       try {
         const photoRef = doc(collection(db, 'photos'));
         await setDoc(photoRef, {
           userId: auth.currentUser.uid,
           username: auth.currentUser.displayName,
-          userProfileImage: currentUser.profileImage,
+          userProfileImage: currentUser?.profileImage || null,
           image: photoPreview,
           size: photoSize,
           caption: caption,
@@ -215,30 +217,29 @@ const HomeScreen = () => {
         showNotification('Photo uploaded successfully');
         setPhotoPreview(null);
         setCaption('');
-        // Refresh the grid data
         const newPhoto = { 
           id: photoRef.id, 
           userId: auth.currentUser.uid, 
           username: auth.currentUser.displayName,
-          userProfileImage: currentUser.profileImage,
+          userProfileImage: currentUser?.profileImage || null,
           image: photoPreview, 
           size: photoSize, 
           caption: caption, 
           timestamp: new Date() 
         };
-        setGridData([newPhoto, ...gridData]);
+        setGridData(prev => [newPhoto, ...prev]);
       } catch (error) {
         console.error('Error uploading photo:', error);
         showNotification('Failed to upload photo. Please try again.');
       }
     }
-  };
+  }, [auth.currentUser, photoPreview, photoSize, caption, currentUser, showNotification]);
 
-  const ProfileDisplay = () => (
+  const ProfileDisplay = useMemo(() => () => (
     <div className="profile-display">
       <div className="profile-photo-container">
         <img 
-          src={currentUser?.profileImage || 'default-profile-image.jpg'} 
+          src={currentUser?.profileImage || '/default-profile-image.jpg'} 
           alt={currentUser?.name || 'Profile'} 
           className="profile-photo" 
         />
@@ -251,153 +252,208 @@ const HomeScreen = () => {
         </p>
       </div>
     </div>
-  );
+  ), [currentUser]);
 
-  const Card = ({ size, user, image, caption, onClick }) => {
+  const Card = React.memo(({ size, user, image, caption, onClick }) => {
     const truncateCaption = (text, maxLength = 50) => {
       if (text.length <= maxLength) return text;
       return text.substr(0, maxLength - 3) + '...';
     };
   
     return (
-      <div className={`card ${size}`} onClick={onClick}>
-        <img src={image} alt={`Photo by ${user.name}`} className="card-image" />
-        {caption && (
-          <div className="card-caption">
-            {truncateCaption(caption)}
-          </div>
-        )}
+      <div className="card-wrapper">
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.3 }}
+          className={`card ${size}`}
+          onClick={onClick}
+        >
+          <img src={image} alt={`Photo by ${user.name}`} className="card-image" />
+          {caption && (
+            <div className="card-caption">
+              {truncateCaption(caption)}
+            </div>
+          )}
+        </motion.div>
         <div className="card-user-info">
-          <img src={user.profileImage} alt={user.name} className="card-user-avatar" />
+          <img src={user.profileImage || '/default-profile-image.jpg'} alt={user.name} className="card-user-avatar" />
           <span className="card-username">{user.name}</span>
         </div>
       </div>
     );
-  };
+  });
 
-  const ImagePreview = ({ selectedImage, comments, onClose, onAddComment, onDeletePost }) => {
-    const [newComment, setNewComment] = useState('');
-  
-    return (
-      <div className="image-preview-overlay" onClick={onClose}>
-        <div className="image-preview-content" onClick={e => e.stopPropagation()}>
-          <div className="image-preview-main">
-            <img src={selectedImage?.image} alt="Preview" className="preview-image" />
-          </div>
-          <div className="image-preview-sidebar">
-            <div className="image-preview-header">
-              <div className="user-info">
-                <img src={selectedImage?.userProfileImage || 'default-profile-image.jpg'} alt="User" className="user-avatar" />
-                <span className="username">@{selectedImage?.username}</span>
-              </div>
-              <IconButton onClick={onClose} className="close-button">
-                <Close />
-              </IconButton>
-            </div>
-            {selectedImage?.caption && (
-              <p className="image-caption">{selectedImage.caption}</p>
-            )}
-            <div className="comments-section">
-              {comments.map(comment => (
-                <div key={comment.id} className="comment">
-                  <strong>{comment.username}: </strong>{comment.text}
-                </div>
-              ))}
-            </div>
-            <div className="add-comment">
-              <TextField
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                fullWidth
-                InputProps={{
-                  style: { color: 'white' }
-                }}
-              />
-              <IconButton onClick={() => {
-                onAddComment(newComment);
-                setNewComment('');
-              }}>
-                <Send />
-              </IconButton>
-            </div>
-            {selectedImage?.userId === auth.currentUser.uid && (
-              <Button
-                startIcon={<Delete />}
-                onClick={onDeletePost}
-                className="delete-button"
-              >
-                Delete Post
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const ImagePreview = React.memo(({ selectedImage, comments, onClose, onAddComment, onDeletePost }) => {
+    const [localComment, setLocalComment] = useState('');
 
-  const PhotoUploadPreview = ({ photoPreview, photoSize, setPhotoSize, caption, setCaption, onUpload, onCancel }) => {
-    const [previewPosition, setPreviewPosition] = useState({ x: 0, y: 0 });
-    
-    const handleImageMove = (e) => {
-      const container = e.currentTarget;
-      const image = container.querySelector('img');
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      setPreviewPosition({
-        x: Math.max(0, Math.min(x, container.offsetWidth - image.width)),
-        y: Math.max(0, Math.min(y, container.offsetHeight - image.height))
-      });
+    const handleAddComment = () => {
+      onAddComment(localComment);
+      setLocalComment('');
     };
-  
+
     return (
-      <div className="photo-upload-preview-overlay">
-        <div className="photo-upload-preview-container">
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="image-preview-overlay"
+            onClick={onClose}
+          >
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              className="image-preview-content"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="image-preview-main">
+                <img src={selectedImage?.image} alt="Preview" className="preview-image" />
+              </div>
+              <div className="image-preview-sidebar">
+                <div className="image-preview-header">
+                  <div className="user-info">
+                    <img src={selectedImage?.userProfileImage || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
+                    <span className="username">@{selectedImage?.username}</span>
+                  </div>
+                  <IconButton onClick={onClose} className="close-button">
+                    <Close />
+                  </IconButton>
+                </div>
+                {selectedImage?.caption && (
+                  <p className="image-caption">{selectedImage.caption}</p>
+                )}
+                <div className="comments-section">
+                  {comments.map(comment => (
+                    <div key={comment.id} className="comment">
+                      <strong>{comment.username}: </strong>{comment.text}
+                    </div>
+                  ))}
+                </div>
+                <div className="add-comment">
+                  <TextField
+                    value={localComment}
+                    onChange={(e) => setLocalComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    fullWidth
+                    InputProps={{
+                      style: { color: 'white' }
+                    }}
+                  />
+                  <IconButton onClick={handleAddComment}>
+                    <Send />
+                  </IconButton>
+                </div>
+                {selectedImage?.userId === auth.currentUser.uid && (
+                  <Button
+                    startIcon={<Delete />}
+                    onClick={onDeletePost}
+                    className="delete-button"
+                  >
+                    Delete Post
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  });
+
+  const PhotoUploadPreview = React.memo(({ photoPreview, photoSize, setPhotoSize, initialCaption, setFinalCaption, onUpload, onCancel }) => {
+    const [localCaption, setLocalCaption] = useState(initialCaption);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const imageRef = useRef(null);
+
+    const handleImageMove = (e) => {
+      if (imageRef.current) {
+        const rect = imageRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setCrop({ x, y });
+      }
+    };
+
+    const getSizeStyle = () => {
+      switch (photoSize) {
+        case 'small': return { width: '200px', height: '200px' };
+        case 'medium': return { width: '300px', height: '300px' };
+        case 'large': return { width: '400px', height: '400px' };
+        default: return { width: '300px', height: '300px' };
+      }
+    };
+
+    const handleUpload = () => {
+      setFinalCaption(localCaption);
+      onUpload();
+    };
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="photo-upload-preview-overlay"
+      >
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          className="photo-upload-preview-container"
+        >
           <div 
-            className={`photo-preview-box ${photoSize}`}
+            className="photo-preview-box"
+            style={getSizeStyle()}
             onMouseMove={handleImageMove}
+            ref={imageRef}
           >
             <img 
               src={photoPreview} 
-              alt="Upload preview" 
+              alt="Preview" 
               style={{
-                transform: `translate(${previewPosition.x}px, ${previewPosition.y}px)`
+                position: 'absolute',
+                top: `-${crop.y}px`,
+                left: `-${crop.x}px`,
+                maxWidth: 'none',
+                maxHeight: 'none',
               }}
             />
           </div>
           <div className="photo-upload-controls">
-            <Select
+            <RadioGroup
+              row
+              aria-label="photo-size"
+              name="photo-size"
               value={photoSize}
               onChange={(e) => setPhotoSize(e.target.value)}
               className="size-select"
             >
-              <MenuItem value="small">Small</MenuItem>
-              <MenuItem value="medium">Medium</MenuItem>
-              <MenuItem value="large">Large</MenuItem>
-            </Select>
+              <FormControlLabel value="small" control={<Radio />} label="Small" />
+              <FormControlLabel value="medium" control={<Radio />} label="Medium" />
+              <FormControlLabel value="large" control={<Radio />} label="Large" />
+            </RadioGroup>
             <TextField
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
+              value={localCaption}
+              onChange={(e) => setLocalCaption(e.target.value)}
               placeholder="Add a caption..."
               fullWidth
               margin="normal"
               InputProps={{
-                style: { color: 'white' }
+                style: { color: 'white', fontWeight: 'bold' }
               }}
             />
             <div className="button-group">
-              <Button onClick={onUpload} variant="contained" color="primary">Upload</Button>
+              <Button onClick={handleUpload} variant="contained" color="primary">Upload</Button>
               <Button onClick={onCancel} variant="outlined">Cancel</Button>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
-  };
+  });
 
-  const PinterestLayout = () => {
+  const PinterestLayout = React.memo(() => {
     useEffect(() => {
       const unsubscribe = auth.onAuthStateChanged((user) => {
         setIsLoading(false);
@@ -411,7 +467,7 @@ const HomeScreen = () => {
       return () => unsubscribe();
     }, [friendsList]);
 
-    const fetchGridData = async () => {
+    const fetchGridData = useCallback(async () => {
       if (auth.currentUser) {
         const photosRef = collection(db, 'photos');
         const q = query(photosRef, where('userId', 'in', [auth.currentUser.uid, ...friendsList]));
@@ -419,7 +475,7 @@ const HomeScreen = () => {
         const photos = photosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setGridData(photos);
       }
-    };
+    }, [friendsList]);
 
     if (isLoading) {
       return <div>Loading...</div>;
@@ -427,9 +483,9 @@ const HomeScreen = () => {
 
     return (
       <div className="pin-container">
-        {gridData.map((item, index) => (
+        {gridData.map((item) => (
           <Card 
-            key={index} 
+            key={item.id}
             size={item.size} 
             user={{name: item.username, profileImage: item.userProfileImage}} 
             image={item.image} 
@@ -439,9 +495,9 @@ const HomeScreen = () => {
         ))}
       </div>
     );
-  };
+  });
 
-  const renderHomeContent = () => (
+  const renderHomeContent = useCallback(() => (
     <div className="home-content">
       <div className="top-bar">
         <ProfileDisplay />
@@ -507,30 +563,32 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      {showImagePreview && (
-        <ImagePreview 
-          selectedImage={selectedImage}
-          comments={comments}
-          onClose={() => setShowImagePreview(false)}
-          onAddComment={handleAddComment}
-          onDeletePost={handleDeletePost}
-        />
-      )}
-      {photoPreview && (
-        <PhotoUploadPreview
-          photoPreview={photoPreview}
-          photoSize={photoSize}
-          setPhotoSize={setPhotoSize}
-          caption={caption}
-          setCaption={setCaption}
-          onUpload={handleUploadPhoto}
-          onCancel={() => setPhotoPreview(null)}
-        />
-      )}
+      <AnimatePresence>
+        {showImagePreview && (
+          <ImagePreview 
+            selectedImage={selectedImage}
+            comments={comments}
+            onClose={() => setShowImagePreview(false)}
+            onAddComment={handleAddComment}
+            onDeletePost={handleDeletePost}
+          />
+        )}
+        {photoPreview && (
+          <PhotoUploadPreview
+            photoPreview={photoPreview}
+            photoSize={photoSize}
+            setPhotoSize={setPhotoSize}
+            initialCaption={caption}
+            setFinalCaption={setCaption}
+            onUpload={handleUploadPhoto}
+            onCancel={() => setPhotoPreview(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
-  );
+  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto]);
 
-  const renderFullMap = () => (
+  const renderFullMap = useCallback(() => (
     <div className="full-map-container">
       <IconButton onClick={toggleFullMap} className="back-button">
         <ArrowBack />
@@ -546,9 +604,9 @@ const HomeScreen = () => {
         isFullScreen={true}
       />
     </div>
-  );
+  ), [toggleFullMap, address, activeSection, lockedUser]);
 
-  const renderSection = () => {
+  const renderSection = useCallback(() => {
     switch(activeSection) {
       case 'profile':
         return <UserProfile handleLogout={handleLogoutClick} />;
@@ -569,9 +627,9 @@ const HomeScreen = () => {
       default:
         return renderHomeContent();
     }
-  };
+  }, [activeSection, currentUserIds, map, handleSetLockedUser, lockedUser, lockedUserData, auth.currentUser, renderHomeContent]);
 
-  const handleLogoutClick = async () => {
+  const handleLogoutClick = useCallback(async () => {
     try {
       await handleLogout();
       showNotification('Logged out successfully');
@@ -580,9 +638,9 @@ const HomeScreen = () => {
       console.error('Logout failed:', error);
       showNotification('Logout failed. Please try again.');
     }
-  };
+  }, [showNotification, navigate]);
 
-  const getActiveClass = () => {
+  const getActiveClass = useCallback(() => {
     if (activeSection === '') {
       return 'home-active';
     }
@@ -593,7 +651,7 @@ const HomeScreen = () => {
       return lockedUser ? 'connections-locked-active' : 'connections-active';
     }
     return activeSection ? `${activeSection}-active` : '';
-  };
+  }, [activeSection, lockedUser]);
 
   return (
     <div className="home-screen-container2">

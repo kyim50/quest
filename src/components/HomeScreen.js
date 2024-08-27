@@ -15,6 +15,7 @@ import QuestsComponent from './QuestsComponent';
 import Connections from './Connections';
 import HistorySection from './HistorySection';
 import PrivacySection from './PrivacySection';
+import PhotoUploadPreview from './PhotoUploadPreview';
 import '../styles/HomeScreen.css';
 
 const HomeScreen = React.memo(() => {
@@ -191,7 +192,7 @@ const HomeScreen = React.memo(() => {
     }
   }, [selectedImage]);
 
-  const handleUploadPhoto = useCallback(async (cropInfo) => {
+  const handleUploadPhoto = useCallback(async (cropInfo, size, captionText) => {
     if (auth.currentUser && photoPreview) {
       try {
         const photoRef = doc(collection(db, 'photos'));
@@ -200,8 +201,8 @@ const HomeScreen = React.memo(() => {
           username: auth.currentUser.displayName,
           userProfileImage: currentUser?.profilePhoto || null,
           image: photoPreview,
-          size: photoSize,
-          caption: caption,
+          size: size,
+          caption: captionText,
           cropInfo: cropInfo,
           timestamp: serverTimestamp(),
         }, { merge: true });
@@ -214,8 +215,8 @@ const HomeScreen = React.memo(() => {
           username: auth.currentUser.displayName,
           userProfileImage: currentUser?.profilePhoto || null,
           image: photoPreview, 
-          size: photoSize, 
-          caption: caption,
+          size: size, 
+          caption: captionText,
           cropInfo: cropInfo,
           timestamp: new Date() 
         };
@@ -225,7 +226,7 @@ const HomeScreen = React.memo(() => {
         showNotification('Failed to upload photo. Please try again.');
       }
     }
-  }, [auth.currentUser, photoPreview, photoSize, caption, currentUser, showNotification]);
+  }, [auth.currentUser, photoPreview, currentUser, showNotification]);
   
   const toggleNotifications = useCallback(() => setShowNotifications(prev => !prev), []);
   const clearNotifications = useCallback(() => setNotifications([]), []);
@@ -343,167 +344,6 @@ const HomeScreen = React.memo(() => {
                 Delete Post
               </Button>
             )}
-          </div>
-        </div>
-      </div>
-    );
-  });
-
-  const PhotoUploadPreview = React.memo(({ photoPreview, photoSize, setPhotoSize, initialCaption, setFinalCaption, onUpload, onCancel, currentUser }) => {
-    const [localCaption, setLocalCaption] = useState(initialCaption);
-    const [outlinePosition, setOutlinePosition] = useState({ x: 0, y: 0 });
-    const [isDragging, setIsDragging] = useState(false);
-    const imageRef = useRef(null);
-    const containerRef = useRef(null);
-    const outlineRef = useRef(null);
-  
-    useEffect(() => {
-      if (imageRef.current && containerRef.current && outlineRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const imgRect = imageRef.current.getBoundingClientRect();
-        const outlineRect = outlineRef.current.getBoundingClientRect();
-        
-        setOutlinePosition({
-          x: (imgRect.width - outlineRect.width) / 2,
-          y: (imgRect.height - outlineRect.height) / 2
-        });
-      }
-    }, [photoSize]);
-  
-    const handleMouseDown = (e) => {
-      setIsDragging(true);
-      e.preventDefault();
-    };
-  
-    const handleMouseMove = useCallback((e) => {
-      if (!isDragging) return;
-  
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const outlineRect = outlineRef.current.getBoundingClientRect();
-  
-      const newX = outlinePosition.x + e.movementX;
-      const newY = outlinePosition.y + e.movementY;
-  
-      const maxX = containerRect.width - outlineRect.width;
-      const maxY = containerRect.height - outlineRect.height;
-  
-      setOutlinePosition({
-        x: Math.max(0, Math.min(maxX, newX)),
-        y: Math.max(0, Math.min(maxY, newY))
-      });
-    }, [isDragging, outlinePosition]);
-  
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-  
-    useEffect(() => {
-      if (isDragging) {
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-      }
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }, [isDragging, handleMouseMove]);
-  
-    const getSizeStyle = () => {
-      switch (photoSize) {
-        case 'small': return { width: '200px', height: '200px' };
-        case 'medium': return { width: '300px', height: '300px' };
-        case 'large': return { width: '400px', height: '400px' };
-        default: return { width: '300px', height: '300px' };
-      }
-    };
-  
-    const handleUpload = () => {
-      const outlineRect = outlineRef.current.getBoundingClientRect();
-      const imageRect = imageRef.current.getBoundingClientRect();
-      
-      const cropInfo = {
-        x: (outlinePosition.x - imageRect.left) / imageRect.width,
-        y: (outlinePosition.y - imageRect.top) / imageRect.height,
-        width: outlineRect.width / imageRect.width,
-        height: outlineRect.height / imageRect.height
-      };
-  
-      setFinalCaption(localCaption);
-      onUpload(cropInfo);
-    };
-  
-    return (
-      <div className="photo-upload-preview-overlay">
-        <div className="photo-upload-preview-container">
-          <div className="preview-content">
-            <div className="full-image-container" ref={containerRef}>
-              <img 
-                ref={imageRef}
-                src={photoPreview} 
-                alt="Full Preview" 
-                className="full-preview-image"
-              />
-              <div 
-                ref={outlineRef}
-                className="card-outline"
-                style={{
-                  ...getSizeStyle(),
-                  position: 'absolute',
-                  left: `${outlinePosition.x}px`,
-                  top: `${outlinePosition.y}px`,
-                  cursor: isDragging ? 'grabbing' : 'grab'
-                }}
-                onMouseDown={handleMouseDown}
-              >
-                <div className="card-outline-border" />
-              </div>
-            </div>
-            <div className="preview-controls">
-              <RadioGroup
-                row
-                aria-label="photo-size"
-                name="photo-size"
-                value={photoSize}
-                onChange={(e) => setPhotoSize(e.target.value)}
-                className="size-select"
-              >
-                <FormControlLabel value="small" control={<Radio />} label="Small" />
-                <FormControlLabel value="medium" control={<Radio />} label="Medium" />
-                <FormControlLabel value="large" control={<Radio />} label="Large" />
-              </RadioGroup>
-              <TextField
-                value={localCaption}
-                onChange={(e) => setLocalCaption(e.target.value)}
-                placeholder="Add a caption..."
-                fullWidth
-                margin="normal"
-                InputProps={{
-                  style: { 
-                    color: 'white', 
-                    fontWeight: 'bold',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '10px',
-                    padding: '10px'
-                  }
-                }}
-              />
-              <div className="button-group">
-                <Button onClick={handleUpload} variant="contained" color="primary">
-                  Upload
-                </Button>
-                <Button onClick={onCancel} variant="outlined">
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-          <div className="preview-user-info">
-            <img 
-              src={currentUser?.profilePhoto || '/default-profile-image.jpg'} 
-              alt={currentUser?.name || 'User'} 
-              className="preview-user-avatar"
-            />
-            <span className="preview-username">{currentUser?.name || 'User'}</span>
           </div>
         </div>
       </div>
@@ -663,10 +503,8 @@ const HomeScreen = React.memo(() => {
         {photoPreview && (
           <PhotoUploadPreview
             photoPreview={photoPreview}
-            photoSize={photoSize}
-            setPhotoSize={setPhotoSize}
+            initialPhotoSize={photoSize}
             initialCaption={caption}
-            setFinalCaption={setCaption}
             onUpload={handleUploadPhoto}
             onCancel={() => setPhotoPreview(null)}
             currentUser={currentUser}

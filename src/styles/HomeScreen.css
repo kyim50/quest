@@ -135,7 +135,7 @@ body {
   flex-grow: 1;
   overflow: hidden;
   width: 100%;
-  padding-top: 20px; /* Add gap between top bar and content */
+  padding-top: 20px;
 }
 
 .grid-area {
@@ -219,19 +219,7 @@ body {
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  margin-top: 10px; /* Add space between camera and map */
-}
-
-.mini-map::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background-color: rgb(38, 38, 40); /* Match the background color */
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  margin-top: 10px;
 }
 
 /* Pinterest layout styles */
@@ -318,6 +306,7 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -327,17 +316,19 @@ body {
 .image-preview-content {
   display: flex;
   width: 90%;
+  max-width: 1200px;
   height: 90%;
-  background-color: rgb(38, 38, 40);
-  border-radius: 16px;
+  background-color: #1E1E1E;
+  border-radius: 20px;
   overflow: hidden;
 }
 
 .image-preview-main {
-  flex: 1;
+  flex: 2;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #2C2C2C;
   overflow: hidden;
 }
 
@@ -348,11 +339,12 @@ body {
 }
 
 .image-preview-sidebar {
-  width: 360px;
-  padding: 20px;
+  flex: 1;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  background-color: rgb(48, 48, 50);
+  background-color: #2C2C2C;
+  color: white;
 }
 
 .image-preview-header {
@@ -360,6 +352,8 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  border-bottom: 1px solid #3C3C3C;
+  padding-bottom: 15px;
 }
 
 .user-info {
@@ -377,7 +371,6 @@ body {
 .username {
   font-size: 18px;
   font-weight: bold;
-  color: #ffffff;
 }
 
 .quest-info {
@@ -387,18 +380,16 @@ body {
 .quest-title {
   font-size: 16px;
   font-weight: bold;
-  color: #ffffff;
 }
 
 .quest-break {
   font-size: 16px;
   font-style: italic;
-  color: #ccc5b9;
+  color: #CCCCCC;
 }
 
 .image-caption {
   margin-bottom: 20px;
-  color: #ffffff;
   font-weight: bold;
 }
 
@@ -406,25 +397,34 @@ body {
   flex-grow: 1;
   overflow-y: auto;
   margin-bottom: 20px;
+  background-color: #3C3C3C;
+  border-radius: 10px;
+  padding: 15px;
 }
 
 .comment {
   margin-bottom: 10px;
-  color: #ccc5b9;
+  padding: 10px;
+  background-color: #4C4C4C;
+  border-radius: 8px;
 }
 
 .add-comment {
   margin-top: 20px;
 }
 
-.close-button, .delete-button {
-  color: #ffffff !important;
+.add-comment .MuiInputBase-root {
+  background-color: #3C3C3C;
+  border-radius: 20px;
+  padding: 5px 15px;
 }
 
-.delete-button {
-  margin-top: 20px !important;
-  background-color: #ff4d4d !important;
-  color: #ffffff !important;
+.add-comment .MuiInputBase-input {
+  color: white;
+}
+
+.close-button, .delete-button, .send-button {
+  color: white !important;
 }
 
 /* Photo upload preview styles */
@@ -435,6 +435,7 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -442,29 +443,27 @@ body {
 }
 
 .photo-upload-preview-container {
-  background-color: rgb(48, 48, 50);
-  padding: 30px;
+  background-color: #1E1E1E;
   border-radius: 20px;
   width: 90%;
+  max-width: 1200px;
   height: 90%;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  overflow: hidden;
 }
 
 .preview-content {
   display: flex;
   flex: 1;
-  gap: 30px;
+  overflow: hidden;
 }
 
 .full-image-container {
   flex: 2;
   position: relative;
   overflow: hidden;
-  border-radius: 10px;
-  width: 100%;
-  height: 100%;
+  background-color: #2C2C2C;
 }
 
 .full-preview-image {
@@ -478,31 +477,27 @@ body {
   border: 2px solid white;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
   cursor: grab;
-  border-radius: 16px;
-  transition: none; /* Remove transition for smoother movement */
+  transition: all 0.3s ease;
 }
 
-.card-outline-border {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid white;
-  pointer-events: none;
-  border-radius: 16px;
+.card-outline:active {
+  cursor: grabbing;
 }
 
 .preview-controls {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding: 30px;
+  background-color: #2C2C2C;
 }
 
 .preview-user-info {
   display: flex;
   align-items: center;
+  background-color: #3C3C3C;
+  padding: 15px;
+  border-radius: 10px;
   margin-top: 20px;
 }
 
@@ -510,34 +505,78 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 .preview-username {
-  color: #ffffff;
+  color: white;
   font-weight: bold;
   font-size: 18px;
 }
 
 .size-select {
-  margin-bottom: 15px;
-  width: 100%;
+  margin-bottom: 20px;
 }
 
 .size-select .MuiFormControlLabel-label {
-  color: #ffffff;
+  color: white;
+}
+
+.size-select .MuiRadio-root {
+  color: white;
+}
+
+.size-select .MuiRadio-root.Mui-checked {
+  color: #4CAF50;
+}
+
+.preview-controls .MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+.preview-controls .MuiInputBase-root {
+  background-color: #3C3C3C;
+  color: white;
+}
+
+.preview-controls .MuiInputLabel-root {
+  color: #CCCCCC;
+}
+
+.preview-controls .MuiOutlinedInput-notchedOutline {
+  border-color: #4C4C4C;
 }
 
 .button-group {
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  margin-top: 15px;
+  margin-top: auto;
 }
 
-.button-group button {
+.preview-controls .MuiButton-root {
   flex: 1;
   margin: 0 5px;
+  text-transform: none;
+  font-weight: bold;
+  padding: 12px 0;
+  border-radius: 25px;
+}
+
+.preview-controls .MuiButton-contained {
+  background-color: #4CAF50;
+}
+
+.preview-controls .MuiButton-contained:hover {
+  background-color: #45a049;
+}
+
+.preview-controls .MuiButton-outlined {
+  border-color: white;
+  color: white;
+}
+
+.preview-controls .MuiButton-outlined:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Notifications dropdown */
@@ -571,6 +610,10 @@ body {
 
 .notification-item:last-child {
   border-bottom: none;
+}
+
+.notification-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Full map styles */
@@ -701,9 +744,8 @@ body {
   }
 
   .camera-map-area {
-    display: flex;
-    flex-direction: column;
-    height: calc(100% - 20px); /* Adjust height to account for the gap */
+    flex-direction: row;
+    height: 150px;
   }
 
   .camera-container,
@@ -719,13 +761,31 @@ body {
   }
 
   .pin-container {
-    column-count: 1;
+    column-count: 2;
+    column-gap: 10px;
+    padding: 10px;
+  }
+
+  .card-wrapper {
+    margin-bottom: 10px;
+  }
+
+  .card.small {
+    height: 150px;
+  }
+
+  .card.medium {
+    height: 200px;
+  }
+
+  .card.large {
+    height: 250px;
   }
 
   .image-preview-content {
     flex-direction: column;
-    width: 95%;
-    height: 95%;
+    width: 100%;
+    height: 100%;
   }
 
   .image-preview-main {
@@ -764,79 +824,12 @@ body {
     max-width: 90%;
     max-height: 90%;
   }
-}
 
-/* Additional styles for better visibility and interaction */
-.card-caption {
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.capture-button:hover {
-  background-color: rgba(255, 255, 255, 0.4) !important;
-}
-
-.back-button:hover, .flip-button:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.photo-upload-preview-container {
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-}
-
-.card-outline {
-  transition: all 0.3s ease;
-}
-
-.card-outline:hover {
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
-}
-
-.preview-controls .MuiButton-root {
-  text-transform: none;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-}
-
-.preview-controls .MuiButton-contained {
-  background-color: #4CAF50;
-}
-
-.preview-controls .MuiButton-contained:hover {
-  background-color: #45a049;
-}
-
-.preview-controls .MuiButton-outlined {
-  border-color: #ffffff;
-  color: #ffffff;
-}
-
-.preview-controls .MuiButton-outlined:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Scrollbar styles */
-.comments-section::-webkit-scrollbar,
-.notifications-dropdown::-webkit-scrollbar {
-  width: 8px;
-}
-
-.comments-section::-webkit-scrollbar-track,
-.notifications-dropdown::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.comments-section::-webkit-scrollbar-thumb,
-.notifications-dropdown::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-.comments-section::-webkit-scrollbar-thumb:hover,
-.notifications-dropdown::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
+  .card-user-info,
+  .notification-item,
+  .preview-controls .MuiButton-root {
+    min-height: 44px;
+  }
 }
 
 /* Animations */
@@ -871,6 +864,120 @@ body {
 .mini-map:focus-visible {
   outline: 2px solid #4CAF50;
   outline-offset: 2px;
+}
+
+/* Additional improvements */
+.card-caption {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.capture-button:hover {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.back-button:hover, .flip-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.photo-upload-preview-container {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.card-outline:hover {
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+}
+
+.comments-section::-webkit-scrollbar {
+  width: 8px;
+}
+
+.comments-section::-webkit-scrollbar-track {
+  background: #3C3C3C;
+  border-radius: 4px;
+}
+
+.comments-section::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+.comments-section::-webkit-scrollbar-thumb:hover {
+  background-color: #777;
+}
+
+/* Ensure text readability */
+.card-caption,
+.image-caption,
+.comment,
+.notification-item {
+  line-height: 1.5;
+}
+
+/* Smooth transitions */
+.card,
+.image-preview-overlay,
+.photo-upload-preview-overlay,
+.notifications-dropdown {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Enhance focus styles for better accessibility */
+button:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+/* Improve contrast for better readability */
+.quest-break,
+.notification-item {
+  color: #e0e0e0;
+}
+
+/* Ensure consistent spacing */
+.image-preview-sidebar > * {
+  margin-bottom: 15px;
+}
+
+/* Improve button styles */
+.MuiButton-root {
+  text-transform: none;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Enhance form field styles */
+.MuiTextField-root {
+  margin-bottom: 15px;
+}
+
+.MuiInputBase-root {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.MuiInputBase-input {
+  color: #ffffff;
+}
+
+/* Improve loading state visibility */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+/* Enhance error message visibility */
+.error-message {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }
 
 /* Dark mode considerations */
@@ -917,137 +1024,4 @@ body {
   .card {
     page-break-inside: avoid;
   }
-}
-
-/* Additional improvements */
-.image-preview-overlay,
-.photo-upload-preview-overlay {
-  backdrop-filter: blur(5px);
-}
-
-.card-outline {
-  transition: all 0.3s ease;
-}
-
-.card-outline:active {
-  cursor: grabbing;
-}
-
-.size-select .MuiRadio-root {
-  color: #ffffff;
-}
-
-.size-select .MuiRadio-root.Mui-checked {
-  color: #4CAF50;
-}
-
-.notification-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.capture-button,
-.back-button,
-.flip-button {
-  transition: background-color 0.3s ease;
-}
-
-.preview-controls .MuiTextField-root {
-  margin-bottom: 15px;
-}
-
-.preview-user-info {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  border-radius: 10px;
-  margin-top: 15px;
-}
-
-/* Ensure text readability */
-.card-caption,
-.image-caption,
-.comment,
-.notification-item {
-  line-height: 1.5;
-}
-
-/* Improve touch targets for mobile */
-@media (max-width: 768px) {
-  .card-user-info,
-  .notification-item,
-  .preview-controls .MuiButton-root {
-    min-height: 44px;
-  }
-}
-
-/* Smooth transitions */
-.card,
-.image-preview-overlay,
-.photo-upload-preview-overlay,
-.notifications-dropdown {
-  transition: all 0.3s ease-in-out;
-}
-
-/* Enhance focus styles for better accessibility */
-button:focus,
-input:focus,
-textarea:focus {
-  outline: 2px solid #4CAF50;
-  outline-offset: 2px;
-}
-
-/* Improve contrast for better readability */
-.quest-break,
-.notification-item {
-  color: #e0e0e0;
-}
-
-/* Add hover effects for interactive elements */
-.card:hover .card-caption,
-.notification-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Ensure consistent spacing */
-.image-preview-sidebar > * {
-  margin-bottom: 15px;
-}
-
-/* Improve button styles */
-.MuiButton-root {
-  text-transform: none;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-
-/* Enhance form field styles */
-.MuiTextField-root {
-  margin-bottom: 15px;
-}
-
-.MuiInputBase-root {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
-.MuiInputBase-input {
-  color: #ffffff;
-}
-
-/* Improve loading state visibility */
-.loading-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  color: #ffffff;
-  font-size: 18px;
-}
-
-/* Enhance error message visibility */
-.error-message {
-  color: #ff6b6b;
-  background-color: rgba(255, 107, 107, 0.1);
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 15px;
 }

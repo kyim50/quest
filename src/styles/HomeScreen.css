@@ -704,12 +704,7 @@ body {
 }
 
 /* Enhance focus styles for better accessibility */
-button:focus,
-input:focus,
-textarea:focus {
-  outline: 2px solid #4CAF50;
-  outline-offset: 2px;
-}
+
 
 /* Improve contrast for better readability */
 .quest-break,

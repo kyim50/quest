@@ -52,6 +52,10 @@
   transition: all 0.3s ease;
 }
 
+.chat-btn1{
+  filter: brightness(0) invert(1);
+}
+
 .add-friend-btn1 {
   background-color: #007AFF;
   color: white;

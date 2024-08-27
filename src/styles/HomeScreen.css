@@ -46,9 +46,21 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 15px 20px;
   width: 100%;
-  background-color: rgb(38, 38, 40);
+  background-color: rgb(48, 48, 50);
+  border-bottom: 1px solid #333;
+}
+
+.top-bar-center {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.top-bar-right {
+  display: flex;
+  gap: 15px;
 }
 
 /* Profile display styles */
@@ -58,9 +70,9 @@ body {
 }
 
 .profile-photo-container {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
+  width: 60px;
+  height: 60px;
+  margin-right: 15px;
   overflow: hidden;
   border-radius: 50%;
 }
@@ -77,31 +89,31 @@ body {
 }
 
 .profile-name {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: bold;
   margin: 0;
   color: #ffffff;
 }
 
 .profile-status {
-  font-size: 12px;
+  font-size: 16px;
   color: #ccc5b9;
   display: flex;
   align-items: center;
-  margin: 0;
+  margin: 5px 0 0;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background-color: #4CAF50;
   border-radius: 50%;
-  margin-right: 5px;
+  margin-right: 8px;
 }
 
 /* Search bar styles */
 .search-bar-home {
-  width: 300px;
+  width: 400px;
 }
 
 .search-bar-home .MuiOutlinedInput-root {
@@ -123,6 +135,7 @@ body {
   flex-grow: 1;
   overflow: hidden;
   width: 100%;
+  padding-top: 20px; /* Add gap between top bar and content */
 }
 
 .grid-area {
@@ -148,7 +161,7 @@ body {
 
 .camera-container, .camera-placeholder {
   height: 200px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -206,6 +219,19 @@ body {
   overflow: hidden;
   position: relative;
   cursor: pointer;
+  margin-top: 10px; /* Add space between camera and map */
+}
+
+.mini-map::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background-color: rgb(38, 38, 40); /* Match the background color */
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 /* Pinterest layout styles */
@@ -246,8 +272,9 @@ body {
 }
 
 .card-image {
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .card-caption {
@@ -263,21 +290,24 @@ body {
 
 .card-user-info {
   background-color: #1c1c1e;
-  padding: 10px;
+  padding: 12px;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
+  display: flex;
+  align-items: center;
 }
 
 .card-user-avatar {
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 8px;
+  margin-right: 10px;
 }
 
 .card-username {
-  font-size: 14px;
+  font-size: 18px;
   color: #ffffff;
+  font-weight: bold;
 }
 
 /* Image preview styles */
@@ -332,27 +362,55 @@ body {
   margin-bottom: 20px;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   margin-right: 10px;
 }
 
+.username {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.quest-info {
+  margin-bottom: 15px;
+}
+
+.quest-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.quest-break {
+  font-size: 16px;
+  font-style: italic;
+  color: #ccc5b9;
+}
+
 .image-caption {
   margin-bottom: 20px;
-  color: white;
+  color: #ffffff;
   font-weight: bold;
 }
 
 .comments-section {
   flex-grow: 1;
   overflow-y: auto;
+  margin-bottom: 20px;
 }
 
 .comment {
   margin-bottom: 10px;
-  color: white;
+  color: #ccc5b9;
 }
 
 .add-comment {
@@ -360,46 +418,13 @@ body {
 }
 
 .close-button, .delete-button {
-  color: white !important;
+  color: #ffffff !important;
 }
 
 .delete-button {
   margin-top: 20px !important;
   background-color: #ff4d4d !important;
-  color: white !important;
-}
-
-/* Full map styles */
-.full-map-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-}
-
-.full-map-container .back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1001;
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  color: white !important;
-}
-
-.address-bar {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1001;
-  background-color: rgba(23, 23, 23, 0.8);
-  color: #ffffff;
-  padding: 10px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: #ffffff !important;
 }
 
 /* Photo upload preview styles */
@@ -438,6 +463,8 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 10px;
+  width: 100%;
+  height: 100%;
 }
 
 .full-preview-image {
@@ -448,12 +475,11 @@ body {
 
 .card-outline {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   border: 2px solid white;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
-  cursor: move;
+  cursor: grab;
+  border-radius: 16px;
+  transition: none; /* Remove transition for smoother movement */
 }
 
 .card-outline-border {
@@ -464,6 +490,7 @@ body {
   bottom: 0;
   border: 2px solid white;
   pointer-events: none;
+  border-radius: 16px;
 }
 
 .preview-controls {
@@ -487,8 +514,9 @@ body {
 }
 
 .preview-username {
-  color: white;
+  color: #ffffff;
   font-weight: bold;
+  font-size: 18px;
 }
 
 .size-select {
@@ -497,7 +525,7 @@ body {
 }
 
 .size-select .MuiFormControlLabel-label {
-  color: white;
+  color: #ffffff;
 }
 
 .button-group {
@@ -510,6 +538,72 @@ body {
 .button-group button {
   flex: 1;
   margin: 0 5px;
+}
+
+/* Notifications dropdown */
+.notifications-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: rgb(48, 48, 50);
+  border-radius: 10px;
+  padding: 15px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notifications-dropdown h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc5b9;
+  font-size: 14px;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+/* Full map styles */
+.full-map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.full-map-container .back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  color: #ffffff !important;
+}
+
+.address-bar {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  background-color: rgba(23, 23, 23, 0.8);
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive adjustments */
@@ -577,8 +671,18 @@ body {
     align-items: flex-start;
   }
 
+  .top-bar-center {
+    width: 100%;
+    margin-top: 10px;
+  }
+
   .search-bar-home {
     width: 100%;
+  }
+
+  .top-bar-right {
+    width: 100%;
+    justify-content: flex-end;
     margin-top: 10px;
   }
 
@@ -597,8 +701,9 @@ body {
   }
 
   .camera-map-area {
-    flex-direction: row;
-    height: 200px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 20px); /* Adjust height to account for the gap */
   }
 
   .camera-container,
@@ -628,7 +733,7 @@ body {
   }
 
   .image-preview-sidebar {
-    width: 100%;width: 100%;
+    width: 100%;
     height: 40%;
   }
 
@@ -664,10 +769,6 @@ body {
 /* Additional styles for better visibility and interaction */
 .card-caption {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.card-user-info {
-  background-color: #1c1c1e;
 }
 
 .capture-button:hover {
@@ -715,21 +816,26 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.comments-section::-webkit-scrollbar {
+/* Scrollbar styles */
+.comments-section::-webkit-scrollbar,
+.notifications-dropdown::-webkit-scrollbar {
   width: 8px;
 }
 
-.comments-section::-webkit-scrollbar-track {
+.comments-section::-webkit-scrollbar-track,
+.notifications-dropdown::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 
-.comments-section::-webkit-scrollbar-thumb {
+.comments-section::-webkit-scrollbar-thumb,
+.notifications-dropdown::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
 }
 
-.comments-section::-webkit-scrollbar-thumb:hover {
+.comments-section::-webkit-scrollbar-thumb:hover,
+.notifications-dropdown::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.5);
 }
 
@@ -811,4 +917,137 @@ body {
   .card {
     page-break-inside: avoid;
   }
+}
+
+/* Additional improvements */
+.image-preview-overlay,
+.photo-upload-preview-overlay {
+  backdrop-filter: blur(5px);
+}
+
+.card-outline {
+  transition: all 0.3s ease;
+}
+
+.card-outline:active {
+  cursor: grabbing;
+}
+
+.size-select .MuiRadio-root {
+  color: #ffffff;
+}
+
+.size-select .MuiRadio-root.Mui-checked {
+  color: #4CAF50;
+}
+
+.notification-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.capture-button,
+.back-button,
+.flip-button {
+  transition: background-color 0.3s ease;
+}
+
+.preview-controls .MuiTextField-root {
+  margin-bottom: 15px;
+}
+
+.preview-user-info {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
+/* Ensure text readability */
+.card-caption,
+.image-caption,
+.comment,
+.notification-item {
+  line-height: 1.5;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  .card-user-info,
+  .notification-item,
+  .preview-controls .MuiButton-root {
+    min-height: 44px;
+  }
+}
+
+/* Smooth transitions */
+.card,
+.image-preview-overlay,
+.photo-upload-preview-overlay,
+.notifications-dropdown {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Enhance focus styles for better accessibility */
+button:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+/* Improve contrast for better readability */
+.quest-break,
+.notification-item {
+  color: #e0e0e0;
+}
+
+/* Add hover effects for interactive elements */
+.card:hover .card-caption,
+.notification-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure consistent spacing */
+.image-preview-sidebar > * {
+  margin-bottom: 15px;
+}
+
+/* Improve button styles */
+.MuiButton-root {
+  text-transform: none;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Enhance form field styles */
+.MuiTextField-root {
+  margin-bottom: 15px;
+}
+
+.MuiInputBase-root {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.MuiInputBase-input {
+  color: #ffffff;
+}
+
+/* Improve loading state visibility */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+/* Enhance error message visibility */
+.error-message {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }

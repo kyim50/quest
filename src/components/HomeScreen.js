@@ -1,25 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IconButton, TextField, Button, Badge, Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { Search, Notifications, ArrowBack, CameraAlt, Refresh, Close, Delete, Send } from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
 import { auth, db, fetchUserData } from '../firebase';
-import '../styles/mapstyles.css';
-import '../styles/HomeScreen.css';
-import '../styles/profile.css';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, setDoc, doc, serverTimestamp, query, where, orderBy, limit } from 'firebase/firestore';
+import { Camera } from 'react-camera-pro';
+import { useNotification } from '../NotificationContext';
+import { checkAuthStatus, handleLogout } from './UserAuthService';
 import MapComponent from './MapComponent';
+import NavigationBar from './NavigationBar';
 import UserProfile from './UserProfile';
 import QuestsComponent from './QuestsComponent';
 import Connections from './Connections';
 import HistorySection from './HistorySection';
 import PrivacySection from './PrivacySection';
-import NavigationBar from './NavigationBar';
-import { useNotification } from '../NotificationContext';
-import { checkAuthStatus, handleLogout } from './UserAuthService';
-import { doc, getDoc, setDoc, collection, query, where, getDocs, deleteDoc, addDoc } from 'firebase/firestore';
-import { Camera } from 'react-camera-pro';
-import { IconButton, TextField, Button, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { ArrowBack, CameraAlt, Refresh, Person, Close, Search, Delete, Send } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import '../styles/HomeScreen.css';
 
-const HomeScreen = () => {
+const HomeScreen = React.memo(() => {
   const [activeSection, setActiveSection] = useState('');
   const [currentUserIds, setCurrentUserIds] = useState([]);
   const [address, setAddress] = useState('Loading address...');
@@ -28,7 +26,6 @@ const HomeScreen = () => {
   const [lockedUserData, setLockedUserData] = useState(null);
   const [capturedImage, setCapturedImage] = useState(null);
   const [facingMode, setFacingMode] = useState('environment');
-  const [flash, setFlash] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [userProfileData, setUserProfileData] = useState(null);
   const [showFullMap, setShowFullMap] = useState(false);
@@ -43,67 +40,65 @@ const HomeScreen = () => {
   const [gridData, setGridData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
-  const cameraRef = useRef(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   const navigate = useNavigate();
   const { showNotification } = useNotification();
+  const cameraRef = useRef(null);
+  const imagePreviewRef = useRef(null);
+
+  const fetchUserDataCallback = useCallback(async (uid) => {
+    return await fetchUserData(uid);
+  }, []);
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const userData = await fetchUserData(user.uid);
+        const userData = await fetchUserDataCallback(user.uid);
         if (userData) {
           setCurrentUser({ uid: user.uid, ...userData });
+          setUserProfileData(userData);
         } else {
           console.error("User document not found");
         }
       } else {
         setCurrentUser(null);
+        setUserProfileData(null);
       }
+      setIsLoading(false);
     });
 
     return () => unsubscribeAuth();
-  }, []);
+  }, [fetchUserDataCallback]);
 
   useEffect(() => {
     const unsubscribeAuth = checkAuthStatus(navigate);
     return () => unsubscribeAuth();
   }, [navigate]);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (auth.currentUser) {
-        const userData = await fetchUserData(auth.currentUser.uid);
-        if (userData) {
-          setUserProfileData(userData);
-        }
-      }
-    };
-    fetchUserProfile();
+  const fetchFriends = useCallback(async () => {
+    if (auth.currentUser) {
+      const friendsRef = collection(db, 'users', auth.currentUser.uid, 'friends');
+      const friendsSnapshot = await getDocs(friendsRef);
+      const friendIds = friendsSnapshot.docs.map(doc => doc.id);
+      setFriendsList(friendIds);
+    }
   }, []);
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      if (auth.currentUser) {
-        const friendsRef = collection(db, 'users', auth.currentUser.uid, 'friends');
-        const friendsSnapshot = await getDocs(friendsRef);
-        const friendIds = friendsSnapshot.docs.map(doc => doc.id);
-        setFriendsList(friendIds);
-      }
-    };
     fetchFriends();
-  }, []);
+  }, [fetchFriends]);
 
   const showSection = useCallback((sectionId) => {
-    setActiveSection(sectionId === activeSection ? '' : sectionId);
+    setActiveSection(prevSection => sectionId === prevSection ? '' : sectionId);
     setShowFullMap(false);
-  }, [activeSection]);
+  }, []);
 
   const handleSetLockedUser = useCallback(async (userId) => {
-    console.log("Setting locked user:", userId);
     if (userId) {
       try {
-        const userData = await fetchUserData(userId);
+        const userData = await fetchUserDataCallback(userId);
         if (userData) {
           setLockedUser(userId);
           setLockedUserData({ id: userId, ...userData });
@@ -124,14 +119,14 @@ const HomeScreen = () => {
       setLockedUser(null);
       setLockedUserData(null);
       if (map && auth.currentUser) {
-        const currentUserData = await fetchUserData(auth.currentUser.uid);
+        const currentUserData = await fetchUserDataCallback(auth.currentUser.uid);
         map.flyTo({
           center: [currentUserData.location.longitude, currentUserData.location.latitude],
           zoom: 15
         });
       }
     }
-  }, [map]);
+  }, [map, fetchUserDataCallback]);
 
   const handleCapture = useCallback(() => {
     const imageSrc = cameraRef.current.takePhoto();
@@ -162,7 +157,6 @@ const HomeScreen = () => {
   }, [map, userProfileData]);
 
   const toggleImagePreview = useCallback((image) => {
-    console.log("Image clicked:", image);
     setSelectedImage(image);
     setShowImagePreview(prev => !prev);
     if (image) {
@@ -177,18 +171,17 @@ const HomeScreen = () => {
     setComments(fetchedComments);
   }, []);
 
-  const handleAddComment = useCallback(async () => {
-    if (newComment.trim() && selectedImage) {
+  const handleAddComment = useCallback(async (commentText) => {
+    if (commentText.trim() && selectedImage) {
       const commentRef = await addDoc(collection(db, 'photos', selectedImage.id, 'comments'), {
-        text: newComment,
+        text: commentText,
         userId: auth.currentUser.uid,
         username: auth.currentUser.displayName,
         timestamp: new Date()
       });
-      setComments(prev => [...prev, { id: commentRef.id, text: newComment, userId: auth.currentUser.uid, username: auth.currentUser.displayName, timestamp: new Date() }]);
-      setNewComment('');
+      setComments(prev => [...prev, { id: commentRef.id, text: commentText, userId: auth.currentUser.uid, username: auth.currentUser.displayName, timestamp: new Date() }]);
     }
-  }, [newComment, selectedImage]);
+  }, [selectedImage]);
 
   const handleDeletePost = useCallback(async () => {
     if (selectedImage && selectedImage.userId === auth.currentUser.uid) {
@@ -198,7 +191,7 @@ const HomeScreen = () => {
     }
   }, [selectedImage]);
 
-  const handleUploadPhoto = useCallback(async () => {
+  const handleUploadPhoto = useCallback(async (cropInfo) => {
     if (auth.currentUser && photoPreview) {
       try {
         const photoRef = doc(collection(db, 'photos'));
@@ -209,8 +202,9 @@ const HomeScreen = () => {
           image: photoPreview,
           size: photoSize,
           caption: caption,
-          timestamp: new Date(),
-        });
+          cropInfo: cropInfo,
+          timestamp: serverTimestamp(),
+        }, { merge: true });
         showNotification('Photo uploaded successfully');
         setPhotoPreview(null);
         setCaption('');
@@ -221,7 +215,8 @@ const HomeScreen = () => {
           userProfileImage: currentUser?.profilePhoto || null,
           image: photoPreview, 
           size: photoSize, 
-          caption: caption, 
+          caption: caption,
+          cropInfo: cropInfo,
           timestamp: new Date() 
         };
         setGridData(prev => [newPhoto, ...prev]);
@@ -231,6 +226,9 @@ const HomeScreen = () => {
       }
     }
   }, [auth.currentUser, photoPreview, photoSize, caption, currentUser, showNotification]);
+  
+  const toggleNotifications = useCallback(() => setShowNotifications(prev => !prev), []);
+  const clearNotifications = useCallback(() => setNotifications([]), []);
 
   const ProfileDisplay = useMemo(() => () => (
     <div className="profile-display">
@@ -289,110 +287,126 @@ const HomeScreen = () => {
     };
 
     return (
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="image-preview-overlay"
-            onClick={onClose}
-          >
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              className="image-preview-content"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="image-preview-main">
-                <img src={selectedImage?.image} alt="Preview" className="preview-image" />
+      <div className="image-preview-overlay" onClick={onClose}>
+        <div className="image-preview-content" onClick={e => e.stopPropagation()}>
+          <div className="image-preview-main">
+            <img src={selectedImage?.image} alt="Preview" className="preview-image" />
+          </div>
+          <div className="image-preview-sidebar">
+            <div className="image-preview-header">
+              <div className="user-info">
+                <img src={selectedImage?.userProfileImage || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
+                <span className="username">@{selectedImage?.username}</span>
               </div>
-              <div className="image-preview-sidebar">
-                <div className="image-preview-header">
-                  <div className="user-info">
-                    <img src={selectedImage?.userProfileImage || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
-                    <span className="username">@{selectedImage?.username}</span>
-                  </div>
-                  <IconButton onClick={onClose} className="close-button">
-                    <Close />
-                  </IconButton>
+              <IconButton onClick={onClose} className="close-button">
+                <Close />
+              </IconButton>
+            </div>
+            <div className="quest-info">
+              {selectedImage?.questTitle ? (
+                <p className="quest-title">{selectedImage.questTitle}</p>
+              ) : (
+                <p className="quest-break">Taking a break from quests</p>
+              )}
+            </div>
+            {selectedImage?.caption && (
+              <p className="image-caption">{selectedImage.caption}</p>
+            )}
+            <div className="comments-section">
+              {comments.map(comment => (
+                <div key={comment.id} className="comment">
+                  <strong>{comment.username}: </strong>{comment.text}
                 </div>
-                {selectedImage?.caption && (
-                  <p className="image-caption">{selectedImage.caption}</p>
-                )}
-                <div className="comments-section">
-                  {comments.map(comment => (
-                    <div key={comment.id} className="comment">
-                      <strong>{comment.username}: </strong>{comment.text}
-                    </div>
-                  ))}
-                </div>
-                <div className="add-comment">
-                  <TextField
-                    value={localComment}
-                    onChange={(e) => setLocalComment(e.target.value)}
-                    placeholder="Add a comment..."
-                    fullWidth
-                    InputProps={{
-                      style: { color: 'white' }
-                    }}
-                  />
-                  <IconButton onClick={handleAddComment}>
-                    <Send />
-                  </IconButton>
-                </div>
-                {selectedImage?.userId === auth.currentUser.uid && (
-                  <Button
-                    startIcon={<Delete />}
-                    onClick={onDeletePost}
-                    className="delete-button"
-                  >
-                    Delete Post
-                  </Button>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              ))}
+            </div>
+            <div className="add-comment">
+              <TextField
+                value={localComment}
+                onChange={(e) => setLocalComment(e.target.value)}
+                placeholder="Add a comment..."
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <IconButton onClick={handleAddComment}>
+                      <Send />
+                    </IconButton>
+                  ),
+                }}
+              />
+            </div>
+            {selectedImage?.userId === auth.currentUser.uid && (
+              <Button
+                startIcon={<Delete />}
+                onClick={onDeletePost}
+                className="delete-button"
+              >
+                Delete Post
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
     );
   });
 
   const PhotoUploadPreview = React.memo(({ photoPreview, photoSize, setPhotoSize, initialCaption, setFinalCaption, onUpload, onCancel, currentUser }) => {
     const [localCaption, setLocalCaption] = useState(initialCaption);
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [outlinePosition, setOutlinePosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
     const imageRef = useRef(null);
     const containerRef = useRef(null);
+    const outlineRef = useRef(null);
   
     useEffect(() => {
-      if (imageRef.current && containerRef.current) {
+      if (imageRef.current && containerRef.current && outlineRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         const imgRect = imageRef.current.getBoundingClientRect();
-        setCrop({
-          x: (imgRect.width - containerRect.width) / 2,
-          y: (imgRect.height - containerRect.height) / 2
+        const outlineRect = outlineRef.current.getBoundingClientRect();
+        
+        setOutlinePosition({
+          x: (imgRect.width - outlineRect.width) / 2,
+          y: (imgRect.height - outlineRect.height) / 2
         });
       }
     }, [photoSize]);
   
-    const handleCardMove = (e) => {
-      if (containerRef.current && imageRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const imgRect = imageRef.current.getBoundingClientRect();
-        
-        const newX = crop.x - e.movementX;
-        const newY = crop.y - e.movementY;
-        
-        const maxX = imgRect.width - rect.width;
-        const maxY = imgRect.height - rect.height;
-        
-        setCrop({
-          x: Math.max(0, Math.min(maxX, newX)),
-          y: Math.max(0, Math.min(maxY, newY))
-        });
-      }
+    const handleMouseDown = (e) => {
+      setIsDragging(true);
+      e.preventDefault();
     };
+  
+    const handleMouseMove = useCallback((e) => {
+      if (!isDragging) return;
+  
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const outlineRect = outlineRef.current.getBoundingClientRect();
+  
+      const newX = outlinePosition.x + e.movementX;
+      const newY = outlinePosition.y + e.movementY;
+  
+      const maxX = containerRect.width - outlineRect.width;
+      const maxY = containerRect.height - outlineRect.height;
+  
+      setOutlinePosition({
+        x: Math.max(0, Math.min(maxX, newX)),
+        y: Math.max(0, Math.min(maxY, newY))
+      });
+    }, [isDragging, outlinePosition]);
+  
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+  
+    useEffect(() => {
+      if (isDragging) {
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+      }
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }, [isDragging, handleMouseMove]);
   
     const getSizeStyle = () => {
       switch (photoSize) {
@@ -404,54 +418,42 @@ const HomeScreen = () => {
     };
   
     const handleUpload = () => {
+      const outlineRect = outlineRef.current.getBoundingClientRect();
+      const imageRect = imageRef.current.getBoundingClientRect();
+      
+      const cropInfo = {
+        x: (outlinePosition.x - imageRect.left) / imageRect.width,
+        y: (outlinePosition.y - imageRect.top) / imageRect.height,
+        width: outlineRect.width / imageRect.width,
+        height: outlineRect.height / imageRect.height
+      };
+  
       setFinalCaption(localCaption);
-      onUpload();
+      onUpload(cropInfo);
     };
   
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="photo-upload-preview-overlay"
-      >
-        <motion.div
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          className="photo-upload-preview-container"
-        >
+      <div className="photo-upload-preview-overlay">
+        <div className="photo-upload-preview-container">
           <div className="preview-content">
-            <div className="full-image-container">
+            <div className="full-image-container" ref={containerRef}>
               <img 
                 ref={imageRef}
                 src={photoPreview} 
                 alt="Full Preview" 
                 className="full-preview-image"
-                style={{
-                  transform: `translate(${-crop.x}px, ${-crop.y}px)`,
-                  cursor: 'move'
-                }}
-                onMouseDown={(e) => {
-                  const startX = e.clientX;
-                  const startY = e.clientY;
-                  const handleMouseMove = (e) => {
-                    handleCardMove({
-                      movementX: startX - e.clientX,
-                      movementY: startY - e.clientY
-                    });
-                  };
-                  const handleMouseUp = () => {
-                    window.removeEventListener('mousemove', handleMouseMove);
-                    window.removeEventListener('mouseup', handleMouseUp);
-                  };
-                  window.addEventListener('mousemove', handleMouseMove);
-                  window.addEventListener('mouseup', handleMouseUp);
-                }}
               />
               <div 
-                ref={containerRef}
+                ref={outlineRef}
                 className="card-outline"
-                style={getSizeStyle()}
+                style={{
+                  ...getSizeStyle(),
+                  position: 'absolute',
+                  left: `${outlinePosition.x}px`,
+                  top: `${outlinePosition.y}px`,
+                  cursor: isDragging ? 'grabbing' : 'grab'
+                }}
+                onMouseDown={handleMouseDown}
               >
                 <div className="card-outline-border" />
               </div>
@@ -503,8 +505,8 @@ const HomeScreen = () => {
             />
             <span className="preview-username">{currentUser?.name || 'User'}</span>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     );
   });
 
@@ -529,7 +531,7 @@ const HomeScreen = () => {
         const photosSnapshot = await getDocs(q);
         const photos = await Promise.all(photosSnapshot.docs.map(async doc => {
           const photoData = doc.data();
-          const userData = await fetchUserData(photoData.userId);
+          const userData = await fetchUserDataCallback(photoData.userId);
           return { 
             id: doc.id, 
             ...photoData, 
@@ -541,7 +543,7 @@ const HomeScreen = () => {
         }));
         setGridData(photos);
       }
-    }, [friendsList]);
+    }, [friendsList, fetchUserDataCallback]);
 
     if (isLoading) {
       return <div>Loading...</div>;
@@ -567,19 +569,38 @@ const HomeScreen = () => {
     <div className="home-content">
       <div className="top-bar">
         <ProfileDisplay />
-        <TextField
-          className="search-bar-home"
-          placeholder="Search..."
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <IconButton>
-                <Search />
-              </IconButton>
-            ),
-          }}
-        />
+        <div className="top-bar-center">
+          <TextField
+            className="search-bar-home"
+            placeholder="Search..."
+            variant="outlined"
+            InputProps={{
+              startAdornment: (
+                <IconButton>
+                  <Search />
+                </IconButton>
+              ),
+            }}
+          />
+        </div>
+        <div className="top-bar-right">
+          <IconButton onClick={toggleNotifications}>
+            <Badge badgeContent={notifications.length} color="primary">
+              <Notifications />
+            </Badge>
+          </IconButton>
+        </div>
       </div>
+
+      {showNotifications && (
+        <div className="notifications-dropdown">
+          <h3>Notifications</h3>
+          {notifications.map((notification, index) => (
+            <div key={index} className="notification-item">{notification}</div>
+          ))}
+          <Button onClick={clearNotifications}>Clear All</Button>
+        </div>
+      )}
 
       <div className="main-area">
         <div className="grid-area">
@@ -653,7 +674,7 @@ const HomeScreen = () => {
         )}
       </AnimatePresence>
     </div>
-  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser]);
+  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications]);
 
   const renderFullMap = useCallback(() => (
     <div className="full-map-container">
@@ -745,6 +766,6 @@ const HomeScreen = () => {
       </div>
     </div>
   );
-};
+});
 
 export default HomeScreen;

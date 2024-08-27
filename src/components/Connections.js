@@ -343,6 +343,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
     if (!user) return null;
 
     const isFriend = friends.some(friend => friend.id === user.id);
+    
 
     return (
       <div className="profile-container">

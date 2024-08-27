@@ -251,7 +251,7 @@ const HomeScreen = React.memo(() => {
   ), [currentUser]);
 
   const Card = React.memo(({ size, user, image, caption, onClick }) => {
-    const truncateCaption = (text, maxLength = 50) => {
+    const truncateText = (text, maxLength = 50) => {
       if (text.length <= maxLength) return text;
       return text.substr(0, maxLength - 3) + '...';
     };
@@ -265,15 +265,13 @@ const HomeScreen = React.memo(() => {
           onClick={onClick}
         >
           <img src={image} alt={`Photo by ${user.name}`} className="card-image" />
-          {caption && (
-            <div className="card-caption">
-              {truncateCaption(caption)}
-            </div>
-          )}
         </motion.div>
         <div className="card-user-info">
           <img src={user.profilePhoto || '/default-profile-image.jpg'} alt={user.name} className="card-user-avatar" />
           <span className="card-username">{user.name}</span>
+          {caption && (
+            <span className="card-caption">{truncateText(caption)}</span>
+          )}
         </div>
       </div>
     );

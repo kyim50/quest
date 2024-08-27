@@ -8,6 +8,7 @@ import '../styles/profile.css';
 const UserProfile = ({ handleLogout }) => {
   const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
   const [name, setName] = useState('Default Name');
+  const [username, setUsername] = useState('default_username'); // New state for username
   const [bio, setBio] = useState('Default Bio');
   const [status, setStatus] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -39,6 +40,7 @@ const UserProfile = ({ handleLogout }) => {
       const userData = await fetchUserData(auth.currentUser.uid);
       if (userData) {
         setName(userData.name || 'Default Name');
+        setUsername(userData.username || 'default_username'); // Set username
         setProfilePhoto(userData.profilePhoto || 'placeholder.jpg');
         setBio(userData.bio || 'Default Bio');
         setStatus(userData.status || '');
@@ -113,6 +115,7 @@ const UserProfile = ({ handleLogout }) => {
 
       await updateUserProfile(auth.currentUser.uid, {
         name,
+        username, // Include username in the update
         bio,
         profilePhoto: photoURL,
         tags,
@@ -172,6 +175,7 @@ const UserProfile = ({ handleLogout }) => {
         </div>
         <div className="profile-name-status">
           <h2 className="profile-name">{name}</h2>
+          <p className="profile-username">@{username}</p> {/* Display username */}
           <p className="profile-status"><span className="status-dot"></span> Active</p>
         </div>
         <div className="privacy-icon">
@@ -179,19 +183,40 @@ const UserProfile = ({ handleLogout }) => {
         </div>
       </div>
 
-      <div className="profile-section">
-        <h3 className="section-title">Bio</h3>
-        {isEditing ? (
+      {isEditing ? (
+        <div className="profile-section">
+          <h3 className="section-title">Edit Profile</h3>
+         <div className='nameedit'>
+          <input 
+            type="text" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            className="profile-input" 
+            placeholder="Name"
+          />
+          <input 
+            type="text" 
+            value={username} 
+            onChange={(e) => setUsername(e.target.value)} 
+            className="profile-input" 
+            placeholder="Username"
+          />
+
+          </div>
           <textarea 
             value={bio} 
             onChange={(e) => setBio(e.target.value)} 
             className="profile-bio-edit" 
+            placeholder="Bio"
             maxLength={150}
           />
-        ) : (
+        </div>
+      ) : (
+        <div className="profile-section">
+          <h3 className="section-title">Bio</h3>
           <p className="profile-bio">{bio}</p>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="profile-actions">
         <button className="edit-profile-button" onClick={isEditing ? handleSaveProfile : handleEditProfile}>
@@ -256,7 +281,7 @@ const UserProfile = ({ handleLogout }) => {
 
       <button className="logout-button" onClick={handleLogout}>
         <img src="/logout.png" alt="Logout" />
-        <span>Logout</span>
+        <p className='logouttext'>Logout</p>
       </button>
     </div>
   );

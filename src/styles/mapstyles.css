@@ -527,3 +527,149 @@ body.light-mode ::-webkit-scrollbar-thumb {
 body.light-mode ::-webkit-scrollbar-thumb:hover {
   background: #a0a0a0;
 }
+
+/* ... (keep existing styles) ... */
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .home-screen-container2 {
+    flex-direction: column-reverse;
+  }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 0;
+    background-color: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+  }
+
+  .nav-header, .nav-footer {
+    display: none;
+  }
+
+  nav {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .nav-button {
+    flex-direction: column;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 5px;
+    border-radius: 0;
+  }
+
+  .nav-button img {
+    width: 24px;
+    height: 24px;
+    margin: 0 0 2px;
+  }
+
+  .nav-button span {
+    font-size: 10px;
+  }
+
+  .main-content2 {
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .content-area {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 10px;
+  }
+
+  .map-container2 {
+    width: 100%;
+    height: 30vh;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  /* Pinterest-like grid layout */
+  .pin-container {
+    column-count: 2;
+    column-gap: 10px;
+    padding: 10px;
+  }
+
+  .card-wrapper {
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  /* Draggable container styles */
+  .draggable-container {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    height: 70vh;
+    background-color: var(--background-color);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    z-index: 999;
+  }
+
+  .draggable-handle {
+    width: 40px;
+    height: 5px;
+    background-color: #ccc;
+    border-radius: 3px;
+    margin: 10px auto;
+  }
+
+  .draggable-content {
+    height: calc(100% - 25px);
+    overflow-y: auto;
+    padding: 0 15px;
+  }
+
+  /* Smooth scrolling for iOS */
+  .draggable-content {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Improved responsiveness */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Smooth transitions */
+.nav-button, .card, .draggable-container {
+  transition: all 0.3s ease;
+}
+
+/* High-performance animations */
+@media (prefers-reduced-motion: no-preference) {
+  .draggable-container {
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+}

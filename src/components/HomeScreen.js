@@ -44,6 +44,7 @@ const HomeScreen = React.memo(() => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [isHomeActive, setIsHomeActive] = useState(true);
+  const [cameraResolution, setCameraResolution] = useState({ width: 1920, height: 1080 });
   
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -78,6 +79,17 @@ const HomeScreen = React.memo(() => {
     const unsubscribeAuth = checkAuthStatus(navigate);
     return () => unsubscribeAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    const updateCameraResolution = () => {
+      const isDesktop = window.innerWidth >= 1024;
+      setCameraResolution(isDesktop ? { width: 3840, height: 2160 } : { width: 1920, height: 1080 });
+    };
+
+    updateCameraResolution();
+    window.addEventListener('resize', updateCameraResolution);
+    return () => window.removeEventListener('resize', updateCameraResolution);
+  }, []);
 
   const fetchFriends = useCallback(async () => {
     if (auth.currentUser) {
@@ -137,9 +149,27 @@ const HomeScreen = React.memo(() => {
   }, [map, fetchUserDataCallback]);
 
   const handleCapture = useCallback(() => {
-    const imageSrc = cameraRef.current.takePhoto();
-    setPhotoPreview(imageSrc);
-    setShowCamera(false);
+    if (cameraRef.current) {
+      const imageSrc = cameraRef.current.takePhoto();
+      
+      // Create a new Image object to get the full resolution
+      const img = new Image();
+      img.onload = () => {
+        // Create a canvas with the image's full resolution
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+
+        // Convert the canvas to a high-quality JPEG data URL
+        const highQualityImageSrc = canvas.toDataURL('image/jpeg', 0.95);
+
+        setPhotoPreview(highQualityImageSrc);
+        setShowCamera(false);
+      };
+      img.src = imageSrc;
+    }
   }, []);
 
   const handleFlipCamera = useCallback(() => {
@@ -482,6 +512,9 @@ const HomeScreen = React.memo(() => {
                   facingMode={facingMode}
                   aspectRatio="cover"
                   errorMessages={{}}
+                  videoSourceDeviceId={undefined}
+                  numberOfCamerasCallback={(i) => console.log(i)}
+                  videoResolution={cameraResolution}
                 />
                 <div className="camera-controls">
                   <IconButton onClick={toggleCamera} className="back-button">
@@ -539,7 +572,7 @@ const HomeScreen = React.memo(() => {
         )}
       </AnimatePresence>
     </div>
-  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications]);
+  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution]);
 
   const renderFullMap = useCallback(() => (
     <div className="full-map-container">

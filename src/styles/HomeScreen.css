@@ -271,7 +271,8 @@ body.light-mode .camera-placeholder span {
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  margin-top: 10px;
+  height: 400px;
+  margin-bottom: 15px;
 }
 
 /* Pinterest layout styles */
@@ -1497,4 +1498,23 @@ body.light-mode hr {
 /* Add smooth transition to color changes */
 * {
   transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+}
+
+.top-bar-right .MuiIconButton-root {
+  margin-left: 8px;
+}
+
+.top-bar-icon {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
+}
+
+body.light-mode .top-bar-icon {
+  filter: none;
 }

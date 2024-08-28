@@ -56,6 +56,7 @@
   filter: brightness(0) invert(1);
 }
 
+
 .add-friend-btn1 {
   background-color: #007AFF;
   color: white;
@@ -91,6 +92,30 @@
   transform: scale(1.1);
 }
 
+.chat-btn2{
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  width:auto;
+  height: 50px; /* Set a fixed height to match the width */
+  filter: brightness(0) invert(1);
+}
+
+.chat-btn2 .icon-img{
+  height:100%;
+  width: auto;
+}
+.chat-btn2:hover{
+  transform: scale(1.1);
+}
+
+.sendchatimg{
+  height:20px;
+  width:auto;
+  filter: brightness(0) invert(1);
+}
 
 .unlock-btn1 {
   background-color: #FF3B30;
@@ -460,8 +485,10 @@
   margin-left: 10px;
   cursor: pointer;
   border-radius: 20px;
-  font-size: 14px;
   transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .chat-input1 button:hover {
@@ -596,7 +623,7 @@
   }
 
   .icon-img {
-    width: 18px;
+    width: auto;
     height: 18px;
   }
 }
@@ -686,7 +713,7 @@
   }
 
   .icon-img {
-    width: 16px;
+    width: auto;
     height: 16px;
   }
 }

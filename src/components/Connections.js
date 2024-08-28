@@ -374,15 +374,16 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
         </div>
 
         <div className="profile-actions">
-          <button className="add-friend-btn" onClick={() => handleAddFriend(user.id)}>
+          <button className="add-friend-btn1" onClick={() => handleAddFriend(user.id)}>
             Add Friend
           </button>
-          <button className="chat-btn" onClick={() => handleChatClick(user)}>
-            Chat
+          <button className="chat-btn2" onClick={() => handleChatClick(user)}>
+          <img src={chatIcon} alt="Chat" className='icon-img' />
+
           </button>
         </div>
 
-        <button className="unlock-btn" onClick={() => setLockedUser(null)}>
+        <button className="unlock-btn1" onClick={() => setLockedUser(null)}>
           Unlock User
         </button>
       </div>
@@ -400,14 +401,15 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
                 <img src={friend.profilePhoto} alt="Friend" />
                 <div>{friend.name}</div>
                 <div className="button-group">
-                  <button className="remove-friend-btn" onClick={(e) => {
+                  <button className="remove-friend-btn1" onClick={(e) => {
                     e.stopPropagation();
                     handleRemoveFriend(friend.id);
                   }}>Remove</button>
-                  <button className="chat-btn" onClick={(e) => {
+                  <button className="chat-btn1" onClick={(e) => {
                     e.stopPropagation();
                     handleChatClick(friend);
-                  }}>Chat</button>
+                  }}>                  <img src={chatIcon} alt="Chat" className='icon-img' />
+</button>
                 </div>
               </div>
             ))}
@@ -538,7 +540,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       {chatUser && (
         <div className="chat-container1">
           <div className="chat-header1">
-            <button className="back-btn1" onClick={handleCloseChat}>← Back</button>
+            <button className="back-btn1" onClick={handleCloseChat}>←</button>
             <img src={chatUser.profilePhoto} alt="Profile" />
             <div>{chatUser.name}</div>
           </div>
@@ -563,7 +565,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
               value={newMessage}
               onChange={handleInputChange}
             />
-            <button onClick={handleSendMessage}>Send</button>
+            <button onClick={handleSendMessage}><img className="sendchatimg" src="sendchat.png"/></button>
           </div>
         </div>
       )}

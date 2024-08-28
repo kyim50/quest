@@ -759,16 +759,20 @@
 
 .tabs1 {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 20px;
 }
 
 .tab-button1 {
-  padding: 10px 20px;
+  padding: 10px 10px;
   border: none;
   background-color: rgb(58,58,60);
   color: white;
   cursor: pointer;
+  width:100%;
+  height: 50px;
+  font-weight: 600;
   border-right: solid 1px rgb(28,28,30);
   transition: background-color 0.3s;
 }

@@ -4,6 +4,12 @@ body {
   font-family: 'Arial', sans-serif;
   background-color: rgb(38, 38, 40);
   color: #fffcf2;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.light-mode {
+  background-color: #f5f5f5;
+  color: #333333;
 }
 
 .home-screen-container2 {
@@ -21,11 +27,15 @@ body {
   flex-direction: column;
   align-items: center;
   z-index: 10;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 0.3s;
   border-right: 1px solid #333;
   padding: 20px 0;
 }
 
+body.light-mode .nav-bar {
+  background-color: #ffffff;
+  border-right-color: #e0e0e0;
+}
 
 /* Main content styles */
 .main-content2 {
@@ -51,6 +61,12 @@ body {
   width: 100%;
   background-color: rgb(48, 48, 50);
   border-bottom: 1px solid #333;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+body.light-mode .top-bar {
+  background-color: #ffffff;
+  border-bottom-color: #e0e0e0;
 }
 
 .top-bar-center {
@@ -94,6 +110,11 @@ body {
   font-weight: bold;
   margin: 0;
   color: #ffffff;
+  transition: color 0.3s;
+}
+
+body.light-mode .profile-name {
+  color: #333333;
 }
 
 .profile-status {
@@ -102,6 +123,11 @@ body {
   display: flex;
   align-items: center;
   margin: 5px 0 0;
+  transition: color 0.3s;
+}
+
+body.light-mode .profile-status {
+  color: #666666;
 }
 
 .status-dot {
@@ -120,14 +146,29 @@ body {
 .search-bar-home .MuiOutlinedInput-root {
   background-color: rgb(58, 58, 60);
   border-radius: 20px;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .search-bar-home .MuiOutlinedInput-root {
+  background-color: #f0f0f0;
 }
 
 .search-bar-home .MuiOutlinedInput-input {
   color: #fffcf2;
+  transition: color 0.3s;
+}
+
+body.light-mode .search-bar-home .MuiOutlinedInput-input {
+  color: #333333;
 }
 
 .search-bar-home .MuiOutlinedInput-notchedOutline {
   border-color: #ccc5b9;
+  transition: border-color 0.3s;
+}
+
+body.light-mode .search-bar-home .MuiOutlinedInput-notchedOutline {
+  border-color: #cccccc;
 }
 
 /* Main area styles */
@@ -175,12 +216,22 @@ body {
   align-items: center;
   background-color: rgb(58, 58, 60);
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .camera-placeholder {
+  background-color: #e0e0e0;
 }
 
 .camera-placeholder span {
   color: #ffffff;
   font-weight: bold;
   margin-top: 10px;
+  transition: color 0.3s;
+}
+
+body.light-mode .camera-placeholder span {
+  color: #333333;
 }
 
 .camera-controls {
@@ -241,7 +292,11 @@ body {
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, background-color 0.3s;
+}
+
+body.light-mode .card {
+  background-color: #ffffff;
 }
 
 .card:hover {
@@ -274,6 +329,11 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .card-user-info {
+  background-color: #f5f5f5;
 }
 
 .card-user-avatar {
@@ -288,6 +348,11 @@ body {
   color: #ffffff;
   font-weight: bold;
   margin-right: 10px;
+  transition: color 0.3s;
+}
+
+body.light-mode .card-username {
+  color: #333333;
 }
 
 .card-caption {
@@ -298,6 +363,11 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color 0.3s;
+}
+
+body.light-mode .card-caption {
+  color: #666666;
 }
 
 /* Image preview styles */
@@ -323,6 +393,11 @@ body {
   background-color: #1E1E1E;
   border-radius: 20px;
   overflow: hidden;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .image-preview-content {
+  background-color: #ffffff;
 }
 
 .image-preview-main {
@@ -347,6 +422,12 @@ body {
   flex-direction: column;
   background-color: #2C2C2C;
   color: white;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.light-mode .image-preview-sidebar {
+  background-color: #f5f5f5;
+  color: #333333;
 }
 
 .image-preview-header {
@@ -402,6 +483,11 @@ body {
   background-color: #3C3C3C;
   border-radius: 10px;
   padding: 15px;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .comments-section {
+  background-color: #e0e0e0;
 }
 
 .comment {
@@ -409,6 +495,11 @@ body {
   padding: 10px;
   background-color: #4C4C4C;
   border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .comment {
+  background-color: #ffffff;
 }
 
 .add-comment {
@@ -419,14 +510,30 @@ body {
   background-color: #3C3C3C;
   border-radius: 20px;
   padding: 5px 15px;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .add-comment .MuiInputBase-root {
+  background-color: #f0f0f0;
 }
 
 .add-comment .MuiInputBase-input {
   color: white;
+  transition: color 0.3s;
+}
+
+body.light-mode .add-comment .MuiInputBase-input {
+  color: #333333;
 }
 
 .close-button, .delete-button, .send-button {
   color: white !important;
+}
+
+body.light-mode .close-button,
+body.light-mode .delete-button,
+body.light-mode .send-button {
+  color: #333333 !important;
 }
 
 /* Notifications dropdown */
@@ -442,6 +549,12 @@ body {
   overflow-y: auto;
   z-index: 1000;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+body.light-mode .notifications-dropdown {
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .notifications-dropdown h3 {
@@ -449,6 +562,11 @@ body {
   font-weight: bold;
   margin-bottom: 10px;
   color: #ffffff;
+  transition: color 0.3s;
+}
+
+body.light-mode .notifications-dropdown h3 {
+  color: #333333;
 }
 
 .notification-item {
@@ -456,6 +574,12 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: #ccc5b9;
   font-size: 14px;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+body.light-mode .notification-item {
+  color: #666666;
+  border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
 .notification-item:last-child {
@@ -464,6 +588,10 @@ body {
 
 .notification-item:hover {
   background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.light-mode .notification-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Full map styles */
@@ -485,6 +613,11 @@ body {
   color: #ffffff !important;
 }
 
+body.light-mode .full-map-container .back-button {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  color: #333333 !important;
+}
+
 .address-bar {
   position: absolute;
   top: 20px;
@@ -497,6 +630,13 @@ body {
   border-radius: 20px;
   font-size: 14px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.light-mode .address-bar {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333333;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive adjustments */
@@ -615,7 +755,7 @@ body {
   }
 }
 
-/* Animations (continued) */
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -654,6 +794,10 @@ body {
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+body.light-mode .card-caption {
+  text-shadow: none;
+}
+
 .capture-button:hover {
   background-color: rgba(255, 255, 255, 0.4) !important;
 }
@@ -662,12 +806,25 @@ body {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
+body.light-mode .back-button:hover,
+body.light-mode .flip-button:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
 .photo-upload-preview-container {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
+body.light-mode .photo-upload-preview-container {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
 .card-outline:hover {
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .card-outline:hover {
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
 }
 
 .comments-section::-webkit-scrollbar {
@@ -679,12 +836,24 @@ body {
   border-radius: 4px;
 }
 
+body.light-mode .comments-section::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
 .comments-section::-webkit-scrollbar-thumb {
   background-color: #555;
   border-radius: 4px;
 }
 
+body.light-mode .comments-section::-webkit-scrollbar-thumb {
+  background-color: #999;
+}
+
 .comments-section::-webkit-scrollbar-thumb:hover {
+  background-color: #777;
+}
+
+body.light-mode .comments-section::-webkit-scrollbar-thumb:hover {
   background-color: #777;
 }
 
@@ -704,13 +873,15 @@ body {
   transition: all 0.3s ease-in-out;
 }
 
-/* Enhance focus styles for better accessibility */
-
-
 /* Improve contrast for better readability */
 .quest-break,
 .notification-item {
   color: #e0e0e0;
+}
+
+body.light-mode .quest-break,
+body.light-mode .notification-item {
+  color: #666666;
 }
 
 /* Ensure consistent spacing */
@@ -735,8 +906,16 @@ body {
   border-radius: 8px;
 }
 
+body.light-mode .MuiInputBase-root {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 .MuiInputBase-input {
   color: #ffffff;
+}
+
+body.light-mode .MuiInputBase-input {
+  color: #333333;
 }
 
 /* Improve loading state visibility */
@@ -749,6 +928,10 @@ body {
   font-size: 18px;
 }
 
+body.light-mode .loading-indicator {
+  color: #333333;
+}
+
 /* Enhance error message visibility */
 .error-message {
   color: #ff6b6b;
@@ -758,23 +941,28 @@ body {
   margin-bottom: 15px;
 }
 
+body.light-mode .error-message {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
 /* Dark mode considerations */
 @media (prefers-color-scheme: dark) {
-  body {
+  body:not(.light-mode) {
     background-color: rgb(18, 18, 20);
   }
 
-  .nav-bar {
+  body:not(.light-mode) .nav-bar {
     background-color: rgb(28, 28, 30);
   }
 
-  .card,
-  .photo-upload-preview-container,
-  .image-preview-content {
+  body:not(.light-mode) .card,
+  body:not(.light-mode) .photo-upload-preview-container,
+  body:not(.light-mode) .image-preview-content {
     background-color: rgb(38, 38, 40);
   }
 
-  .search-bar-home .MuiOutlinedInput-root {
+  body:not(.light-mode) .search-bar-home .MuiOutlinedInput-root {
     background-color: rgb(48, 48, 50);
   }
 }
@@ -819,6 +1007,10 @@ body {
   z-index: 2000;
 }
 
+body.light-mode .photo-upload-preview-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
 .photo-upload-preview-container {
   background-color: #1E1E1E;
   border-radius: 20px;
@@ -828,6 +1020,11 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .photo-upload-preview-container {
+  background-color: #ffffff;
 }
 
 .preview-content {
@@ -841,6 +1038,10 @@ body {
   position: relative;
   overflow: hidden;
   background-color: #2C2C2C;
+}
+
+body.light-mode .full-image-container {
+  background-color: #f0f0f0;
 }
 
 .full-preview-image {
@@ -857,6 +1058,11 @@ body {
   transition: all 0.3s ease;
 }
 
+body.light-mode .card-outline {
+  border-color: #333333;
+  box-shadow: 0 0 0 9999px rgba(255, 255, 255, 0.5);
+}
+
 .card-outline:active {
   cursor: grabbing;
 }
@@ -867,6 +1073,11 @@ body {
   flex-direction: column;
   padding: 30px;
   background-color: #2C2C2C;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .preview-controls {
+  background-color: #f5f5f5;
 }
 
 .preview-user-info {
@@ -876,6 +1087,11 @@ body {
   padding: 15px;
   border-radius: 10px;
   margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .preview-user-info {
+  background-color: #e0e0e0;
 }
 
 .preview-user-avatar {
@@ -889,6 +1105,11 @@ body {
   color: white;
   font-weight: bold;
   font-size: 18px;
+  transition: color 0.3s;
+}
+
+body.light-mode .preview-username {
+  color: #333333;
 }
 
 .size-select {
@@ -897,10 +1118,20 @@ body {
 
 .size-select .MuiFormControlLabel-label {
   color: white;
+  transition: color 0.3s;
+}
+
+body.light-mode .size-select .MuiFormControlLabel-label {
+  color: #333333;
 }
 
 .size-select .MuiRadio-root {
   color: white;
+  transition: color 0.3s;
+}
+
+body.light-mode .size-select .MuiRadio-root {
+  color: #333333;
 }
 
 .size-select .MuiRadio-root.Mui-checked {
@@ -914,14 +1145,30 @@ body {
 .preview-controls .MuiInputBase-root {
   background-color: #3C3C3C;
   color: white;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.light-mode .preview-controls .MuiInputBase-root {
+  background-color: #ffffff;
+  color: #333333;
 }
 
 .preview-controls .MuiInputLabel-root {
   color: #CCCCCC;
+  transition: color 0.3s;
+}
+
+body.light-mode .preview-controls .MuiInputLabel-root {
+  color: #666666;
 }
 
 .preview-controls .MuiOutlinedInput-notchedOutline {
   border-color: #4C4C4C;
+  transition: border-color 0.3s;
+}
+
+body.light-mode .preview-controls .MuiOutlinedInput-notchedOutline {
+  border-color: #cccccc;
 }
 
 .button-group {
@@ -950,10 +1197,20 @@ body {
 .preview-controls .MuiButton-outlined {
   border-color: white;
   color: white;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+body.light-mode .preview-controls .MuiButton-outlined {
+  border-color: #333333;
+  color: #333333;
 }
 
 .preview-controls .MuiButton-outlined:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.light-mode .preview-controls .MuiButton-outlined:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Ensure minimum touch target size for mobile */
@@ -963,4 +1220,281 @@ body {
   .preview-controls .MuiButton-root {
     min-height: 44px;
   }
+}
+
+/* Accessibility improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+/* High contrast mode adjustments */
+@media (forced-colors: active) {
+  .card,
+  .camera-placeholder,
+  .mini-map,
+  .image-preview-content,
+  .photo-upload-preview-container {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+body.light-mode ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Ensure consistent font sizing */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Improve form field contrast in light mode */
+body.light-mode .MuiInputBase-root {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+}
+
+body.light-mode .MuiInputBase-input {
+  color: #333333;
+}
+
+/* Enhance button styles for better visibility */
+.MuiButton-root {
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.MuiButton-contained {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.MuiButton-contained:hover {
+  background-color: #45a049;
+}
+
+body.light-mode .MuiButton-contained {
+  background-color: #4CAF50;
+  color: white;
+}
+
+body.light-mode .MuiButton-contained:hover {
+  background-color: #45a049;
+}
+
+.MuiButton-outlined {
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.MuiButton-outlined:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+body.light-mode .MuiButton-outlined {
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+body.light-mode .MuiButton-outlined:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Improve readability of placeholder text */
+::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+body.light-mode ::placeholder {
+  color: #666666;
+}
+
+/* Ensure proper contrast for disabled elements */
+.Mui-disabled {
+  opacity: 0.6;
+}
+
+/* Add a subtle transition to all interactive elements */
+a,
+button,
+input,
+select,
+textarea {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Improve focus styles for better accessibility */
+*:focus {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+/* Ensure proper text contrast in different modes */
+body.light-mode {
+  color: #333333;
+}
+
+body:not(.light-mode) {
+  color: #ffffff;
+}
+
+/* Add smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure proper spacing for inline elements */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* Improve table readability */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+body.light-mode th,
+body.light-mode td {
+  border-bottom-color: #eee;
+}
+
+/* Ensure proper styling for code blocks */
+pre,
+code {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #2c2c2c;
+  color: #f8f8f2;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+body.light-mode pre,
+body.light-mode code {
+  background-color: #f5f5f5;
+  color: #333333;
+}
+
+/* Improve blockquote styling */
+blockquote {
+  border-left: 4px solid #4CAF50;
+  margin: 0;
+  padding-left: 1em;
+  color: #888;
+}
+
+body.light-mode blockquote {
+  color: #666;
+}
+
+/* Ensure proper list styling */
+ul,
+ol {
+  padding-left: 2em;
+}
+
+/* Add a subtle hover effect to cards */
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Improve visibility of form validation messages */
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+body.light-mode .error-message {
+  color: #d32f2f;
+}
+
+/* Ensure proper styling for hr elements */
+hr {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 1rem 0;
+}
+
+body.light-mode hr {
+  border-top-color: #ddd;
+}
+
+/* Add smooth transition to color changes */
+* {
+  transition: color 0.3s ease, background-color 0.3s ease;
 }

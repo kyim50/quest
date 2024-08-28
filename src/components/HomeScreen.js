@@ -13,7 +13,6 @@ import NavigationBar from './NavigationBar';
 import UserProfile from './UserProfile';
 import QuestsComponent from './QuestsComponent';
 import Connections from './Connections';
-import HistorySection from './HistorySection';
 import PrivacySection from './PrivacySection';
 import PhotoUploadPreview from './PhotoUploadPreview';
 import '../styles/HomeScreen.css';
@@ -43,7 +42,7 @@ const HomeScreen = React.memo(() => {
   const [currentUser, setCurrentUser] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
-
+  const [isHomeActive, setIsHomeActive] = useState(true);
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const cameraRef = useRef(null);
@@ -92,8 +91,12 @@ const HomeScreen = React.memo(() => {
   }, [fetchFriends]);
 
   const showSection = useCallback((sectionId) => {
-    setActiveSection(prevSection => sectionId === prevSection ? '' : sectionId);
-    setShowFullMap(false);
+    setActiveSection(prevSection => {
+      const newSection = sectionId === prevSection ? '' : sectionId;
+      setIsHomeActive(newSection === '');
+      setShowFullMap(false);
+      return newSection;
+    });
   }, []);
 
   const handleSetLockedUser = useCallback(async (userId) => {
@@ -542,6 +545,10 @@ const HomeScreen = React.memo(() => {
   }, [showNotification, navigate]);
 
   const renderSection = useCallback(() => {
+    if (isHomeActive) {
+      return renderHomeContent();
+    }
+
     switch(activeSection) {
       case 'profile':
         return <UserProfile handleLogout={handleLogoutClick} />;
@@ -555,17 +562,15 @@ const HomeScreen = React.memo(() => {
           lockedUser={lockedUser}
           lockedUserData={lockedUserData}
         />;
-      case 'history':
-        return <HistorySection currentUser={auth.currentUser} />;
       case 'privacy':
         return <PrivacySection />;
       default:
-        return renderHomeContent();
+        return null;
     }
-  }, [activeSection, currentUserIds, map, handleSetLockedUser, lockedUser, lockedUserData, auth.currentUser, renderHomeContent, handleLogoutClick]);
+  }, [activeSection, isHomeActive, currentUserIds, map, handleSetLockedUser, lockedUser, lockedUserData, renderHomeContent, handleLogoutClick]);
 
   const getActiveClass = useCallback(() => {
-    if (activeSection === '') {
+    if (isHomeActive) {
       return 'home-active';
     }
     if (activeSection === 'profile' || activeSection === 'privacy') {
@@ -575,7 +580,13 @@ const HomeScreen = React.memo(() => {
       return lockedUser ? 'connections-locked-active' : 'connections-active';
     }
     return activeSection ? `${activeSection}-active` : '';
-  }, [activeSection, lockedUser]);
+  }, [activeSection, lockedUser, isHomeActive]);
+
+  useEffect(() => {
+    if (isHomeActive) {
+      setMap(null);
+    }
+  }, [isHomeActive]);
 
   return (
     <div className="home-screen-container2">
@@ -585,7 +596,7 @@ const HomeScreen = React.memo(() => {
       />
       <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}
-        {activeSection !== '' && !showFullMap && (
+        {!isHomeActive && !showFullMap && (
           <div className="map-container2">
             <MapComponent 
               address={address} 

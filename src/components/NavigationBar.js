@@ -7,7 +7,6 @@ const NavigationBar = ({ activeSection, showSection, handleLogout }) => {
     { id: 'profile', icon: '/profile.png', label: 'Profile' },
     { id: 'connections', icon: '/connections.png', label: 'Connections' },
     { id: 'quests', icon: '/quest.png', label: 'Quests' },
-    { id: 'history', icon: '/history.png', label: 'History' },
     { id: 'privacy', icon: '/privacy.png', label: 'Privacy' },
   ];
 

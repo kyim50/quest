@@ -59,10 +59,10 @@ body.light-mode .nav-bar {
   align-items: center;
   padding: 15px 20px;
   width: 100%;
-  background-color: rgb(48, 48, 50);
-  border-bottom: 1px solid #333;
+  background-color: rgb(18, 18, 20);
   transition: background-color 0.3s, border-color 0.3s;
 }
+
 
 body.light-mode .top-bar {
   background-color: #ffffff;
@@ -162,14 +162,8 @@ body.light-mode .search-bar-home .MuiOutlinedInput-input {
   color: #333333;
 }
 
-.search-bar-home .MuiOutlinedInput-notchedOutline {
-  border-color: #ccc5b9;
-  transition: border-color 0.3s;
-}
 
-body.light-mode .search-bar-home .MuiOutlinedInput-notchedOutline {
-  border-color: #cccccc;
-}
+
 
 /* Main area styles */
 .main-area {
@@ -367,6 +361,8 @@ body.light-mode .card-username {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: color 0.3s;
+  margin-bottom: -20px;
+  margin-top: 5px;
 }
 
 body.light-mode .card-caption {
@@ -479,6 +475,8 @@ body.light-mode .image-preview-sidebar {
   font-weight: bold;
 }
 
+
+
 .comments-section {
   flex-grow: 1;
   overflow-y: auto;
@@ -494,7 +492,9 @@ body.light-mode .comments-section {
 }
 
 .comment {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
   padding: 10px;
   background-color: #4C4C4C;
   border-radius: 8px;
@@ -514,6 +514,13 @@ body.light-mode .comment {
   border-radius: 20px;
   padding: 5px 15px;
   transition: background-color 0.3s;
+}
+
+.comment-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 body.light-mode .add-comment .MuiInputBase-root {
@@ -1512,8 +1519,8 @@ body.light-mode hr {
 }
 
 .top-bar-icon {
-  width: 24px;
-  height: 24px;
+  width: auto;
+  height: 32px;
   filter: invert(1);
 }
 

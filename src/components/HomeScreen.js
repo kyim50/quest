@@ -17,6 +17,8 @@ import PrivacySection from './PrivacySection';
 import PhotoUploadPreview from './PhotoUploadPreview';
 import { toggleTheme } from '../theme-toggle';
 import '../styles/HomeScreen.css';
+import notificationIcon from '../assets/notification.png';
+import themeToggleIcon from '../assets/day-and-night.png';
 
 const HomeScreen = React.memo(() => {
   const [activeSection, setActiveSection] = useState('');
@@ -152,17 +154,14 @@ const HomeScreen = React.memo(() => {
     if (cameraRef.current) {
       const imageSrc = cameraRef.current.takePhoto();
       
-      // Create a new Image object to get the full resolution
       const img = new Image();
       img.onload = () => {
-        // Create a canvas with the image's full resolution
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, img.width, img.height);
 
-        // Convert the canvas to a high-quality JPEG data URL
         const highQualityImageSrc = canvas.toDataURL('image/jpeg', 0.95);
 
         setPhotoPreview(highQualityImageSrc);
@@ -205,9 +204,17 @@ const HomeScreen = React.memo(() => {
   const fetchComments = useCallback(async (imageId) => {
     const commentsRef = collection(db, 'photos', imageId, 'comments');
     const commentsSnapshot = await getDocs(commentsRef);
-    const fetchedComments = commentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const fetchedComments = await Promise.all(commentsSnapshot.docs.map(async doc => {
+      const commentData = doc.data();
+      const userData = await fetchUserDataCallback(commentData.userId);
+      return { 
+        id: doc.id, 
+        ...commentData,
+        userProfileImage: userData.profilePhoto
+      };
+    }));
     setComments(fetchedComments);
-  }, []);
+  }, [fetchUserDataCallback]);
 
   const handleAddComment = useCallback(async (commentText) => {
     if (commentText.trim() && selectedImage) {
@@ -217,35 +224,22 @@ const HomeScreen = React.memo(() => {
         username: auth.currentUser.displayName,
         timestamp: new Date()
       });
-      setComments(prev => [...prev, { id: commentRef.id, text: commentText, userId: auth.currentUser.uid, username: auth.currentUser.displayName, timestamp: new Date() }]);
+      const userData = await fetchUserDataCallback(auth.currentUser.uid);
+      setComments(prev => [...prev, { 
+        id: commentRef.id, 
+        text: commentText, 
+        userId: auth.currentUser.uid, 
+        username: auth.currentUser.displayName, 
+        timestamp: new Date(),
+        userProfileImage: userData.profilePhoto
+      }]);
     }
-  }, [selectedImage]);
-
-  const handleDeletePost = useCallback(async () => {
-    if (selectedImage && selectedImage.userId === auth.currentUser.uid) {
-      await deleteDoc(doc(db, 'photos', selectedImage.id));
-      setShowImagePreview(false);
-      setGridData(prev => prev.filter(item => item.id !== selectedImage.id));
-    }
-  }, [selectedImage]);
+  }, [selectedImage, fetchUserDataCallback]);
 
   const handleUploadPhoto = useCallback(async (cropInfo, size, captionText) => {
     if (auth.currentUser && photoPreview) {
       try {
         const photoRef = doc(collection(db, 'photos'));
-        await setDoc(photoRef, {
-          userId: auth.currentUser.uid,
-          username: auth.currentUser.displayName,
-          userProfileImage: currentUser?.profilePhoto || null,
-          image: photoPreview,
-          size: size,
-          caption: captionText,
-          cropInfo: cropInfo,
-          timestamp: serverTimestamp(),
-        }, { merge: true });
-        showNotification('Photo uploaded successfully');
-        setPhotoPreview(null);
-        setCaption('');
         const newPhoto = { 
           id: photoRef.id, 
           userId: auth.currentUser.uid, 
@@ -257,6 +251,15 @@ const HomeScreen = React.memo(() => {
           cropInfo: cropInfo,
           timestamp: new Date(),
         };
+        
+        await setDoc(photoRef, {
+          ...newPhoto,
+          timestamp: serverTimestamp(),
+        }, { merge: true });
+        
+        showNotification('Photo uploaded successfully');
+        setPhotoPreview(null);
+        setCaption('');
         setGridData(prev => [newPhoto, ...prev]);
       } catch (error) {
         console.error('Error uploading photo:', error);
@@ -264,6 +267,20 @@ const HomeScreen = React.memo(() => {
       }
     }
   }, [auth.currentUser, photoPreview, currentUser, showNotification]);
+
+  const handleDeletePost = useCallback(async () => {
+    if (selectedImage && selectedImage.userId === auth.currentUser.uid) {
+      try {
+        await deleteDoc(doc(db, 'photos', selectedImage.id));
+        setShowImagePreview(false);
+        setGridData(prev => prev.filter(item => item.id !== selectedImage.id));
+        showNotification('Post deleted successfully');
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        showNotification('Failed to delete post. Please try again.');
+      }
+    }
+  }, [selectedImage, showNotification]);
 
   const toggleNotifications = useCallback(() => setShowNotifications(prev => !prev), []);
   const clearNotifications = useCallback(() => setNotifications([]), []);
@@ -313,12 +330,12 @@ const HomeScreen = React.memo(() => {
 
   const ImagePreview = React.memo(({ selectedImage, comments, onClose, onAddComment, onDeletePost }) => {
     const [localComment, setLocalComment] = useState('');
-
+  
     const handleAddComment = () => {
       onAddComment(localComment);
       setLocalComment('');
     };
-
+  
     return (
       <div className="image-preview-overlay" onClick={onClose}>
         <div className="image-preview-content" onClick={e => e.stopPropagation()}>
@@ -329,7 +346,7 @@ const HomeScreen = React.memo(() => {
             <div className="image-preview-header">
               <div className="user-info">
                 <img src={selectedImage?.userProfileImage || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
-                <span className="username">@{selectedImage?.username}</span>
+                <span className="username">{selectedImage?.username || 'Unknown User'}</span>
               </div>
               <IconButton onClick={onClose} className="close-button">
                 <Close />
@@ -348,7 +365,15 @@ const HomeScreen = React.memo(() => {
             <div className="comments-section">
               {comments.map(comment => (
                 <div key={comment.id} className="comment">
-                  <strong>{comment.username}: </strong>{comment.text}
+                  <img 
+                    src={comment.userProfileImage || '/default-profile-image.jpg'} 
+                    alt={comment.username} 
+                    className="comment-user-avatar"
+                  />
+                  <div className="comment-content">
+                    <strong>{comment.username}</strong>
+                    <p>{comment.text}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -397,35 +422,36 @@ const HomeScreen = React.memo(() => {
     }, [friendsList]);
 
     const fetchGridData = useCallback(async () => {
-    if (auth.currentUser) {
-      const photosRef = collection(db, 'photos');
-      const q = query(
-        photosRef,
-        where('userId', 'in', [auth.currentUser.uid, ...friendsList]),
-        orderBy('timestamp', 'desc')
-      );
-      const photosSnapshot = await getDocs(q);
-      const photos = await Promise.all(photosSnapshot.docs.map(async doc => {
-        const photoData = doc.data();
-        const userData = await fetchUserDataCallback(photoData.userId);
-        return { 
-          id: doc.id, 
-          ...photoData, 
-          user: {
-            name: userData.name,
-            profilePhoto: userData.profilePhoto
-          }
-        };
-      }));
-      setGridData(photos);
-    }
-  }, [friendsList, fetchUserDataCallback]);
+      if (auth.currentUser) {
+        const photosRef = collection(db, 'photos');
+        const q = query(
+          photosRef,
+          where('userId', 'in', [auth.currentUser.uid, ...friendsList]),
+          orderBy('timestamp', 'desc')
+        );
+        const photosSnapshot = await getDocs(q);
+        const photos = await Promise.all(photosSnapshot.docs.map(async doc => {
+          const photoData = doc.data();
+          const userData = await fetchUserData(photoData.userId);
+          return { 
+            id: doc.id, 
+            ...photoData, 
+            username: userData.name,
+            user: {
+              name: userData.name,
+              profilePhoto: userData.profilePhoto
+            }
+          };
+        }));
+        setGridData(photos);
+      }
+    }, [friendsList]);
 
-  useEffect(() => {
-    if (friendsList.length > 0) {
-      fetchGridData();
-    }
-  }, [friendsList, fetchGridData]);
+    useEffect(() => {
+      if (friendsList.length > 0) {
+        fetchGridData();
+      }
+    }, [friendsList, fetchGridData]);
 
     if (isLoading) {
       return <div>Loading...</div>;
@@ -446,18 +472,6 @@ const HomeScreen = React.memo(() => {
       </div>
     );
   });
-
-  const NotificationIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 18H4V8L12 13L20 8V18ZM12 11L4 6H20L12 11Z" fill="white"/>
-    </svg>
-  );
-
-  const ThemeToggleIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7ZM2 13H4C4.55 13 5 12.55 5 12C5 11.45 4.55 11 4 11H2C1.45 11 1 11.45 1 12C1 12.55 1.45 13 2 13ZM20 13H22C22.55 13 23 12.55 23 12C23 11.45 22.55 11 22 11H20C19.45 11 19 11.45 19 12C19 12.55 19.45 13 20 13ZM11 2V4C11 4.55 11.45 5 12 5C12.55 5 13 4.55 13 4V2C13 1.45 12.55 1 12 1C11.45 1 11 1.45 11 2ZM11 20V22C11 22.55 11.45 23 12 23C12.55 23 13 22.55 13 22V20C13 19.45 12.55 19 12 19C11.45 19 11 19.45 11 20ZM5.99 4.58C5.6 4.19 4.96 4.19 4.58 4.58C4.19 4.97 4.19 5.61 4.58 5.99L5.64 7.05C6.03 7.44 6.67 7.44 7.05 7.05C7.43 6.66 7.44 6.02 7.05 5.64L5.99 4.58ZM18.36 16.95C17.97 16.56 17.33 16.56 16.95 16.95C16.56 17.34 16.56 17.98 16.95 18.36L18.01 19.42C18.4 19.81 19.04 19.81 19.42 19.42C19.81 19.03 19.81 18.39 19.42 18.01L18.36 16.95ZM19.42 5.99C19.81 5.6 19.81 4.96 19.42 4.58C19.03 4.19 18.39 4.19 18.01 4.58L16.95 5.64C16.56 6.03 16.56 6.67 16.95 7.05C17.34 7.43 17.98 7.44 18.36 7.05L19.42 5.99ZM7.05 18.36C7.44 17.97 7.44 17.33 7.05 16.95C6.66 16.56 6.02 16.56 5.64 16.95L4.58 18.01C4.19 18.4 4.19 19.04 4.58 19.42C4.97 19.81 5.61 19.81 5.99 19.42L7.05 18.36Z" fill="white"/>
-    </svg>
-  );
 
   const renderHomeContent = useCallback(() => (
     <div className="home-content">
@@ -480,12 +494,12 @@ const HomeScreen = React.memo(() => {
         <div className="top-bar-right">
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">
-              <img src="notification.png" alt="Notifications" className="top-bar-icon" />
-            </Badge>
+            <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
+                        </Badge>
           </IconButton>
           <IconButton onClick={toggleTheme}>
-            <img src="day-and-night.png" alt="Toggle Theme" className="top-bar-icon" />
-          </IconButton>
+          <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-icon" />        
+            </IconButton>
         </div>
       </div>
 
@@ -653,7 +667,7 @@ const HomeScreen = React.memo(() => {
         activeSection={activeSection} 
         showSection={showSection} 
       />
-      <div className={`main-content2 ${isHomeActive ? 'home-active' : activeSection + '-active'}`}>
+      <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}
         {!isHomeActive && !showFullMap && (
           <div className="map-container2">

@@ -9,7 +9,9 @@ body {
     font-family: Arial, sans-serif; /* Add a font for consistency */
 }
 
-
+::-webkit-scrollbar{
+    display: none;
+}
 
 /* Logo Styles */
 .logo {

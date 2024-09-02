@@ -1,47 +1,61 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { setupUserLocationsListener, trackUserLocation, centerMapOnUser } from './UserLocationService';
 import QuestsComponent from './QuestsComponent';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import Quests from './Quests';
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection, lockedUser, showAddressBar, isFullScreen }) => {
   const mapContainerRef = useRef(null);
-  const [mapInstance, setMapInstance] = useState(null);
+  const mapInstanceRef = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [currentUserIds, setLocalCurrentUserIds] = useState([]);
   const markersRef = useRef({});
 
-  useEffect(() => {
-    if (!mapInstance) {
-      const newMap = new mapboxgl.Map({
+  const initializeMap = useCallback(() => {
+    if (!mapInstanceRef.current) {
+      const savedState = JSON.parse(localStorage.getItem('mapState'));
+      mapInstanceRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/kyim50/clzniqnmq009s01qgee0a13s0',
-        center: [0, 0],
-        zoom: 2,
+        center: savedState?.center || [0, 0],
+        zoom: savedState?.zoom || 2,
         attributionControl: false,
       });
 
-      newMap.on('load', () => {
+      mapInstanceRef.current.on('load', () => {
         setMapLoaded(true);
-        setMapInstance(newMap);
-        setMap(newMap);
+        setMap(mapInstanceRef.current);
+      });
+
+      mapInstanceRef.current.on('moveend', () => {
+        const center = mapInstanceRef.current.getCenter();
+        const zoom = mapInstanceRef.current.getZoom();
+        localStorage.setItem('mapState', JSON.stringify({ center, zoom }));
       });
     }
+  }, [setMap]);
 
+  useEffect(() => {
+    initializeMap();
     return () => {
-      if (mapInstance) mapInstance.remove();
+      if (mapInstanceRef.current) {
+        const center = mapInstanceRef.current.getCenter();
+        const zoom = mapInstanceRef.current.getZoom();
+        localStorage.setItem('mapState', JSON.stringify({ center, zoom }));
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
-  }, [mapInstance, setMap]);
+  }, [initializeMap]);
 
   useEffect(() => {
     let unsubscribe;
-    if (mapLoaded && mapInstance) {
-      trackUserLocation(mapInstance, setAddress);
-      unsubscribe = setupUserLocationsListener(mapInstance, (ids, markers) => {
+    if (mapLoaded && mapInstanceRef.current) {
+      trackUserLocation(mapInstanceRef.current, setAddress);
+      unsubscribe = setupUserLocationsListener(mapInstanceRef.current, (ids, markers) => {
         setLocalCurrentUserIds(ids);
         setCurrentUserIds(ids);
         markersRef.current = markers;
@@ -53,30 +67,24 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
         unsubscribe();
       }
     };
-  }, [mapLoaded, mapInstance, setAddress, setCurrentUserIds]);
+  }, [mapLoaded, setAddress, setCurrentUserIds]);
 
   useEffect(() => {
-    if (mapInstance && mapLoaded) {
+    if (mapInstanceRef.current && mapLoaded) {
       const handleResize = () => {
-        mapInstance.resize();
+        mapInstanceRef.current.resize();
       };
 
       handleResize();
       window.addEventListener('resize', handleResize);
-      const resizeTimeout = setTimeout(handleResize, 300);
-
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        clearTimeout(resizeTimeout);
-      };
+      return () => window.removeEventListener('resize', handleResize);
     }
-  }, [mapInstance, mapLoaded, activeSection, isFullScreen]);
+  }, [mapLoaded, activeSection, isFullScreen]);
 
   useEffect(() => {
-    if (mapInstance && mapLoaded && lockedUser) {
-      centerMapOnUser(mapInstance, lockedUser);
+    if (mapInstanceRef.current && mapLoaded && lockedUser) {
+      centerMapOnUser(mapInstanceRef.current, lockedUser);
 
-      // Update markers to show/hide lock indicator
       Object.keys(markersRef.current).forEach(userId => {
         const marker = markersRef.current[userId];
         const element = marker.getElement();
@@ -93,22 +101,22 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
         }
       });
     }
-  }, [mapInstance, mapLoaded, lockedUser]);
+  }, [mapLoaded, lockedUser]);
 
   const handleQuestAccepted = async (quest) => {
-    if (mapInstance && quest.senderLocation) {
+    if (mapInstanceRef.current && quest.senderLocation) {
       const { lng, lat } = quest.senderLocation;
-      mapInstance.flyTo({ center: [lng, lat], zoom: 14 });
+      mapInstanceRef.current.flyTo({ center: [lng, lat], zoom: 14 });
 
-      const route = await getRouteToSender(mapInstance, quest.senderLocation);
+      const route = await getRouteToSender(mapInstanceRef.current, quest.senderLocation);
       if (route) {
         const routeLayerId = `route-${quest.id}`;
-        if (mapInstance.getLayer(routeLayerId)) {
-          mapInstance.removeLayer(routeLayerId);
-          mapInstance.removeSource(routeLayerId);
+        if (mapInstanceRef.current.getLayer(routeLayerId)) {
+          mapInstanceRef.current.removeLayer(routeLayerId);
+          mapInstanceRef.current.removeSource(routeLayerId);
         }
 
-        mapInstance.addLayer({
+        mapInstanceRef.current.addLayer({
           id: routeLayerId,
           type: 'line',
           source: {
@@ -148,7 +156,7 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
     <>
       <div ref={mapContainerRef} className={`map-placeholder ${isFullScreen ? 'full-screen' : ''}`} style={{ width: '100%', height: '100%' }}></div>
       {showAddressBar && <div className="address-bar" id="address-bar">{address}</div>}
-      {mapInstance && <QuestsComponent map={mapInstance} currentUserIds={currentUserIds} onQuestAccepted={handleQuestAccepted} />}
+      {mapInstanceRef.current && <QuestsComponent map={mapInstanceRef.current} currentUserIds={currentUserIds} onQuestAccepted={handleQuestAccepted} />}
     </>
   );
 };

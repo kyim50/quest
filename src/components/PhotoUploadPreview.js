@@ -23,52 +23,37 @@ const PreviewContainer = styled('div')({
   maxWidth: '1200px',
   height: '90%',
   display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-});
-
-const PreviewContent = styled('div')({
-  display: 'flex',
-  flex: 1,
   overflow: 'hidden',
 });
 
 const ImageContainer = styled('div')({
   flex: 2,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
   position: 'relative',
   overflow: 'hidden',
   backgroundColor: '#2C2C2C',
 });
 
-const FullPreviewImage = styled('img')({
+const PreviewImage = styled('div')(({ size }) => ({
+  position: 'relative',
+  overflow: 'hidden',
+  borderRadius: '16px',
+  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+  ...(size === 'small' && { width: '200px', height: '200px' }),
+  ...(size === 'medium' && { width: '300px', height: '300px' }),
+  ...(size === 'large' && { width: '400px', height: '400px' }),
+}));
+
+const StyledImg = styled('img')({
+  position: 'absolute',
+  top: 0,
+  left: 0,
   width: '100%',
   height: '100%',
-  objectFit: 'contain',
+  objectFit: 'cover',
 });
-
-const CardOutline = styled('div')(({ size }) => ({
-  position: 'absolute',
-  border: '2px solid white',
-  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-  borderRadius: '16px',
-  transition: 'all 0.3s ease',
-  cursor: 'grab',
-  '&:active': {
-    cursor: 'grabbing',
-  },
-  ...(size === 'small' && {
-    width: '200px',
-    height: '200px',
-  }),
-  ...(size === 'medium' && {
-    width: '300px',
-    height: '300px',
-  }),
-  ...(size === 'large' && {
-    width: '400px',
-    height: '400px',
-  }),
-}));
 
 const ControlsContainer = styled('div')({
   flex: 1,
@@ -135,72 +120,88 @@ const Username = styled('span')({
 const PhotoUploadPreview = ({ photoPreview, initialPhotoSize, initialCaption, onUpload, onCancel, currentUser }) => {
   const [photoSize, setPhotoSize] = useState(initialPhotoSize);
   const [caption, setCaption] = useState(initialCaption);
-  const [outlinePosition, setOutlinePosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const previewRef = useRef(null);
   const imageRef = useRef(null);
-  const containerRef = useRef(null);
-  const outlineRef = useRef(null);
 
   useEffect(() => {
-    if (imageRef.current && containerRef.current && outlineRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const imgRect = imageRef.current.getBoundingClientRect();
-      const outlineRect = outlineRef.current.getBoundingClientRect();
-      
-      setOutlinePosition({
-        x: (imgRect.width - outlineRect.width) / 2,
-        y: (imgRect.height - outlineRect.height) / 2
-      });
+    const img = new Image();
+    img.onload = () => {
+      setImageSize({ width: img.width, height: img.height });
+    };
+    img.src = photoPreview;
+  }, [photoPreview]);
+
+  useEffect(() => {
+    adjustImagePosition();
+  }, [photoSize, imageSize]);
+
+  const adjustImagePosition = () => {
+    if (previewRef.current && imageSize.width && imageSize.height) {
+      const previewRect = previewRef.current.getBoundingClientRect();
+      const imageAspect = imageSize.width / imageSize.height;
+      const previewAspect = previewRect.width / previewRect.height;
+
+      let newScale, newX, newY;
+
+      if (imageAspect > previewAspect) {
+        // Image is wider
+        newScale = previewRect.height / imageSize.height;
+        newX = (previewRect.width - imageSize.width * newScale) / 2;
+        newY = 0;
+      } else {
+        // Image is taller
+        newScale = previewRect.width / imageSize.width;
+        newX = 0;
+        newY = (previewRect.height - imageSize.height * newScale) / 2;
+      }
+
+      setScale(newScale);
+      setPosition({ x: newX, y: newY });
     }
-  }, [photoSize]);
+  };
 
   const handleMouseDown = (e) => {
-    setIsDragging(true);
     e.preventDefault();
-  };
+    const startX = e.clientX - position.x;
+    const startY = e.clientY - position.y;
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
+    const handleMouseMove = (e) => {
+      if (previewRef.current && imageRef.current) {
+        const previewRect = previewRef.current.getBoundingClientRect();
+        const imageRect = imageRef.current.getBoundingClientRect();
 
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const outlineRect = outlineRef.current.getBoundingClientRect();
+        let newX = e.clientX - startX;
+        let newY = e.clientY - startY;
 
-    const newX = outlinePosition.x + e.movementX;
-    const newY = outlinePosition.y + e.movementY;
+        // Constrain movement
+        newX = Math.min(0, Math.max(previewRect.width - imageRect.width, newX));
+        newY = Math.min(0, Math.max(previewRect.height - imageRect.height, newY));
 
-    const maxX = containerRect.width - outlineRect.width;
-    const maxY = containerRect.height - outlineRect.height;
-
-    setOutlinePosition({
-      x: Math.max(0, Math.min(maxX, newX)),
-      y: Math.max(0, Math.min(maxY, newY))
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+        setPosition({ x: newX, y: newY });
+      }
     };
-  }, [isDragging]);
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
 
   const handleUpload = () => {
-    const outlineRect = outlineRef.current.getBoundingClientRect();
+    const previewRect = previewRef.current.getBoundingClientRect();
     const imageRect = imageRef.current.getBoundingClientRect();
     
     const cropInfo = {
-      x: (outlinePosition.x - imageRect.left) / imageRect.width,
-      y: (outlinePosition.y - imageRect.top) / imageRect.height,
-      width: outlineRect.width / imageRect.width,
-      height: outlineRect.height / imageRect.height
+      x: (previewRect.left - imageRect.left) / imageRect.width,
+      y: (previewRect.top - imageRect.top) / imageRect.height,
+      width: previewRect.width / imageRect.width,
+      height: previewRect.height / imageRect.height
     };
 
     onUpload(cropInfo, photoSize, caption);
@@ -209,54 +210,54 @@ const PhotoUploadPreview = ({ photoPreview, initialPhotoSize, initialCaption, on
   return (
     <PreviewOverlay>
       <PreviewContainer>
-        <PreviewContent>
-          <ImageContainer ref={containerRef}>
-            <FullPreviewImage ref={imageRef} src={photoPreview} alt="Preview" />
-            <CardOutline
-              ref={outlineRef}
-              size={photoSize}
+        <ImageContainer>
+          <PreviewImage ref={previewRef} size={photoSize}>
+            <StyledImg
+              ref={imageRef}
+              src={photoPreview}
+              alt="Preview"
               style={{
-                left: `${outlinePosition.x}px`,
-                top: `${outlinePosition.y}px`,
+                transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+                transformOrigin: 'top left',
               }}
               onMouseDown={handleMouseDown}
             />
-          </ImageContainer>
-          <ControlsContainer>
-            <SizeSelect
-              row
-              aria-label="photo-size"
-              name="photo-size"
-              value={photoSize}
-              onChange={(e) => setPhotoSize(e.target.value)}
-            >
-              <FormControlLabel value="small" control={<Radio />} label="Small" />
-              <FormControlLabel value="medium" control={<Radio />} label="Medium" />
-              <FormControlLabel value="large" control={<Radio />} label="Large" />
-            </SizeSelect>
-            <StyledTextField
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Add a caption..."
-              fullWidth
-              multiline
-              rows={4}
-              variant="outlined"
-            />
-            <ButtonGroup>
-              <StyledButton onClick={handleUpload} variant="contained" color="primary">
-                Upload
-              </StyledButton>
-              <StyledButton onClick={onCancel} variant="outlined">
-                Cancel
-              </StyledButton>
-            </ButtonGroup>
-            <UserInfo>
-              <UserAvatar src={currentUser?.profilePhoto || '/default-profile-image.jpg'} alt={currentUser?.name} />
-              <Username>{currentUser?.name}</Username>
-            </UserInfo>
-          </ControlsContainer>
-        </PreviewContent>
+          </PreviewImage>
+        </ImageContainer>
+        <ControlsContainer>
+          <SizeSelect
+            row
+            aria-label="photo-size"
+            name="photo-size"
+            value={photoSize}
+            onChange={(e) => setPhotoSize(e.target.value)}
+          >
+            <FormControlLabel value="small" control={<Radio />} label="Small" />
+            <FormControlLabel value="medium" control={<Radio />} label="Medium" />
+            <FormControlLabel value="large" control={<Radio />} label="Large" />
+          </SizeSelect>
+          <StyledTextField
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Add a caption..."
+            fullWidth
+            multiline
+            rows={4}
+            variant="outlined"
+          />
+          <ButtonGroup>
+            <StyledButton onClick={handleUpload} variant="contained" color="primary">
+              Upload
+            </StyledButton>
+            <StyledButton onClick={onCancel} variant="outlined">
+              Cancel
+            </StyledButton>
+          </ButtonGroup>
+          <UserInfo>
+            <UserAvatar src={currentUser?.profilePhoto || '/default-profile-image.jpg'} alt={currentUser?.name} />
+            <Username>{currentUser?.name}</Username>
+          </UserInfo>
+        </ControlsContainer>
       </PreviewContainer>
     </PreviewOverlay>
   );

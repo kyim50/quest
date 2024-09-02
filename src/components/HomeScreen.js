@@ -162,7 +162,7 @@ const HomeScreen = React.memo(() => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, img.width, img.height);
 
-        const highQualityImageSrc = canvas.toDataURL('image/jpeg', 0.95);
+        const highQualityImageSrc = canvas.toDataURL('image/png', 1);
 
         setPhotoPreview(highQualityImageSrc);
         setShowCamera(false);

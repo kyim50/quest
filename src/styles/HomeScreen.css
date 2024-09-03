@@ -80,6 +80,49 @@ body.light-mode .top-bar {
   gap: 15px;
 }
 
+/*Mid bar styles*/
+.mid-bar{
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 5px;
+  overflow-y: scroll;
+}
+.friends-display{
+  display: flex;
+  border-radius: 25px;
+  background-color: rgb(50, 50, 54);
+  padding: 10px;
+  margin: 0 5px;
+}
+.friends-display-photo-wrapper{
+  width: 60px;
+  height: 60px;
+  margin-right: 15px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.friends-display-photo{
+
+}
+.friends-display-name{
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  color: #ffffff;
+  transition: color 0.3s;
+}
+.friends-display-status{
+  font-size: 16px;
+  color: #ccc5b9;
+  display: flex;
+  align-items: center;
+  margin: 5px 0 0;
+  transition: color 0.3s;
+}
+
 /* Profile display styles */
 .profile-display {
   display: flex;

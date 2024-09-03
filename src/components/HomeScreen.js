@@ -301,7 +301,7 @@ const HomeScreen = React.memo(() => {
           Active now
         </p>
       </div>
-    </div>
+    </div>  
   ), [currentUser]);
 
   const Card = React.memo(({ size, user, image, caption, onClick }) => {
@@ -500,6 +500,17 @@ const HomeScreen = React.memo(() => {
           <IconButton onClick={toggleTheme}>
           <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-icon" />        
             </IconButton>
+        </div>
+      </div>
+      <div className = "mid-bar"> 
+        <div className="friends-display">
+          <div className="profile-photo-container">
+            <img src='/profile.png' className="profile-photo" alt="default profile"></img>
+          </div>
+          <div className = "profile-name-status">
+            <div className = "friends-display-name">Nova</div>
+            <div className = "friends-display-status">On a quest</div>
+          </div>
         </div>
       </div>
 

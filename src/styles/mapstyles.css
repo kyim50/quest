@@ -95,7 +95,7 @@ nav {
 }
 
 .nav-button span {
-  color: #ffffff;
+  color: var(--text-color);
 }
 
 .nav-footer {

@@ -20,6 +20,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [lockedUser, setLockedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('friends');
+  const [theme, setTheme] = useState(document.body.classList.contains('light-mode'));
 
   const fetchPeople = useCallback(async () => {
     if (!auth.currentUser) {
@@ -107,7 +108,17 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
 
     fetchFriends();
 
-    return () => unsubscribeRequests();
+    // Add theme change listener
+    const handleThemeChange = () => {
+      setTheme(document.body.classList.contains('light-mode'));
+    };
+
+    window.addEventListener('themeChange', handleThemeChange);
+
+    return () => {
+      unsubscribeRequests();
+      window.removeEventListener('themeChange', handleThemeChange);
+    };
   }, [fetchPeople, fetchFriends]);
 
   const handleAddFriend = async (receiverId) => {
@@ -405,11 +416,12 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
                     e.stopPropagation();
                     handleRemoveFriend(friend.id);
                   }}>Remove</button>
-                  <button className="chat-btn1" onClick={(e) => {
+<button className="chat-btn1" onClick={(e) => {
                     e.stopPropagation();
                     handleChatClick(friend);
-                  }}>                  <img src={chatIcon} alt="Chat" className='icon-img' />
-</button>
+                  }}>
+                    <img src={chatIcon} alt="Chat" className='icon-img' />
+                  </button>
                 </div>
               </div>
             ))}
@@ -431,36 +443,36 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
             ))}
           </div>
         );
-        case 'people':
-      return (
-        <div className="people-section">
-          <h2>People</h2>
-          {filteredPeople.map(user => (
-            <div 
-              key={user.id} 
-              className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
-              onClick={() => handleUserClick(user)}
-            >
-              <img src={user.profilePhoto} alt="User" />
-              <div>{user.name}</div>
-              <div className="button-group">
-                <button className="add-friend-btn1" onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddFriend(user.id);
-                }}>
-                  Add Friend
-                </button>
-                <button className="chat-btn1" onClick={(e) => {
-                  e.stopPropagation();
-                  handleChatClick(user);
-                }}>
-                  <img src={chatIcon} alt="Chat" className='icon-img' />
-                </button>
+      case 'people':
+        return (
+          <div className="people-section">
+            <h2>People</h2>
+            {filteredPeople.map(user => (
+              <div 
+                key={user.id} 
+                className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
+                onClick={() => handleUserClick(user)}
+              >
+                <img src={user.profilePhoto} alt="User" />
+                <div>{user.name}</div>
+                <div className="button-group">
+                  <button className="add-friend-btn1" onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddFriend(user.id);
+                  }}>
+                    Add Friend
+                  </button>
+                  <button className="chat-btn1" onClick={(e) => {
+                    e.stopPropagation();
+                    handleChatClick(user);
+                  }}>
+                    <img src={chatIcon} alt="Chat" className='icon-img' />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      );
+            ))}
+          </div>
+        );
       case 'recentChats':
         return (
           <div className="recent-chats-section">
@@ -479,7 +491,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   };
 
   return (
-    <div className={`connections-container1 ${lockedUser ? 'user-locked1' : ''}`}>
+    <div className={`connections-container1 ${theme ? 'light-mode' : ''}`}>
       {notification && <div className="notification1">{notification}</div>}
 
       {lockedUser ? (
@@ -565,7 +577,9 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
               value={newMessage}
               onChange={handleInputChange}
             />
-            <button onClick={handleSendMessage}><img className="sendchatimg" src="sendchat.png"/></button>
+            <button onClick={handleSendMessage}>
+              <img className="sendchatimg" src="sendchat.png" alt="Send" />
+            </button>
           </div>
         </div>
       )}

@@ -8,7 +8,7 @@ import '../styles/profile.css';
 const UserProfile = ({ handleLogout }) => {
   const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
   const [name, setName] = useState('Default Name');
-  const [username, setUsername] = useState('default_username'); // New state for username
+  const [username, setUsername] = useState('default_username');
   const [bio, setBio] = useState('Default Bio');
   const [status, setStatus] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -22,11 +22,10 @@ const UserProfile = ({ handleLogout }) => {
   const { showNotification } = useNotification();
 
   const predefinedTags = [
-    { text: '🎓', value: 'education' },
-    { text: '🍔', value: 'food' },
-    { text: '🎮', value: 'games' },
-    { text: '⚽', value: 'sports & activity' },
-    { text: '🌟', value: 'other' }
+    { img: '/education.png', value: 'education' },
+    { img: '/food.png', value: 'food' },
+    { img: '/games.png', value: 'games' },
+    { img: '/other.png', value: 'other' }
   ];
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const UserProfile = ({ handleLogout }) => {
       const userData = await fetchUserData(auth.currentUser.uid);
       if (userData) {
         setName(userData.name || 'Default Name');
-        setUsername(userData.username || 'default_username'); // Set username
+        setUsername(userData.username || 'default_username');
         setProfilePhoto(userData.profilePhoto || 'placeholder.jpg');
         setBio(userData.bio || 'Default Bio');
         setStatus(userData.status || '');
@@ -115,7 +114,7 @@ const UserProfile = ({ handleLogout }) => {
 
       await updateUserProfile(auth.currentUser.uid, {
         name,
-        username, // Include username in the update
+        username,
         bio,
         profilePhoto: photoURL,
         tags,
@@ -175,7 +174,7 @@ const UserProfile = ({ handleLogout }) => {
         </div>
         <div className="profile-name-status">
           <h2 className="profile-name">{name}</h2>
-          <p className="profile-username">@{username}</p> {/* Display username */}
+          <p className="profile-username">@{username}</p>
           <p className="profile-status"><span className="status-dot"></span> Active</p>
         </div>
         <div className="privacy-icon">
@@ -186,22 +185,21 @@ const UserProfile = ({ handleLogout }) => {
       {isEditing ? (
         <div className="profile-section">
           <h3 className="section-title">Edit Profile</h3>
-         <div className='nameedit'>
-          <input 
-            type="text" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            className="profile-input" 
-            placeholder="Name"
-          />
-          <input 
-            type="text" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)} 
-            className="profile-input" 
-            placeholder="Username"
-          />
-
+          <div className='nameedit'>
+            <input 
+              type="text" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              className="profile-input" 
+              placeholder="Name"
+            />
+            <input 
+              type="text" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              className="profile-input" 
+              placeholder="Username"
+            />
           </div>
           <textarea 
             value={bio} 
@@ -226,8 +224,10 @@ const UserProfile = ({ handleLogout }) => {
           <button onClick={toggleTagOptions}>Add Tags</button>
           {showTagOptions && (
             <div className="tag-options">
-              {predefinedTags.map(({ text, value }) => (
-                <button key={value} onClick={() => handleAddTag(value)}>{text}</button>
+              {predefinedTags.map(({ img, value }) => (
+                <button key={value} onClick={() => handleAddTag(value)}>
+                  <img src={img} alt={value} className="tag-icon" />
+                </button>
               ))}
             </div>
           )}
@@ -239,7 +239,7 @@ const UserProfile = ({ handleLogout }) => {
         <div className="tags-container">
           {tags.map((tag) => (
             <div key={tag} className="tag">
-              {predefinedTags.find(t => t.value === tag).text}
+              <img src={predefinedTags.find(t => t.value === tag).img} alt={tag} className="tag-icon" />
               <button onClick={() => handleRemoveTag(tag)}>x</button>
             </div>
           ))}

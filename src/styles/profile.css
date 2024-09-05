@@ -1,5 +1,53 @@
+:root {
+    /* Dark theme variables */
+    --dark-background: rgb(38, 38, 40);
+    --dark-text: #fffcf2;
+    --dark-secondary-text: #ccc5b9;
+    --dark-section-background: rgb(48, 48, 50);
+    --dark-input-background: rgb(58, 58, 60);
+    --dark-hover: rgb(84, 84, 85);
+    --dark-border: #333333;
+    --dark-tag-background: rgb(58, 58, 60);
+    --dark-quest-background: rgb(58, 58, 60);
+
+    /* Light theme variables */
+    --light-background: #f0f0f0;
+    --light-text: #333333;
+    --light-secondary-text: #666666;
+    --light-section-background: #ffffff;
+    --light-input-background: #ffffff;
+    --light-hover: #e0e0e0;
+    --light-border: #cccccc;
+    --light-tag-background: #f0f0f0;
+    --light-quest-background: #f9f9f9;
+
+    /* Default to dark theme */
+    --background-color: var(--dark-background);
+    --text-color: var(--dark-text);
+    --secondary-text-color: var(--dark-secondary-text);
+    --section-background: var(--dark-section-background);
+    --input-background: var(--dark-input-background);
+    --hover-color: var(--dark-hover);
+    --border-color: var(--dark-border);
+    --tag-background: var(--dark-tag-background);
+    --quest-background: var(--dark-quest-background);
+}
+
+/* Light mode class */
+.light-mode {
+    --background-color: var(--light-background);
+    --text-color: var(--light-text);
+    --secondary-text-color: var(--light-secondary-text);
+    --section-background: var(--light-section-background);
+    --input-background: var(--light-input-background);
+    --hover-color: var(--light-hover);
+    --border-color: var(--light-border);
+    --tag-background: var(--light-tag-background);
+    --quest-background: var(--light-quest-background);
+}
+
 .profile-container {
-    background-color: rgb(38, 38, 40);
+    background-color: var(--background-color);
     border-radius: 20px;
     padding: 20px;
     width: 100%;
@@ -9,7 +57,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    color: #fffcf2;
+    color: var(--text-color);
 }
 
 .profile-header {
@@ -64,11 +112,18 @@
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.profile-username {
+    font-size: 16px;
+    color: var(--secondary-text-color);
+    margin-bottom: 5px;
 }
 
 .profile-status {
     font-size: 14px;
-    color: #ccc5b9;
+    color: var(--secondary-text-color);
 }
 
 .status-dot {
@@ -85,7 +140,7 @@
 }
 
 .profile-section {
-    background-color: rgb(48, 48, 50);
+    background-color: var(--section-background);
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 20px;
@@ -95,12 +150,12 @@
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
-    color: #fffcf2;
+    color: var(--secondary-text-color);
 }
 
 .profile-bio {
     font-size: 14px;
-    color: #ccc5b9;
+    color: var(--secondary-text-color);
 }
 
 .profile-bio-edit {
@@ -108,12 +163,11 @@
     min-height: 100px;
     padding: 8px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
+    background-color: var(--input-background);
+    color: var(--text-color);
     font-size: 14px;
-    /* Remove default input styles */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -122,22 +176,21 @@
     resize: vertical;
 }
 
-.nameedit
-{
+.nameedit {
     display: flex;
     justify-content: space-between;
 }
-.profile-input{
+
+.profile-input {
     width: 45%;
     height: 50px;
     padding: 8px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
+    background-color: var(--input-background);
+    color: var(--text-color);
     font-size: 14px;
-    /* Remove default input styles */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -154,18 +207,29 @@
 .edit-profile-button,
 .add-tag button {
     background-color: rgb(58, 58, 60);
-    color: #fffcf2;
+    color: var(--text-color);
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     border: none;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.light-mode .edit-profile-button,
+.light-mode .add-tag button {
+    background-color: #3c68c6;
+    color: #ffffff;
 }
 
 .edit-profile-button:hover,
 .add-tag button:hover {
-    background-color: rgb(84, 84, 85);
+    background-color: var(--hover-color);
+}
+
+.light-mode .edit-profile-button:hover,
+.light-mode .add-tag button:hover {
+    background-color: #2c4e9e;
 }
 
 .edit-profile-button i {
@@ -180,8 +244,8 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: rgb(58, 58, 60);
-    border: 1px solid #ccc5b9;
+    background-color: var(--section-background);
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     padding: 5px;
     z-index: 10;
@@ -191,17 +255,26 @@
 }
 
 .tag-options button {
-    background-color: rgb(68, 68, 70);
-    color: #fffcf2;
+    background-color: var(--tag-background);
+    color: var(--text-color);
     border: none;
-    padding: 5px 10px;
+    padding: 5px;
     border-radius: 3px;
     cursor: pointer;
     transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tag-options button:hover {
-    background-color: rgb(84, 84, 85);
+    background-color: var(--hover-color);
+}
+
+.tag-icon {
+    width: auto;
+    height: 21px;
+    object-fit: contain;
 }
 
 .tags-container {
@@ -211,8 +284,8 @@
 }
 
 .tag {
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
+    background-color: var(--tag-background);
+    color: var(--text-color);
     padding: 5px 10px;
     border-radius: 30px;
     font-size: 14px;
@@ -220,17 +293,31 @@
     align-items: center;
 }
 
+.tag .tag-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+.tag span {
+    margin-right: 5px;
+}
+
 .tag button {
     background: none;
     border: none;
     color: rgb(10, 145, 255);
-    margin-left: 5px;
     cursor: pointer;
     font-size: 14px;
+    padding: 0 5px;
+}
+
+.light-mode .tag button {
+    color: #3c68c6;
 }
 
 .quest-item {
-    background-color: rgb(58, 58, 60);
+    background-color: var(--quest-background);
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 10px;
@@ -239,6 +326,7 @@
 .quest-item p {
     margin: 0;
     font-size: 14px;
+    color: var(--text-color);
 }
 
 .quest-item p:first-child {
@@ -260,12 +348,45 @@
 }
 
 .no-quests {
-    background-color: rgb(58, 58, 60);
+    background-color: var(--quest-background);
     padding: 15px;
     border-radius: 5px;
     text-align: center;
     font-style: italic;
-    color: #ccc5b9;
+    color: var(--secondary-text-color);
+}
+
+.logout-button {
+    background-color: #ff4d4d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    height: 50px;
+    margin-top: auto;
+}
+
+.logout-button img {
+    height: 25px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.logouttext {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+.logout-button:hover {
+    background-color: #ff3333;
 }
 
 @media (max-width: 1200px) {
@@ -290,60 +411,4 @@
     .add-tag button {
         width: 100%;
     }
-}
-
-.tag {
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
-    padding: 5px 10px;
-    border-radius: 30px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.tag button {
-    background: none;
-    border: none;
-    color: rgb(10, 145, 255);
-    margin-left: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 0 5px;
-}
-
-.logout-button {
-    background-color: #ff4d4d;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
-    height:50px;
-    margin-top: auto;
-}
-
-.logout-button img{
-    height:25px;
-    width:auto;
-    filter: brightness(0) invert(1);
-    
-
-}
-
-.logouttext{
-    color:white;
-    font-size: 18px;
-    font-weight: 600;
-    margin-left: 2px;
-}
-
-.logout-button:hover {
-    background-color: #ff3333;
 }

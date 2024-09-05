@@ -96,7 +96,7 @@ const PrivacySection = () => {
       <h2>Privacy Settings</h2>
 
       <div className="privacy-section">
-        <h3 className="section-title">Location Visibility</h3>
+        <h3 className="section-title1">Location Visibility</h3>
         <div className="privacy-option">
           <label className="toggle-switch">
             <input
@@ -133,7 +133,7 @@ const PrivacySection = () => {
       </div>
 
       <div className="privacy-section">
-        <h3 className="section-title">Custom Visibility List</h3>
+        <h3 className="section-title1">Custom Visibility List</h3>
         <div className="privacy-option">
           <label className="toggle-switch">
             <input

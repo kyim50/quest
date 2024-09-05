@@ -47,6 +47,7 @@ const HomeScreen = React.memo(() => {
   const [notifications, setNotifications] = useState([]);
   const [isHomeActive, setIsHomeActive] = useState(true);
   const [cameraResolution, setCameraResolution] = useState({ width: 1920, height: 1080 });
+  const [friends, setFriends] = useState([]);
   
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -107,6 +108,66 @@ const HomeScreen = React.memo(() => {
   useEffect(() => {
     fetchFriends();
   }, [fetchFriends]);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      if (!auth.currentUser) return;
+
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        const friendIds = userData.friends || [];
+
+        const friendsData = await Promise.all(
+          friendIds.map(async (friendId) => {
+            const friendRef = doc(db, 'users', friendId);
+            const friendSnap = await getDoc(friendRef);
+            if (friendSnap.exists()) {
+              const friendData = friendSnap.data();
+              
+              // Check if friend is on a quest
+              const activeQuestQuery = query(
+                collection(db, 'quests'),
+                where('uid', '==', friendId),
+                where('status', '==', 'accepted')
+              );
+              const activeQuestSnap = await getDocs(activeQuestQuery);
+              
+              let questStatus = 'Idle';
+              let questPartner = null;
+              
+              if (!activeQuestSnap.empty) {
+                const questData = activeQuestSnap.docs[0].data();
+                questStatus = 'On a quest';
+                if (questData.targetUser) {
+                  const partnerSnap = await getDoc(doc(db, 'users', questData.targetUser));
+                  if (partnerSnap.exists()) {
+                    questPartner = partnerSnap.data();
+                  }
+                }
+              }
+
+              return {
+                id: friendId,
+                name: friendData.name,
+                username: friendData.username,
+                profilePhoto: friendData.profilePhoto,
+                status: questStatus,
+                questPartner: questPartner
+              };
+            }
+            return null;
+          })
+        );
+
+        setFriends(friendsData.filter(friend => friend !== null));
+      }
+    };
+
+    fetchFriends();
+  }, []);
 
   const showSection = useCallback((sectionId) => {
     setActiveSection(prevSection => {
@@ -324,7 +385,7 @@ const HomeScreen = React.memo(() => {
           <img src={user.profilePhoto || '/default-profile-image.jpg'} alt={user.name} className="card-user-avatar" />
           <span className="card-username">{user.name}</span>
         </div>
-      </div>
+        </div>
     );
   });
 
@@ -495,22 +556,35 @@ const HomeScreen = React.memo(() => {
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">
             <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
-                        </Badge>
+            </Badge>
           </IconButton>
           <IconButton onClick={toggleTheme}>
           <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-icon" />        
-            </IconButton>
+          </IconButton>
         </div>
       </div>
-      <div className = "mid-bar"> 
-        <div className="friends-display">
-          <div className="profile-photo-container">
-            <img src='/profile.png' className="profile-photo" alt="default profile"></img>
-          </div>
-          <div className = "profile-name-status">
-            <div className = "friends-display-name">Nova</div>
-            <div className = "friends-display-status">On a quest</div>
-          </div>
+      <div className="mid-bar">
+        <div className="friends-list">
+          {friends.map((friend) => (
+            <div key={friend.id} className="friend-item">
+              <div className="friend-photo-container">
+                <img src={friend.profilePhoto || '/default-profile-image.jpg'} alt={friend.name} className="friend-photo" />
+              </div>
+              <div className="friend-info">
+                <div className="friend-name">{friend.name}</div>
+                <div className="friend-username">@{friend.username}</div>
+                <div className={`friend-status ${friend.status === 'Idle' ? 'idle' : 'on-quest'}`}>
+                  {friend.status}
+                  {friend.status === 'On a quest' && friend.questPartner && (
+                    <span className="quest-partner">
+                      with <img src={friend.questPartner.profilePhoto || '/default-profile-image.jpg'} alt={friend.questPartner.name} className="partner-photo" />
+                      @{friend.questPartner.username}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -597,7 +671,7 @@ const HomeScreen = React.memo(() => {
         )}
       </AnimatePresence>
     </div>
-  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution]);
+  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution, friends]);
 
   const renderFullMap = useCallback(() => (
     <div className="full-map-container">

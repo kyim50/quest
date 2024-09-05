@@ -63,7 +63,6 @@ body.light-mode .nav-bar {
   transition: background-color 0.3s, border-color 0.3s;
 }
 
-
 body.light-mode .top-bar {
   background-color: #ffffff;
   border-bottom-color: #e0e0e0;
@@ -80,47 +79,101 @@ body.light-mode .top-bar {
   gap: 15px;
 }
 
-/*Mid bar styles*/
-.mid-bar{
+/* Mid bar styles */
+.mid-bar {
   display: flex;
-  flex-wrap: wrap;
   width: 100%;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 5px;
-  overflow-y: scroll;
-}
-.friends-display{
-  display: flex;
-  border-radius: 25px;
-  background-color: rgb(50, 50, 54);
   padding: 10px;
-  margin: 0 5px;
+  overflow-x: auto;
+  background-color: #121214;
+  border-bottom: 1px solid rgb(38, 38, 40);
 }
-.friends-display-photo-wrapper{
-  width: 60px;
-  height: 60px;
-  margin-right: 15px;
+
+body.light-mode .mid-bar {
+  background-color: #f0f0f0;
+  border-bottom-color: #e0e0e0;
+}
+
+.friends-list {
+  display: flex;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  background-color: rgb(38, 38, 40);
+  border-radius: 15px;
+  padding: 10px;
+  min-width: 200px;
+  transition: background-color 0.3s;
+}
+
+body.light-mode .friend-item {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.friend-photo-container {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
   overflow: hidden;
   border-radius: 50%;
 }
-.friends-display-photo{
 
+.friend-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.friends-display-name{
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0;
-  color: #ffffff;
-  transition: color 0.3s;
+
+.friend-info {
+  display: flex;
+  flex-direction: column;
 }
-.friends-display-status{
+
+.friend-name {
   font-size: 16px;
-  color: #ccc5b9;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+body.light-mode .friend-name {
+  color: #333333;
+}
+
+.friend-username {
+  font-size: 14px;
+  color: #999999;
+}
+
+.friend-status {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.friend-status.idle {
+  color: #4CAF50;
+}
+
+.friend-status.on-quest {
+  color: #FFC107;
+}
+
+.quest-partner {
   display: flex;
   align-items: center;
-  margin: 5px 0 0;
-  transition: color 0.3s;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.partner-photo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: 0 5px;
 }
 
 /* Profile display styles */
@@ -205,9 +258,6 @@ body.light-mode .search-bar-home .MuiOutlinedInput-input {
   color: #333333;
 }
 
-
-
-
 /* Main area styles */
 .main-area {
   display: flex;
@@ -245,8 +295,6 @@ body.light-mode .search-bar-home .MuiOutlinedInput-input {
   overflow: hidden;
   position: relative;
 }
-
-
 
 .camera-placeholder {
   display: flex;
@@ -517,8 +565,6 @@ body.light-mode .image-preview-sidebar {
   margin-bottom: 20px;
   font-weight: bold;
 }
-
-
 
 .comments-section {
   flex-grow: 1;
@@ -1107,7 +1153,7 @@ body.light-mode .full-image-container {
 
 .card-outline {
   position: absolute;
-  border: 2px solid white;
+  border:2px solid white;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
   cursor: grab;
   transition: all 0.3s ease;
@@ -1571,4 +1617,26 @@ body.light-mode hr {
 
 body.light-mode .top-bar-icon {
   filter: none;
+}
+
+/* Scrollbar styles for the mid-bar */
+.mid-bar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.mid-bar::-webkit-scrollbar-track {
+  background: rgb(18, 18, 20);
+}
+
+.mid-bar::-webkit-scrollbar-thumb {
+  background-color: rgb(58, 58, 60);
+  border-radius: 3px;
+}
+
+body.light-mode .mid-bar::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+body.light-mode .mid-bar::-webkit-scrollbar-thumb {
+  background-color: #999999;
 }

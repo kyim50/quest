@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { auth, uploadImage, updateUserProfile, fetchUserData, db } from '../firebase';
 import { useNotification } from '../NotificationContext';
+import { useUserStatus } from '../components/UserStatusContext';
 import { Privacy } from './Privacy';
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, limit, doc, onSnapshot } from 'firebase/firestore';
 import '../styles/profile.css';
 
 const UserProfile = ({ handleLogout }) => {
@@ -10,7 +11,6 @@ const UserProfile = ({ handleLogout }) => {
   const [name, setName] = useState('Default Name');
   const [username, setUsername] = useState('default_username');
   const [bio, setBio] = useState('Default Bio');
-  const [status, setStatus] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -20,6 +20,7 @@ const UserProfile = ({ handleLogout }) => {
   const [activeQuest, setActiveQuest] = useState(null);
   const fileInputRef = useRef(null);
   const { showNotification } = useNotification();
+  const { userStatus } = useUserStatus();
 
   const predefinedTags = [
     { img: '/education.png', value: 'education' },
@@ -29,9 +30,11 @@ const UserProfile = ({ handleLogout }) => {
   ];
 
   useEffect(() => {
-    fetchUserDataAndUpdate();
-    fetchRecentQuests();
-    fetchActiveQuest();
+    if (auth.currentUser) {
+      fetchUserDataAndUpdate();
+      fetchRecentQuests();
+      fetchActiveQuest();
+    }
   }, []);
 
   const fetchUserDataAndUpdate = async () => {
@@ -42,16 +45,18 @@ const UserProfile = ({ handleLogout }) => {
         setUsername(userData.username || 'default_username');
         setProfilePhoto(userData.profilePhoto || 'placeholder.jpg');
         setBio(userData.bio || 'Default Bio');
-        setStatus(userData.status || '');
         setIsPrivate(userData.isPrivate || false);
         setTags(userData.tags || []);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      showNotification('Failed to load user data', 'error');
     }
   };
 
   const fetchRecentQuests = async () => {
+    if (!auth.currentUser) return;
+
     try {
       const questsQuery = query(
         collection(db, 'quests'),
@@ -64,10 +69,13 @@ const UserProfile = ({ handleLogout }) => {
       setRecentQuests(quests);
     } catch (error) {
       console.error('Error fetching recent quests:', error);
+      showNotification('Failed to load recent quests', 'error');
     }
   };
 
   const fetchActiveQuest = async () => {
+    if (!auth.currentUser) return;
+
     try {
       const activeQuestQuery = query(
         collection(db, 'quests'),
@@ -77,18 +85,23 @@ const UserProfile = ({ handleLogout }) => {
       const activeQuestSnapshot = await getDocs(activeQuestQuery);
       if (!activeQuestSnapshot.empty) {
         const activeQuestData = activeQuestSnapshot.docs[0].data();
-        const partnerUserData = await fetchUserData(activeQuestData.targetUser);
-        setActiveQuest({
-          ...activeQuestData,
-          partnerName: partnerUserData.name,
-          partnerPhoto: partnerUserData.profilePhoto,
-          partnerUsername: partnerUserData.username
-        });
+        if (activeQuestData.targetUser) {
+          const partnerUserData = await fetchUserData(activeQuestData.targetUser);
+          setActiveQuest({
+            ...activeQuestData,
+            partnerName: partnerUserData?.name || 'Unknown',
+            partnerPhoto: partnerUserData?.profilePhoto || 'placeholder.jpg',
+            partnerUsername: partnerUserData?.username || 'unknown_user'
+          });
+        } else {
+          setActiveQuest(activeQuestData);
+        }
       } else {
         setActiveQuest(null);
       }
     } catch (error) {
       console.error('Error fetching active quest:', error);
+      showNotification('Failed to load active quest', 'error');
     }
   };
 
@@ -96,8 +109,10 @@ const UserProfile = ({ handleLogout }) => {
     setIsPrivate(newPrivacyMode);
     try {
       await updateUserProfile(auth.currentUser.uid, { isPrivate: newPrivacyMode });
+      showNotification('Privacy settings updated', 'success');
     } catch (error) {
       console.error('Error updating privacy mode:', error);
+      showNotification('Failed to update privacy settings', 'error');
     }
   };
 
@@ -146,18 +161,44 @@ const UserProfile = ({ handleLogout }) => {
     if (tags.length < 3 && !tags.includes(tag)) {
       const updatedTags = [...tags, tag];
       setTags(updatedTags);
-      await updateUserProfile(auth.currentUser.uid, { tags: updatedTags });
+      try {
+        await updateUserProfile(auth.currentUser.uid, { tags: updatedTags });
+        showNotification('Tag added successfully', 'success');
+      } catch (error) {
+        console.error('Error adding tag:', error);
+        showNotification('Failed to add tag', 'error');
+      }
     }
   };
 
   const handleRemoveTag = async (tag) => {
     const updatedTags = tags.filter((t) => t !== tag);
     setTags(updatedTags);
-    await updateUserProfile(auth.currentUser.uid, { tags: updatedTags });
+    try {
+      await updateUserProfile(auth.currentUser.uid, { tags: updatedTags });
+      showNotification('Tag removed successfully', 'success');
+    } catch (error) {
+      console.error('Error removing tag:', error);
+      showNotification('Failed to remove tag', 'error');
+    }
   };
 
   const toggleTagOptions = () => {
     setShowTagOptions(!showTagOptions);
+  };
+
+  const getStatusColor = () => {
+    switch (userStatus) {
+      case 'online':
+        return 'green';
+      case 'idle':
+        return 'yellow';
+      case 'on quest':
+        return 'red';
+      case 'offline':
+      default:
+        return 'grey';
+    }
   };
 
   return (
@@ -175,7 +216,10 @@ const UserProfile = ({ handleLogout }) => {
         <div className="profile-name-status">
           <h2 className="profile-name">{name}</h2>
           <p className="profile-username">@{username}</p>
-          <p className="profile-status"><span className="status-dot"></span> Active</p>
+          <p className="profile-status">
+            <span className={`status-dot ${getStatusColor()}`}></span>
+            {userStatus.charAt(0).toUpperCase() + userStatus.slice(1)}
+          </p>
         </div>
         <div className="privacy-icon">
           <Privacy isPrivate={isPrivate} onPrivacyChange={handlePrivacyModeChange} />
@@ -239,7 +283,7 @@ const UserProfile = ({ handleLogout }) => {
         <div className="tags-container">
           {tags.map((tag) => (
             <div key={tag} className="tag">
-              <img src={predefinedTags.find(t => t.value === tag).img} alt={tag} className="tag-icon" />
+              <img src={predefinedTags.find(t => t.value === tag)?.img || '/other.png'} alt={tag} className="tag-icon" />
               <button onClick={() => handleRemoveTag(tag)}>x</button>
             </div>
           ))}
@@ -251,10 +295,12 @@ const UserProfile = ({ handleLogout }) => {
         {activeQuest ? (
           <div className="quest-item">
             <p>"{activeQuest.title}" with</p>
-            <div className="quest-partner">
-              <img src={activeQuest.partnerPhoto} alt={activeQuest.partnerName} className="partner-photo" />
-              <p>{activeQuest.partnerName} @{activeQuest.partnerUsername}</p>
-            </div>
+            {activeQuest.partnerName && (
+              <div className="quest-partner">
+                <img src={activeQuest.partnerPhoto || 'placeholder.jpg'} alt={activeQuest.partnerName} className="partner-photo" />
+                <p>{activeQuest.partnerName} @{activeQuest.partnerUsername}</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="no-quests">
@@ -269,7 +315,7 @@ const UserProfile = ({ handleLogout }) => {
           recentQuests.map(quest => (
             <div key={quest.id} className="quest-item">
               <p>{quest.title}</p>
-              <p>with {quest.targetUser.name}</p>
+              {quest.targetUser && <p>with {typeof quest.targetUser === 'string' ? quest.targetUser : (quest.targetUser.name || 'Unknown User')}</p>}
             </div>
           ))
         ) : (

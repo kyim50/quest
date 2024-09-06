@@ -124,15 +124,32 @@
 .profile-status {
     font-size: 14px;
     color: var(--secondary-text-color);
+    display: flex;
+    align-items: center;
 }
 
 .status-dot {
     width: 10px;
     height: 10px;
-    background-color: rgb(57, 93, 123);
     border-radius: 50%;
     display: inline-block;
     margin-right: 8px;
+}
+
+.status-dot.green {
+    background-color: #2ecc71;
+}
+
+.status-dot.yellow {
+    background-color: #f1c40f;
+}
+
+.status-dot.red {
+    background-color: #e74c3c;
+}
+
+.status-dot.grey {
+    background-color: #95a5a6;
 }
 
 .privacy-icon {

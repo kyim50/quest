@@ -2,10 +2,14 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { setupUserLocationsListener, trackUserLocation, centerMapOnUser } from './UserLocationService';
 import QuestsComponent from './QuestsComponent';
+import { getCurrentTheme, initializeTheme } from '../theme-toggle';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
 mapboxgl.accessToken = MAPBOX_TOKEN;
+
+const darkMapStyle = 'mapbox://styles/kyim50/clzniqnmq009s01qgee0a13s0'; // Your current dark style
+const lightMapStyle = 'mapbox://styles/mapbox/light-v10'; // Example light style, replace with your custom light style if you have one
 
 const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSection, lockedUser, showAddressBar, isFullScreen }) => {
   const mapContainerRef = useRef(null);
@@ -17,9 +21,10 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
   const initializeMap = useCallback(() => {
     if (!mapInstanceRef.current) {
       const savedState = JSON.parse(localStorage.getItem('mapState'));
+      const currentTheme = getCurrentTheme();
       mapInstanceRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: 'mapbox://styles/kyim50/clzniqnmq009s01qgee0a13s0',
+        style: currentTheme === 'light' ? lightMapStyle : darkMapStyle,
         center: savedState?.center || [0, 0],
         zoom: savedState?.zoom || 2,
         attributionControl: false,
@@ -28,6 +33,7 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
       mapInstanceRef.current.on('load', () => {
         setMapLoaded(true);
         setMap(mapInstanceRef.current);
+        window.currentMap = mapInstanceRef.current; // Store map instance globally for theme-toggle.js
       });
 
       mapInstanceRef.current.on('moveend', () => {
@@ -40,6 +46,7 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
 
   useEffect(() => {
     initializeMap();
+    initializeTheme(); // Initialize theme from theme-toggle.js
     return () => {
       if (mapInstanceRef.current) {
         const center = mapInstanceRef.current.getCenter();
@@ -47,9 +54,24 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
         localStorage.setItem('mapState', JSON.stringify({ center, zoom }));
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
+        window.currentMap = null; // Clear global reference
       }
     };
   }, [initializeMap]);
+
+  useEffect(() => {
+    const handleThemeChange = (event) => {
+      const { isLightMode } = event.detail;
+      if (mapInstanceRef.current && mapLoaded) {
+        mapInstanceRef.current.setStyle(isLightMode ? lightMapStyle : darkMapStyle);
+      }
+    };
+
+    window.addEventListener('themeChanged', handleThemeChange);
+    return () => {
+      window.removeEventListener('themeChanged', handleThemeChange);
+    };
+  }, [mapLoaded]);
 
   useEffect(() => {
     let unsubscribe;

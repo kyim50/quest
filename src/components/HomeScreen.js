@@ -65,12 +65,16 @@ const HomeScreen = React.memo(() => {
         if (userData) {
           setCurrentUser({ uid: user.uid, ...userData });
           setUserProfileData(userData);
+          fetchFriends(user.uid);
+          fetchGridData(user.uid);
         } else {
           console.error("User document not found");
         }
       } else {
         setCurrentUser(null);
         setUserProfileData(null);
+        setFriends([]);
+        setGridData([]);
       }
       setIsLoading(false);
     });
@@ -94,80 +98,97 @@ const HomeScreen = React.memo(() => {
     return () => window.removeEventListener('resize', updateCameraResolution);
   }, []);
 
-  const fetchFriends = useCallback(async () => {
-    if (auth.currentUser) {
-      const userDocRef = doc(db, 'users', auth.currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      const userData = userDoc.data();
-      if (userData && userData.friends) {
-        setFriendsList(userData.friends);
-      }
+  const fetchFriends = useCallback(async (userId) => {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      const friendIds = userData.friends || [];
+
+      const friendsData = await Promise.all(
+        friendIds.map(async (friendId) => {
+          const friendRef = doc(db, 'users', friendId);
+          const friendSnap = await getDoc(friendRef);
+          if (friendSnap.exists()) {
+            const friendData = friendSnap.data();
+            
+            const activeQuestQuery = query(
+              collection(db, 'quests'),
+              where('uid', '==', friendId),
+              where('status', '==', 'accepted')
+            );
+            const activeQuestSnap = await getDocs(activeQuestQuery);
+            
+            let questStatus = 'Idle';
+            let questPartner = null;
+            
+            if (!activeQuestSnap.empty) {
+              const questData = activeQuestSnap.docs[0].data();
+              questStatus = 'On a quest';
+              if (questData.targetUser) {
+                const partnerSnap = await getDoc(doc(db, 'users', questData.targetUser));
+                if (partnerSnap.exists()) {
+                  questPartner = partnerSnap.data();
+                }
+              }
+            }
+
+            return {
+              id: friendId,
+              name: friendData.name,
+              username: friendData.username,
+              profilePhoto: friendData.profilePhoto,
+              status: questStatus,
+              questPartner: questPartner
+            };
+          }
+          return null;
+        })
+      );
+
+      setFriends(friendsData.filter(friend => friend !== null));
     }
   }, []);
-
-  useEffect(() => {
-    fetchFriends();
-  }, [fetchFriends]);
-
-  useEffect(() => {
-    const fetchFriends = async () => {
-      if (!auth.currentUser) return;
-
-      const userRef = doc(db, 'users', auth.currentUser.uid);
+  
+  const fetchGridData = useCallback(async (userId) => {
+    if (!userId) return;
+    
+    try {
+      const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {
         const userData = userSnap.data();
         const friendIds = userData.friends || [];
-
-        const friendsData = await Promise.all(
-          friendIds.map(async (friendId) => {
-            const friendRef = doc(db, 'users', friendId);
-            const friendSnap = await getDoc(friendRef);
-            if (friendSnap.exists()) {
-              const friendData = friendSnap.data();
-              
-              // Check if friend is on a quest
-              const activeQuestQuery = query(
-                collection(db, 'quests'),
-                where('uid', '==', friendId),
-                where('status', '==', 'accepted')
-              );
-              const activeQuestSnap = await getDocs(activeQuestQuery);
-              
-              let questStatus = 'Idle';
-              let questPartner = null;
-              
-              if (!activeQuestSnap.empty) {
-                const questData = activeQuestSnap.docs[0].data();
-                questStatus = 'On a quest';
-                if (questData.targetUser) {
-                  const partnerSnap = await getDoc(doc(db, 'users', questData.targetUser));
-                  if (partnerSnap.exists()) {
-                    questPartner = partnerSnap.data();
-                  }
-                }
-              }
-
-              return {
-                id: friendId,
-                name: friendData.name,
-                username: friendData.username,
-                profilePhoto: friendData.profilePhoto,
-                status: questStatus,
-                questPartner: questPartner
-              };
-            }
-            return null;
-          })
+        
+        const photosRef = collection(db, 'photos');
+        const q = query(
+          photosRef,
+          where('userId', 'in', [userId, ...friendIds]),
+          orderBy('timestamp', 'desc')
         );
-
-        setFriends(friendsData.filter(friend => friend !== null));
+        const photosSnapshot = await getDocs(q);
+        const photos = await Promise.all(photosSnapshot.docs.map(async doc => {
+          const photoData = doc.data();
+          const userData = await fetchUserData(photoData.userId);
+          return { 
+            id: doc.id, 
+            ...photoData, 
+            username: userData?.name || 'Unknown User',
+            user: {
+              name: userData?.name || 'Unknown User',
+              profilePhoto: userData?.profilePhoto || '/default-profile-image.jpg'
+            }
+          };
+        }));
+        setGridData(photos);
       }
-    };
-
-    fetchFriends();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching grid data:', error);
+      showNotification('Failed to load posts. Please try again.');
+    }
+  }, [fetchUserData, showNotification]);
 
   const showSection = useCallback((sectionId) => {
     setActiveSection(prevSection => {
@@ -310,24 +331,24 @@ const HomeScreen = React.memo(() => {
           size: size, 
           caption: captionText,
           cropInfo: cropInfo,
-          timestamp: new Date(),
+          timestamp: serverTimestamp(),
         };
         
-        await setDoc(photoRef, {
-          ...newPhoto,
-          timestamp: serverTimestamp(),
-        }, { merge: true });
+        await setDoc(photoRef, newPhoto);
         
         showNotification('Photo uploaded successfully');
         setPhotoPreview(null);
         setCaption('');
         setGridData(prev => [newPhoto, ...prev]);
+        
+        // Fetch updated data immediately after upload
+        fetchGridData();
       } catch (error) {
         console.error('Error uploading photo:', error);
         showNotification('Failed to upload photo. Please try again.');
       }
     }
-  }, [auth.currentUser, photoPreview, currentUser, showNotification]);
+  }, [auth.currentUser, photoPreview, currentUser, showNotification, fetchGridData]);
 
   const handleDeletePost = useCallback(async () => {
     if (selectedImage && selectedImage.userId === auth.currentUser.uid) {
@@ -336,12 +357,15 @@ const HomeScreen = React.memo(() => {
         setShowImagePreview(false);
         setGridData(prev => prev.filter(item => item.id !== selectedImage.id));
         showNotification('Post deleted successfully');
+        
+        // Fetch updated data immediately after deletion
+        fetchGridData();
       } catch (error) {
         console.error('Error deleting post:', error);
         showNotification('Failed to delete post. Please try again.');
       }
     }
-  }, [selectedImage, showNotification]);
+  }, [selectedImage, showNotification, fetchGridData]);
 
   const toggleNotifications = useCallback(() => setShowNotifications(prev => !prev), []);
   const clearNotifications = useCallback(() => setNotifications([]), []);
@@ -356,7 +380,7 @@ const HomeScreen = React.memo(() => {
         />
       </div>
       <div className="profile-name-status">
-        <h2 className="profile-name">{currentUser?.name || 'Loading...'}</h2>
+      <h2 className="profile-name">{currentUser?.name || 'Loading...'}</h2>
         <p className="profile-status">
           <span className="status-dot"></span>
           Active now
@@ -385,7 +409,7 @@ const HomeScreen = React.memo(() => {
           <img src={user.profilePhoto || '/default-profile-image.jpg'} alt={user.name} className="card-user-avatar" />
           <span className="card-username">{user.name}</span>
         </div>
-        </div>
+      </div>
     );
   });
 
@@ -480,39 +504,7 @@ const HomeScreen = React.memo(() => {
       });
 
       return () => unsubscribe();
-    }, [friendsList]);
-
-    const fetchGridData = useCallback(async () => {
-      if (auth.currentUser) {
-        const photosRef = collection(db, 'photos');
-        const q = query(
-          photosRef,
-          where('userId', 'in', [auth.currentUser.uid, ...friendsList]),
-          orderBy('timestamp', 'desc')
-        );
-        const photosSnapshot = await getDocs(q);
-        const photos = await Promise.all(photosSnapshot.docs.map(async doc => {
-          const photoData = doc.data();
-          const userData = await fetchUserData(photoData.userId);
-          return { 
-            id: doc.id, 
-            ...photoData, 
-            username: userData.name,
-            user: {
-              name: userData.name,
-              profilePhoto: userData.profilePhoto
-            }
-          };
-        }));
-        setGridData(photos);
-      }
-    }, [friendsList]);
-
-    useEffect(() => {
-      if (friendsList.length > 0) {
-        fetchGridData();
-      }
-    }, [friendsList, fetchGridData]);
+    }, []);
 
     if (isLoading) {
       return <div>Loading...</div>;
@@ -543,6 +535,7 @@ const HomeScreen = React.memo(() => {
             className="search-bar-home"
             placeholder="Search..."
             variant="outlined"
+            fullWidth
             InputProps={{
               startAdornment: (
                 <IconButton>
@@ -555,36 +548,39 @@ const HomeScreen = React.memo(() => {
         <div className="top-bar-right">
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">
-            <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
+              <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
             </Badge>
           </IconButton>
           <IconButton onClick={toggleTheme}>
-          <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-icon" />        
+            <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-icon" />        
           </IconButton>
         </div>
       </div>
-      <div className="mid-bar">
-        <div className="friends-list">
-          {friends.map((friend) => (
-            <div key={friend.id} className="friend-item">
-              <div className="friend-photo-container">
-                <img src={friend.profilePhoto || '/default-profile-image.jpg'} alt={friend.name} className="friend-photo" />
-              </div>
-              <div className="friend-info">
-                <div className="friend-name">{friend.name}</div>
-                <div className="friend-username">@{friend.username}</div>
-                <div className={`friend-status ${friend.status === 'Idle' ? 'idle' : 'on-quest'}`}>
-                  {friend.status}
-                  {friend.status === 'On a quest' && friend.questPartner && (
-                    <span className="quest-partner">
-                      with <img src={friend.questPartner.profilePhoto || '/default-profile-image.jpg'} alt={friend.questPartner.name} className="partner-photo" />
-                      @{friend.questPartner.username}
-                    </span>
-                  )}
+      <div className="friends-bar">
+        <div className="friends-list-container">
+          <h3 className="friends-list-title">Friends</h3>
+          <div className="friends-list">
+            {friends.map((friend) => (
+              <div key={friend.id} className="friend-item">
+                <div className="friend-photo-container">
+                  <img src={friend.profilePhoto || '/default-profile-image.jpg'} alt={friend.name} className="friend-photo" />
+                </div>
+                <div className="friend-info">
+                  <div className="friend-name">{friend.name}</div>
+                  <div className="friend-username">@{friend.username}</div>
+                  <div className={`friend-status ${friend.status === 'Idle' ? 'idle' : 'on-quest'}`}>
+                    {friend.status}
+                    {friend.status === 'On a quest' && friend.questPartner && (
+                      <span className="quest-partner">
+                        with <img src={friend.questPartner.profilePhoto || '/default-profile-image.jpg'} alt={friend.questPartner.name} className="partner-photo" />
+                        @{friend.questPartner.username}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 

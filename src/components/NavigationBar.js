@@ -1,8 +1,9 @@
 import React from 'react';
-import '../styles/mapstyles.css';
+import '../styles/HomeScreen.css';
 
-const NavigationBar = ({ activeSection, showSection }) => {
+const NavigationBar = ({ activeSection, showSection, logo, title }) => {
   const navItems = [
+    { id: 'home', icon: '/home.png', label: 'Home' },
     { id: 'profile', icon: '/profile.png', label: 'Profile' },
     { id: 'connections', icon: '/connections.png', label: 'Connections' },
     { id: 'quests', icon: '/quest.png', label: 'Quests' },
@@ -13,11 +14,11 @@ const NavigationBar = ({ activeSection, showSection }) => {
     <div className="nav-bar">
       <div className="nav-header">
         <img 
-          src="Questslogo blue.png" 
+          src={logo}
           alt="Quests Logo" 
           className="qlogo" 
-          onClick={() => showSection('home')}
         />
+        <span className="nav-title">{title}</span>
       </div>
       <nav>
         {navItems.map((item) => (

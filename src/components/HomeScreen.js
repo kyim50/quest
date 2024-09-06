@@ -556,31 +556,30 @@ const HomeScreen = React.memo(() => {
           </IconButton>
         </div>
       </div>
-      <div className="friends-bar">
-        <div className="friends-list-container">
-          <h3 className="friends-list-title">Friends</h3>
-          <div className="friends-list">
-            {friends.map((friend) => (
-              <div key={friend.id} className="friend-item">
-                <div className="friend-photo-container">
-                  <img src={friend.profilePhoto || '/default-profile-image.jpg'} alt={friend.name} className="friend-photo" />
-                </div>
-                <div className="friend-info">
-                  <div className="friend-name">{friend.name}</div>
-                  <div className="friend-username">@{friend.username}</div>
-                  <div className={`friend-status ${friend.status === 'Idle' ? 'idle' : 'on-quest'}`}>
-                    {friend.status}
-                    {friend.status === 'On a quest' && friend.questPartner && (
-                      <span className="quest-partner">
-                        with <img src={friend.questPartner.profilePhoto || '/default-profile-image.jpg'} alt={friend.questPartner.name} className="partner-photo" />
-                        @{friend.questPartner.username}
-                      </span>
-                    )}
-                  </div>
+
+      <div className="section-container">
+        <h2 className="section-title">Friends</h2>
+        <div className="friends-list">
+          {friends.map((friend) => (
+            <div key={friend.id} className="friend-item">
+              <div className="friend-photo-container">
+                <img src={friend.profilePhoto || '/default-profile-image.jpg'} alt={friend.name} className="friend-photo" />
+              </div>
+              <div className="friend-info">
+                <div className="friend-name">{friend.name}</div>
+                <div className="friend-username">@{friend.username}</div>
+                <div className={`friend-status ${friend.status === 'Idle' ? 'idle' : 'on-quest'}`}>
+                  {friend.status}
+                  {friend.status === 'On a quest' && friend.questPartner && (
+                    <span className="quest-partner">
+                      with <img src={friend.questPartner.profilePhoto || '/default-profile-image.jpg'} alt={friend.questPartner.name} className="partner-photo" />
+                      @{friend.questPartner.username}
+                    </span>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -596,50 +595,56 @@ const HomeScreen = React.memo(() => {
 
       <div className="main-area">
         <div className="grid-area">
-          <PinterestLayout />
+          <div className="section-container">
+            <h2 className="section-title">Feed</h2>
+            <PinterestLayout />
+          </div>
         </div>
         <div className="side-area">
-          <div className="camera-map-area">
-            {showCamera ? (
-              <div className="camera-container">
-                <Camera
-                  ref={cameraRef}
-                  facingMode={facingMode}
-                  aspectRatio="cover"
-                  errorMessages={{}}
-                  videoSourceDeviceId={undefined}
-                  numberOfCamerasCallback={(i) => console.log(i)}
-                  videoResolution={cameraResolution}
-                />
-                <div className="camera-controls">
-                  <IconButton onClick={toggleCamera} className="back-button">
-                    <ArrowBack />
-                  </IconButton>
-                  <IconButton onClick={handleCapture} className="capture-button">
-                    <div className="capture-button-inner" />
-                  </IconButton>
-                  <IconButton onClick={handleFlipCamera} className="flip-button">
-                    <Refresh />
-                  </IconButton>
+          <div className="section-container">
+            <h2 className="section-title">Camera & Map</h2>
+            <div className="camera-map-area">
+              {showCamera ? (
+                <div className="camera-container">
+                  <Camera
+                    ref={cameraRef}
+                    facingMode={facingMode}
+                    aspectRatio="cover"
+                    errorMessages={{}}
+                    videoSourceDeviceId={undefined}
+                    numberOfCamerasCallback={(i) => console.log(i)}
+                    videoResolution={cameraResolution}
+                  />
+                  <div className="camera-controls">
+                    <IconButton onClick={toggleCamera} className="back-button">
+                      <ArrowBack />
+                    </IconButton>
+                    <IconButton onClick={handleCapture} className="capture-button">
+                      <div className="capture-button-inner" />
+                    </IconButton>
+                    <IconButton onClick={handleFlipCamera} className="flip-button">
+                      <Refresh />
+                    </IconButton>
+                  </div>
                 </div>
+              ) : (
+                <div className="camera-placeholder" onClick={toggleCamera}>
+                  <CameraAlt />
+                  <span>Open Camera</span>
+                </div>
+              )}
+              <div className="mini-map" onClick={toggleFullMap}>
+                <MapComponent 
+                  address={address} 
+                  setAddress={setAddress} 
+                  setCurrentUserIds={setCurrentUserIds}
+                  setMap={setMap}
+                  activeSection={activeSection}
+                  lockedUser={lockedUser}
+                  showAddressBar={false}
+                  isFullScreen={false}
+                />
               </div>
-            ) : (
-              <div className="camera-placeholder" onClick={toggleCamera}>
-                <CameraAlt />
-                <span>Open Camera</span>
-              </div>
-            )}
-            <div className="mini-map" onClick={toggleFullMap}>
-              <MapComponent 
-                address={address} 
-                setAddress={setAddress} 
-                setCurrentUserIds={setCurrentUserIds}
-                setMap={setMap}
-                activeSection={activeSection}
-                lockedUser={lockedUser}
-                showAddressBar={false}
-                isFullScreen={false}
-              />
             </div>
           </div>
         </div>
@@ -746,7 +751,9 @@ const HomeScreen = React.memo(() => {
     <div className="home-screen-container2">
       <NavigationBar 
         activeSection={activeSection} 
-        showSection={showSection} 
+        showSection={showSection}
+        logo="Questslogo blue.png"
+        title="QUESTS"
       />
       <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}

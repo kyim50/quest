@@ -1,153 +1,195 @@
+:root {
+  /* Dark theme variables */
+  --dark-background: rgb(38, 38, 40);
+  --dark-text: #fffcf2;
+  --dark-section-background: rgb(48, 48, 50);
+  --dark-input-background: rgb(58, 58, 60);
+  --dark-border: #ccc;
+  --dark-toggle-background: #ccc;
+  --dark-toggle-active: #2196F3;
+  --dark-remove-button: #ff4d4d;
+
+  /* Light theme variables */
+  --light-background: #f2f2f7;
+  --light-text: #1c1c1e;
+  --light-section-background: #ffffff;
+  --light-input-background: #e5e5ea;
+  --light-border: #c7c7cc;
+  --light-toggle-background: #e5e5ea;
+  --light-toggle-active: #34c759;
+  --light-remove-button: #ff3b30;
+
+  /* Default to dark theme */
+  --background-color: var(--dark-background);
+  --text-color: var(--dark-text);
+  --section-background: var(--dark-section-background);
+  --input-background: var(--dark-input-background);
+  --border-color: var(--dark-border);
+  --toggle-background: var(--dark-toggle-background);
+  --toggle-active: var(--dark-toggle-active);
+  --remove-button: var(--dark-remove-button);
+}
+
+/* Light mode class */
+.light-mode {
+  --background-color: var(--light-background);
+  --text-color: var(--light-text);
+  --section-background: var(--light-section-background);
+  --input-background: var(--light-input-background);
+  --border-color: var(--light-border);
+  --toggle-background: var(--light-toggle-background);
+  --toggle-active: var(--light-toggle-active);
+  --remove-button: var(--light-remove-button);
+}
+
 .privacy-container {
-    color: white;
-    font-weight: bold;
-    background-color: rgb(38, 38, 40);
-    border-radius: 20px;
-    padding: 20px;
-    width: 100%;
-    max-width: 375px;
-    height: 96vh;
-    margin: 2vh 1%;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    color: #fffcf2;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 375px;
+  height: 96vh;
+  margin: 2vh 1%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .privacy-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .privacy-container h2,
 .privacy-container h3,
 .privacy-container span {
-  color: white;
+  color: var(--text-color);
 }
 
 .privacy-section {
-    background-color: rgb(48, 48, 50);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
+  background-color: var(--section-background);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
 }
 
 .section-title1 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #fffcf2;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--text-color);
 }
 
 .privacy-option {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .privacy-option label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
 .toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-  
-  .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    transform: translateX(26px);
-  }
-  
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--toggle-background);
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--toggle-active);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
 
 .search-user {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .search-user input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: rgb(58, 58, 60);
-    color: #fffcf2;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-background);
+  color: var(--text-color);
 }
 
 .search-results {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .search-result-item, .custom-list-item {
-    display: flex;
-    align-items: center;
-    background-color: rgb(58, 58, 60);
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: var(--input-background);
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
 }
 
 .user-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 .custom-list-item button {
-    margin-left: auto;
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    cursor: pointer;
+  margin-left: auto;
+  background-color: var(--remove-button);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 /* Ensure the map expands when in the privacy section */
 .main-content.privacy-active .map-container {
-    width: calc(100% - 375px);
+  width: calc(100% - 375px);
 }

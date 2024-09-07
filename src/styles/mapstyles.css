@@ -262,17 +262,6 @@ body {
     flex-direction: column;
   }
 
-  .nav-bar {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    padding: 10px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-  }
 
   .nav-header {
     padding: 0;
@@ -414,7 +403,7 @@ body.light-mode {
 }
 
 /* Transition for smooth theme switching */
-body, .nav-bar, .nav-button, .address-bar {
+body, .nav-button, .address-bar {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 

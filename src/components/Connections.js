@@ -397,7 +397,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
           <div className="friends-section">
             <h2>Friends</h2>
             {friends.map(friend => (
-              <div key={friend.id} className="friend-item" onClick={() => handleUserClick(friend)}>
+              <div key={friend.id} className="friend-item1" onClick={() => handleUserClick(friend)}>
                 <img src={friend.profilePhoto} alt="Friend" />
                 <div>{friend.name}</div>
                 <div className="button-group">

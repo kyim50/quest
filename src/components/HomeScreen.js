@@ -558,7 +558,6 @@ const HomeScreen = React.memo(() => {
       </div>
 
       <div className="section-container">
-        <h2 className="section-title">Friends</h2>
         <div className="friends-list">
           {friends.map((friend) => (
             <div key={friend.id} className="friend-item">

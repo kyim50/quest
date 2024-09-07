@@ -39,7 +39,6 @@ body.light-mode {
   overflow: hidden;
 }
 
-
 .nav-bar:hover {
   width: 200px;
 }
@@ -1576,7 +1575,6 @@ body.light-mode .photo-upload-preview-overlay {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: background-color 0.3s;
 }
 
 body.light-mode .photo-upload-preview-container {
@@ -1597,16 +1595,17 @@ body.light-mode .photo-upload-preview-container {
   border-radius: 20px;
 }
 
-body.light-mode .full-image-container {
-  background-color: #f0f0f0;
-}
-
 .full-preview-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
   border-radius: 20px;
 }
+
+body.light-mode .full-image-container {
+  background-color: #f0f0f0;
+}
+
 
 .card-outline {
   position: absolute;
@@ -1631,7 +1630,6 @@ body.light-mode .card-outline {
   flex-direction: column;
   padding: 30px;
   background-color: #2C2C2C;
-  transition: background-color 0.3s;
 }
 
 body.light-mode .preview-controls {
@@ -1769,4 +1767,412 @@ body.light-mode .preview-controls .MuiButton-outlined {
 
 body.light-mode .preview-controls .MuiButton-outlined:hover {
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .nav-bar {
+    width: 60px;
+  }
+
+  .grid-area {
+    width: 100%;
+  }
+
+  .side-area {
+    width: 100%;
+    position: static;
+    padding: 20px;
+  }
+
+  .image-preview-content {
+    flex-direction: column;
+    height: 90%;
+  }
+
+  .image-preview-sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .pin-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-screen-container2 {
+    padding-left: 0;
+  }
+
+  .nav-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 60px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    background-color: #1a1a1a !important;
+    z-index: 9999 !important;
+    padding: 5px 0 !important;
+    border-top: 1px solid #333 !important;
+  }
+
+  /* Style each nav button */
+  .nav-button {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 5px 0 !important;
+    color: white !important;
+    text-decoration: none !important;
+    font-size: 10px !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    min-width: 0 !important; /* Ensure buttons can shrink if needed */
+  }
+
+  /* Style nav button icons */
+  .nav-button img {
+    width: 24px !important;
+    height: 24px !important;
+    margin-bottom: 4px !important;
+    filter: brightness(0) invert(1) !important; /* Ensure icons are white */
+  }
+
+  /* Hide the nav button text on mobile */
+  .nav-button span {
+    display: none !important;
+  }
+
+  /* Adjust active button styles */
+  .nav-button.active {
+    background-color: transparent !important;
+    color: #0a91ff !important;
+  }
+
+  .nav-button.active img {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(93%) saturate(1352%) hue-rotate(190deg) brightness(119%) contrast(119%) !important;
+  }
+
+  .main-content2 {
+    margin-left: 0;
+    padding-bottom: 60px !important;
+    width: 100%;
+    padding-right: 0;
+    overflow-y: auto; /* Allow scrolling */
+    height: calc(100vh - 60px); /* Full height minus nav bar */
+  }
+
+  .top-bar {
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 10px;
+    height: 50px; /* Reduced height */
+  }
+
+  .top-bar-center {
+    width: auto;
+    margin-top: 0;
+    flex-grow: 1;
+  }
+
+  .search-bar-home {
+    width: 100%;
+    max-width: none;
+  }
+
+  .search-bar-home .MuiOutlinedInput-root {
+    height: 36px; /* Smaller height */
+  }
+
+  .search-bar-home .MuiOutlinedInput-input {
+    padding: 8px 14px; /* Adjusted padding */
+    font-size: 14px; /* Smaller font size */
+  }
+
+  .top-bar-right {
+    width: auto;
+    margin-top: 0;
+  }
+
+  .top-bar-icon {
+    height: 20px; /* Smaller icons */
+  }
+
+  .main-area {
+    flex-direction: column;
+  }
+
+  .grid-area,
+  .side-area {
+    width: 100%;
+  }
+
+  .side-area {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  .camera-map-area {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: auto;
+    margin-top: 10px;
+    padding-top: 0;
+  }
+
+  .camera-container,
+  .camera-placeholder,
+  .mini-map {
+    width: 48%; /* Slightly less than 50% to account for gap */
+    height: 150px; /* Reduced height */
+    margin-bottom: 10px;
+  }
+
+  .pin-container {
+    column-count: 2;
+    column-gap: 10px;
+    padding: 10px;
+  }
+
+  .card-wrapper {
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+   /* Keep original card sizes */
+   .card.small {
+    height: 200px;
+  }
+
+  .card.medium {
+    height: 300px;
+  }
+
+  .card.large {
+    height: 400px;
+  }
+
+  .card-user-info {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .card-username {
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
+
+  .card-caption {
+    margin-left: 0;
+    margin-top: 5px;
+  }
+
+  .friends-list2 {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .friend-item {
+    min-width: 250px;
+    margin-left: 0;
+  }
+
+  .image-preview-overlay,
+  .photo-upload-preview-overlay {
+    padding: 10px;
+  }
+
+  .image-preview-content,
+  .photo-upload-preview-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  .preview-content {
+    flex-direction: column;
+  }
+
+  .full-image-container {
+    height: 50%;
+  }
+
+  .preview-controls {
+    padding: 15px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .preview-controls .MuiButton-root {
+    margin: 5px 0;
+  }
+
+  .notifications-dropdown {
+    width: 100%;
+    right: 0;
+    left: 0;
+    top: 100%;
+  }
+}
+
+/* Ensure minimum touch target size for mobile */
+@media (max-width: 768px) {
+  .card-user-info,
+  .notification-item,
+  .preview-controls .MuiButton-root,
+  .nav-button {
+    min-height: 44px;
+  }
+
+  .top-bar-icon {
+    height: 24px;
+  }
+
+  .profile-name-status {
+    display: none;
+  }
+
+  .top-bar .profile-photo-container {
+    width: 30px;
+    height: 30px;
+  }
+
+  .top-bar .profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Keep only the profile photo visible */
+  .profile-photo-container {
+    width: 20px;
+    height: 20px;
+  }
+
+  .section-title3 {
+    font-size: 16px;
+    margin-left: 10px;
+  }
+
+  .friend-item {
+    padding: 10px;
+  }
+
+  .friend-item img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .friend-name {
+    font-size: 16px;
+  }
+
+  .friend-username,
+  .friend-status {
+    font-size: 12px;
+  }
+}
+
+/* Improve scrolling on mobile */
+@media (max-width: 768px) {
+  .friends-list2,
+  .grid-area,
+  .comments-section {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Adjust font sizes for better readability on mobile */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+}
+
+/* Improve form field usability on mobile */
+@media (max-width: 768px) {
+  .MuiInputBase-root {
+    font-size: 16px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Adjust spacing for mobile */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 15px;
+  }
+
+  .comment {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+  .notification-item {
+    padding: 8px;
+  }
+}
+
+/* Ensure proper button sizing on mobile */
+@media (max-width: 768px) {
+  .MuiButton-root {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Adjust modal content for mobile */
+@media (max-width: 768px) {
+  .image-preview-content,
+  .photo-upload-preview-container {
+    width: 95%;
+    height: 95%;
+  }
+}
+
+/* Improve table responsiveness */
+@media (max-width: 768px) {
+  table {
+    font-size: 14px;
+  }
+
+  th,
+  td {
+    padding: 6px;
+  }
 }

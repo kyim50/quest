@@ -3,11 +3,11 @@ import '../styles/HomeScreen.css';
 
 const NavigationBar = ({ activeSection, showSection, logo, title }) => {
   const navItems = [
-    { id: 'home', icon: '/home.png', label: 'Home' },
-    { id: 'profile', icon: '/profile.png', label: 'Profile' },
-    { id: 'connections', icon: '/connections.png', label: 'Connections' },
-    { id: 'quests', icon: '/quest.png', label: 'Quests' },
-    { id: 'privacy', icon: '/privacy.png', label: 'Privacy' },
+    { id: 'home', icon: '/home.png', label: 'Feed' },
+    { id: 'profile', icon: '/user-avatar.png', label: 'Profile' },
+    { id: 'connections', icon: '/happy.png', label: 'Connections' },
+    { id: 'quests', icon: '/letter.png', label: 'Quests' },
+    { id: 'privacy', icon: '/privacy1.png', label: 'Privacy' },
   ];
 
   return (

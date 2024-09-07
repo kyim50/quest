@@ -129,6 +129,15 @@ body.light-mode .nav-bar {
   width: 100%;
   overflow-x: hidden;
   transition: padding-left 0.3s ease;
+  padding-right: 320px; /* To account for the fixed side area */
+}
+
+.side-area {
+  position: fixed;
+  top: 120px; /* Positioned right below the top bar */
+  right: 20px; /* Align with the right edge of the screen */
+  width: 300px; /* Adjust width as needed */
+  z-index: 900; /* Below the top bar but above other content */
 }
 
 .nav-bar:hover ~ .main-content2 {
@@ -154,7 +163,7 @@ body.light-mode .nav-bar {
   position: sticky;
   margin-left: 20px;
   top: 0;
-  z-index: 10;
+  z-index: 1000;
 }
 
 body.light-mode .top-bar {
@@ -339,13 +348,7 @@ body.light-mode .friend-status {
   width: calc(100% - 300px);
 }
 
-.side-area {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  margin-left: 20px;
-  flex-shrink: 0;
-}
+
 
 /* Camera and map area styles */
 /* Updated camera and map area styles */
@@ -427,7 +430,7 @@ body.light-mode .camera-placeholder span {
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  height: 300px;
+  height: 375px;
   margin-bottom: 15px;
 }
 

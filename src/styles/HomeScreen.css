@@ -174,14 +174,19 @@ body.light-mode .top-bar {
 }
 
 /* Friends bar styles */
-.friends-list {
+.friends-list2 {
   width: 100%;
   overflow-y: hidden;
   padding: 20px;
   transition: background-color 0.3s;
-  position: sticky;
-  top: 60px;
+  position: relative;
+  top: 0px;
   z-index: 9;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  
 }
 
 body.light-mode .friends-bar {
@@ -203,12 +208,7 @@ body.light-mode .friends-list-title {
   color: #333333;
 }
 
-.friends-list {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
+
 
 .friend-item {
   display: flex;
@@ -633,6 +633,12 @@ body.light-mode .image-preview-sidebar {
 .image-caption {
   margin-bottom: 20px;
   font-weight: bold;
+}
+.section-title3{
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-left:20px;
 }
 
 .comments-section {

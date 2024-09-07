@@ -558,7 +558,7 @@ const HomeScreen = React.memo(() => {
       </div>
 
       <div className="section-container">
-        <div className="friends-list">
+        <div className="friends-list2">
           {friends.map((friend) => (
             <div key={friend.id} className="friend-item">
               <div className="friend-photo-container">
@@ -595,7 +595,7 @@ const HomeScreen = React.memo(() => {
       <div className="main-area">
         <div className="grid-area">
           <div className="section-container">
-            <h2 className="section-title">Feed</h2>
+            <h2 className="section-title3">Feed</h2>
             <PinterestLayout />
           </div>
         </div>

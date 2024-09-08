@@ -51,7 +51,8 @@ body {
 }
 
 .content-area {
-  width: calc(60% - 250px);
+  width: 400px;
+  flex-shrink: 0;
   height: 100%;
   margin: 0 1%;
   overflow-y: auto;
@@ -73,18 +74,6 @@ body {
 #map {
   width: 100%;
   height: 100%;
-}
-
-.connections-active .content-area,
-.connections-locked-active .content-area {
-  width: 400px;
-  flex-shrink: 0;
-}
-
-.connections-active .map-container2,
-.connections-locked-active .map-container2 {
-  width: calc(100% - 420px); /* 400px for content + 20px for margins */
-  flex-grow: 0;
 }
 
 /* Profile active state */
@@ -296,4 +285,3 @@ body.light-mode ::-webkit-scrollbar-thumb {
 body.light-mode ::-webkit-scrollbar-thumb:hover {
   background: #a0a0a0;
 }
-

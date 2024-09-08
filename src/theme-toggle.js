@@ -3,7 +3,7 @@
 import mapboxgl from 'mapbox-gl';
 
 const darkTheme = {
-  '--background-color': 'rgb(33,33,33)',
+  '--background-color': 'rgb(33,33,35)',
   '--text-color': '#ffffff',
   '--accent-color': '#0a91ff',
   '--nav-background': '#1a1a1a',

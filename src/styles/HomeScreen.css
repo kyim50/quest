@@ -1810,13 +1810,13 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: inline-block !important;
   }
 
-  .top-bar-center {
-    display: block !important; /* Hide search bar to save space */
-  }
-
   .top-bar-right {
     display: flex !important;
     align-items: center !important;
+  }
+
+  .top-bar-center{
+    display: none;
   }
 
   .main-content2 {

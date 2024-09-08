@@ -545,6 +545,21 @@ const HomeScreen = React.memo(() => {
               </div>
             </div>
           </div>
+          <div className="top-bar-center">
+          <TextField
+            className="search-bar-home"
+            placeholder="Search..."
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <IconButton>
+                  <Search />
+                </IconButton>
+              ),
+            }}
+          />
+        </div>
           <div className="top-bar-right">
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">

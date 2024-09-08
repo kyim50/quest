@@ -115,6 +115,7 @@ body.light-mode .nav-bar {
 .nav-button span {
   opacity: 0;
   transition: opacity 0.3s ease;
+  color:white;
 }
 
 .nav-bar:hover .nav-button span {
@@ -1824,7 +1825,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
   }
 
   .mobile-nav-button.active {
-    color: #0a91ff !important;
+    color: white !important;
   }
 
   .mobile-nav-button.active img {

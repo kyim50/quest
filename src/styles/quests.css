@@ -1,36 +1,36 @@
 :root {
   /* Dark theme variables */
-  --dark-background: #1C1C1E;
-  --dark-text: #F0F0F5;
-  --dark-secondary-text: #A0A0A5;
-  --dark-section-background: #2C2C2E;
-  --dark-item-background: #3A3A3C;
-  --dark-input-background: #3A3A3C;
-  --dark-button-background: #007AFF;
-  --dark-button-hover: #0051A1;
-  --dark-border: #4A4A4C;
+  --dark-background: rgb(33, 33, 33);
+  --dark-text: #fffcf2;
+  --dark-secondary-text: #ccc5b9;
+  --dark-section-background: rgb(36, 36, 36);
+  --dark-input-background: rgb(58, 58, 60);
+  --dark-hover: rgb(84, 84, 85);
+  --dark-border: #333333;
+  --dark-tag-background: rgb(58, 58, 60);
+  --dark-quest-background: rgb(58, 58, 60);
 
   /* Light theme variables */
-  --light-background: #F2F2F7;
-  --light-text: #1C1C1E;
-  --light-secondary-text: #6C6C70;
-  --light-section-background: #FFFFFF;
-  --light-item-background: #F2F2F7;
-  --light-input-background: #FFFFFF;
-  --light-button-background: #007AFF;
-  --light-button-hover: #0051A1;
-  --light-border: #C7C7CC;
+  --light-background: #f0f0f0;
+  --light-text: #333333;
+  --light-secondary-text: #666666;
+  --light-section-background: #ffffff;
+  --light-input-background: #ffffff;
+  --light-hover: #e0e0e0;
+  --light-border: #cccccc;
+  --light-tag-background: #f0f0f0;
+  --light-quest-background: #f9f9f9;
 
   /* Default to dark theme */
   --background-color: var(--dark-background);
   --text-color: var(--dark-text);
   --secondary-text-color: var(--dark-secondary-text);
   --section-background: var(--dark-section-background);
-  --item-background: var(--dark-item-background);
   --input-background: var(--dark-input-background);
-  --button-background: var(--dark-button-background);
-  --button-hover: var(--dark-button-hover);
+  --hover-color: var(--dark-hover);
   --border-color: var(--dark-border);
+  --tag-background: var(--dark-tag-background);
+  --quest-background: var(--dark-quest-background);
 }
 
 /* Light mode class */

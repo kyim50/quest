@@ -911,20 +911,8 @@ body.light-mode .address-bar {
   animation: slideIn 0.3s ease-in-out;
 }
 
-/* Accessibility improvements */
-.card:focus,
-.camera-placeholder:focus,
-.mini-map:focus {
-  outline: 2px solid #4CAF50;
-  outline-offset: 2px;
-}
 
-.card:focus-visible,
-.camera-placeholder:focus-visible,
-.mini-map:focus-visible {
-  outline: 2px solid #4CAF50;
-  outline-offset: 2px;
-}
+
 
 /* Additional improvements */
 .card-caption {
@@ -1084,11 +1072,7 @@ body.light-mode .error-message {
   border-width: 0;
 }
 
-/* Focus styles for keyboard navigation */
-*:focus-visible {
-  outline: 2px solid #4CAF50;
-  outline-offset: 2px;
-}
+
 
 /* High contrast mode adjustments */
 @media (forced-colors: active) {
@@ -1182,23 +1166,15 @@ body.light-mode .MuiButton-contained {
   color: white;
 }
 
-body.light-mode .MuiButton-contained:hover {
-  background-color: #45a049;
-}
 
-.MuiButton-outlined {
-  border-color: #4CAF50;
-  color: #4CAF50;
-}
+
+
 
 .MuiButton-outlined:hover {
   background-color: rgba(76, 175, 80, 0.1);
 }
 
-body.light-mode .MuiButton-outlined {
-  border-color: #4CAF50;
-  color: #4CAF50;
-}
+
 
 body.light-mode .MuiButton-outlined:hover {
   background-color: rgba(76, 175, 80, 0.1);
@@ -1229,10 +1205,7 @@ textarea {
 }
 
 /* Improve focus styles for better accessibility */
-*:focus {
-  outline: 2px solid #4CAF50;
-  outline-offset: 2px;
-}
+
 
 /* Ensure proper text contrast in different modes */
 body.light-mode {
@@ -1667,13 +1640,7 @@ body.light-mode .preview-controls .MuiOutlinedInput-notchedOutline {
   border-radius: 25px;
 }
 
-.preview-controls .MuiButton-contained {
-  background-color: #4CAF50;
-}
 
-.preview-controls .MuiButton-contained:hover {
-  background-color: #45a049;
-}
 
 .preview-controls .MuiButton-outlined {
   border-color: white;

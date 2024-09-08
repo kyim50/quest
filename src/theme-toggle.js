@@ -3,9 +3,9 @@
 import mapboxgl from 'mapbox-gl';
 
 const darkTheme = {
-  '--background-color': '#1e1e2e',
+  '--background-color': 'rgb(33,33,33)',
   '--text-color': '#ffffff',
-  '--accent-color': '#3c68c6',
+  '--accent-color': '#0a91ff',
   '--nav-background': '#1a1a1a',
   '--card-background': '#2c2c2c',
   '--hover-color': '#3a3a3a',

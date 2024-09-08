@@ -1,25 +1,25 @@
 :root {
   /* Dark theme variables */
-  --dark-background: #1C1C1E;
-  --dark-text: #F0F0F5;
-  --dark-secondary-text: #ADADAD;
-  --dark-section-background: #2C2C2E;
-  --dark-input-background: #3E3E3E;
-  --dark-hover: #3A3A3C;
+  --dark-background: rgb(33, 33, 33);
+  --dark-text: #fffcf2;
+  --dark-secondary-text: #ccc5b9;
+  --dark-section-background: rgb(36, 36, 36);
+  --dark-input-background: rgb(58, 58, 60);
+  --dark-hover: rgb(84, 84, 85);
   --dark-border: #333333;
-  --dark-accent: #007AFF;
-  --dark-accent-hover: #0056b3;
+  --dark-tag-background: rgb(58, 58, 60);
+  --dark-quest-background: rgb(58, 58, 60);
 
   /* Light theme variables */
-  --light-background: #F5F5F5;
+  --light-background: #f0f0f0;
   --light-text: #333333;
   --light-secondary-text: #666666;
-  --light-section-background: #FFFFFF;
-  --light-input-background: #FFFFFF;
-  --light-hover: #E0E0E0;
-  --light-border: #CCCCCC;
-  --light-accent: #3c68c6;
-  --light-accent-hover: #2c4e9e;
+  --light-section-background: #ffffff;
+  --light-input-background: #ffffff;
+  --light-hover: #e0e0e0;
+  --light-border: #cccccc;
+  --light-tag-background: #f0f0f0;
+  --light-quest-background: #f9f9f9;
 
   /* Default to dark theme */
   --background-color: var(--dark-background);
@@ -29,8 +29,8 @@
   --input-background: var(--dark-input-background);
   --hover-color: var(--dark-hover);
   --border-color: var(--dark-border);
-  --accent-color: var(--dark-accent);
-  --accent-hover-color: var(--dark-accent-hover);
+  --tag-background: var(--dark-tag-background);
+  --quest-background: var(--dark-quest-background);
 }
 
 /* Light mode class */
@@ -55,6 +55,7 @@
   max-width: 450px;
   margin: 0 auto;
   padding: 20px;
+  padding-left: 40px;
   border-radius: 0;
   background-color: var(--background-color);
   color: var(--text-color);

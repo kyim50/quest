@@ -4,7 +4,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  background-color: rgb(38, 38, 40);
+  background-color: rgb(33, 33, 33);
   color: #ffffff;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -161,6 +161,7 @@ body.light-mode .nav-bar {
   transition: background-color 0.3s, border-color 0.3s;
   position: sticky;
   margin-left: 20px;
+  margin-right: 400px;
   top: 0;
   z-index: 1000;
 }
@@ -845,86 +846,9 @@ body.light-mode .address-bar {
 }
 
 @media (max-width: 768px) {
-  .home-screen-container2 {
-    flex-direction: column;
-  }
-
-  .nav-bar {
-    width: 100%;
-    height: 60px;
-    flex-direction: row;
-    justify-content: space-around;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    padding: 0;
-  }
-
-  .nav-bar:hover {
-    width: 100%;
-  }
-
-  .nav-header {
-    display: none;
-  }
-
-  .nav-button {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 0;
-    padding: 5px;
-  }
-
-  .nav-button img {
-    margin-right: 0;
-    margin-bottom: 5px;
-  }
-
-  .nav-button span {
-    font-size: 12px;
-    opacity: 1;
-  }
-
-  .main-content2 {
-    margin-left: 0;
-    width: 100%;
-    height: calc(100vh - 60px);
-    padding-bottom: 60px;
-  }
-
-  .top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .top-bar-center {
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .search-bar-home {
-    width: 100%;
-  }
-
-  .top-bar-right {
-    width: 100%;
-    justify-content: flex-end;
-    margin-top: 10px;
-  }
-
-  .main-area {
-    flex-direction: column;
-  }
-
-  .grid-area,
-  .side-area {
-    width: 100%;
-  }
-
   .side-area {
     margin-left: 0;
-    margin-top: 20px;
+    margin-top: 10px;
   }
 
   .camera-map-area {
@@ -1801,111 +1725,142 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
 }
 
 @media (max-width: 768px) {
-  .home-screen-container2 {
-    padding-left: 0;
-  }
-
   .nav-bar {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    top: auto !important;
+    display: none !important; /* Forcefully hide side navigation on mobile */
+  }
+
+  .home-screen-container2 {
+    padding-left: 0 !important; /* Force remove left padding */
     width: 100% !important;
-    height: 60px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    background-color: #1a1a1a !important;
-    z-index: 9999 !important;
-    padding: 5px 0 !important;
-    border-top: 1px solid #333 !important;
-  }
-
-  /* Style each nav button */
-  .nav-button {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    padding: 5px 0 !important;
-    color: white !important;
-    text-decoration: none !important;
-    font-size: 10px !important;
-    background: none !important;
-    border: none !important;
-    cursor: pointer !important;
-    min-width: 0 !important; /* Ensure buttons can shrink if needed */
-  }
-
-  /* Style nav button icons */
-  .nav-button img {
-    width: 24px !important;
-    height: 24px !important;
-    margin-bottom: 4px !important;
-    filter: brightness(0) invert(1) !important; /* Ensure icons are white */
-  }
-
-  /* Hide the nav button text on mobile */
-  .nav-button span {
-    display: none !important;
-  }
-
-  /* Adjust active button styles */
-  .nav-button.active {
-    background-color: transparent !important;
-    color: #0a91ff !important;
-  }
-
-  .nav-button.active img {
-    filter: brightness(0) saturate(100%) invert(40%) sepia(93%) saturate(1352%) hue-rotate(190deg) brightness(119%) contrast(119%) !important;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
   }
 
   .main-content2 {
-    margin-left: 0;
-    padding-bottom: 60px !important;
-    width: 100%;
-    padding-right: 0;
-    overflow-y: auto; /* Allow scrolling */
-    height: calc(100vh - 60px); /* Full height minus nav bar */
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    padding-bottom: 60px !important; /* Space for mobile nav bar */
   }
 
   .top-bar {
-    flex-direction: row;
-    align-items: center;
-    padding: 5px 10px;
-    height: 50px; /* Reduced height */
+    padding: 10px !important;
+    margin-left: 0;
+    height: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background-color: rgb(18, 18, 20) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: fixed !important;
+    z-index: 1000 !important;
+  }
+
+  .profile-display {
+    display: flex !important;
+    align-items: center !important;
+    max-width: 50% !important;
+  }
+
+  .profile-photo-container {
+    width: 40px !important;
+    height: 40px !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .profile-photo {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+  }
+
+  .profile-name-status {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+
+  .profile-name {
+    font-size: 14px !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .profile-status {
+    font-size: 12px !important;
+    margin: 0 !important;
+    color: #ccc5b9 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .status-dot {
+    width: 8px !important;
+    height: 8px !important;
+    background-color: #4CAF50 !important;
+    border-radius: 50% !important;
+    margin-right: 5px !important;
+    display: inline-block !important;
   }
 
   .top-bar-center {
-    width: auto;
-    margin-top: 0;
-    flex-grow: 1;
-  }
-
-  .search-bar-home {
-    width: 100%;
-    max-width: none;
-  }
-
-  .search-bar-home .MuiOutlinedInput-root {
-    height: 36px; /* Smaller height */
-  }
-
-  .search-bar-home .MuiOutlinedInput-input {
-    padding: 8px 14px; /* Adjusted padding */
-    font-size: 14px; /* Smaller font size */
+    display: block !important; /* Hide search bar to save space */
   }
 
   .top-bar-right {
-    width: auto;
-    margin-top: 0;
+    display: flex !important;
+    align-items: center !important;
   }
 
-  .top-bar-icon {
-    height: 20px; /* Smaller icons */
+  .main-content2 {
+    margin-top: 50px !important; /* Adjust for fixed top bar */
+    padding-top: 10px !important;
+  }
+
+
+  /* Mobile navigation bar styles */
+  .mobile-nav-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 60px !important;
+    background-color: #1a1a1a !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    z-index: 1000 !important;
+  }
+
+  .mobile-nav-button {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    color: white !important;
+    text-decoration: none !important;
+    font-size: 12px !important;
+  }
+
+  .mobile-nav-button img {
+    width: 24px !important;
+    height: 24px !important;
+    margin-bottom: 4px !important;
+    filter: brightness(0) invert(1) !important; /* Make icons white */
+  }
+
+  .mobile-nav-button.active {
+    color: #0a91ff !important;
+  }
+
+  .mobile-nav-button.active img {
+    filter: none !important; /* Remove filter for active icon */
   }
 
   .main-area {
@@ -1919,7 +1874,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
 
   .side-area {
     margin-left: 0;
-    margin-top: 20px;
+    margin-top: 0px;
   }
 
   .camera-map-area {
@@ -1927,7 +1882,9 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     flex-direction: row;
     justify-content: space-between;
     height: auto;
-    margin-top: 10px;
+    margin-top: 5px;
+    margin-bottom: 30px;
+    margin-right: 0px;
     padding-top: 0;
   }
 
@@ -1965,7 +1922,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
   }
 
   .card.large {
-    height: 400px;
+    height: 350px;
   }
 
   .card-user-info {

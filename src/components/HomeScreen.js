@@ -529,23 +529,23 @@ const HomeScreen = React.memo(() => {
   const renderHomeContent = useCallback(() => (
     <div className="home-content">
       <div className="top-bar">
-        <ProfileDisplay />
-        <div className="top-bar-center">
-          <TextField
-            className="search-bar-home"
-            placeholder="Search..."
-            variant="outlined"
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <IconButton>
-                  <Search />
-                </IconButton>
-              ),
-            }}
-          />
-        </div>
-        <div className="top-bar-right">
+          <div className="profile-display">
+            <div className="profile-photo-container">
+              <img 
+                src={currentUser?.profilePhoto || '/default-profile-image.jpg'} 
+                alt={currentUser?.name || 'Profile'} 
+                className="profile-photo" 
+              />
+            </div>
+            <div className="profile-name-status">
+              <div className="profile-name">{currentUser?.name || 'Loading...'}</div>
+              <div className="profile-status">
+                <span className="status-dot"></span>
+                Active now
+              </div>
+            </div>
+          </div>
+          <div className="top-bar-right">
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">
               <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
@@ -753,7 +753,31 @@ const HomeScreen = React.memo(() => {
         showSection={showSection}
         logo="Questslogo blue.png"
         title="QUESTS"
-      />
+        />
+        {window.innerWidth <= 768 && (
+          <nav className="mobile-nav-bar">
+            <a href="#home" className={`mobile-nav-button ${activeSection === '' ? 'active' : ''}`} onClick={() => showSection('')}>
+              <img src="home.png" alt="Home" />
+              <span>Home</span>
+            </a>
+            <a href="#profile" className={`mobile-nav-button ${activeSection === 'profile' ? 'active' : ''}`} onClick={() => showSection('profile')}>
+              <img src="user-avatar.png" alt="Profile" />
+              <span>Profile</span>
+            </a>
+            <a href="#connections" className={`mobile-nav-button ${activeSection === 'connections' ? 'active' : ''}`} onClick={() => showSection('connections')}>
+              <img src="happy.png" alt="Connections" />
+              <span>Connections</span>
+            </a>
+            <a href="#quests" className={`mobile-nav-button ${activeSection === 'quests' ? 'active' : ''}`} onClick={() => showSection('quests')}>
+              <img src="letter.png" alt="Quests" />
+              <span>Quests</span>
+            </a>
+            <a href="#privacy" className={`mobile-nav-button ${activeSection === 'privacy' ? 'active' : ''}`} onClick={() => showSection('privacy')}>
+              <img src="privacy1.png" alt="Privacy" />
+              <span>Privacy</span>
+            </a>
+          </nav>
+        )}
       <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}
         {!isHomeActive && !showFullMap && (

@@ -1,9 +1,9 @@
 :root {
     /* Dark theme variables */
-    --dark-background: rgb(38, 38, 40);
+    --dark-background: rgb(33, 33, 33);
     --dark-text: #fffcf2;
     --dark-secondary-text: #ccc5b9;
-    --dark-section-background: rgb(48, 48, 50);
+    --dark-section-background: rgb(36, 36, 36);
     --dark-input-background: rgb(58, 58, 60);
     --dark-hover: rgb(84, 84, 85);
     --dark-border: #333333;
@@ -409,23 +409,5 @@
 @media (max-width: 1200px) {
     .profile-container {
         width: calc(60% - 80px);
-    }
-}
-
-@media (max-width: 768px) {
-    .profile-container {
-        width: 96%;
-        height: auto;
-        margin: 2vh 2%;
-    }
-    
-    .profile-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .edit-profile-button,
-    .add-tag button {
-        width: 100%;
     }
 }

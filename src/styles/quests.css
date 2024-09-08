@@ -47,13 +47,18 @@
 }
 
 .quests-page {
-  padding: 20px;
+  display: none; /* Hide by default */
   background-color: var(--background-color);
   color: var(--text-color);
-  min-height: 100vh;
-  width: 500px;
-  margin: 0 auto;
-  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.main-content2.quests-active .quests-page {
+  display: block;
 }
 
 .quests-header {
@@ -207,7 +212,7 @@
   padding: 30px;
   width: 90%;
   max-width: 400px;
-  max-height: 80vh;
+  max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
@@ -446,5 +451,150 @@ input:checked + .slider:before {
   .tab-button {
     width: 100%;
     text-align: center;
+  }
+}
+
+
+
+/* Rest of the existing styles remain unchanged */
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .quests-page {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50%; /* Adjust this value to control how much of the map is visible */
+    max-width: none;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background-color: var(--background-color);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .main-content2.quests-active .quests-page {
+    transform: translateY(0);
+  }
+
+  .quests-header {
+    margin-bottom: 15px;
+  }
+
+  .quests-header h2 {
+    font-size: 20px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+
+  .tab-button {
+    flex: 1 0 33.33%;
+    font-size: 12px;
+    padding: 8px;
+    height: 40px;
+  }
+
+  .quests-column {
+    padding: 15px;
+  }
+
+  .quests-column h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .quest-item {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .quest-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .quest-actions button {
+    width: 100%;
+  }
+
+
+  .quest-popup{
+    position: relative;
+    top:0px;
+    transform: scale(0.6);
+    margin-bottom:60px;
+  }
+  .modal {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .quest-popup h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .quest-popup input,
+  .quest-popup textarea,
+  .quest-popup select {
+    padding: 10px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+
+  .user-search-results {
+    max-height: 120px;
+  }
+
+  .confirm-button,
+  .cancel-button,
+  .select-button,
+  .close-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  /* Ensure there's enough space for scrolling */
+  body, html {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Style for the map container */
+  .map-container2 {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 60px !important; /* Adjust based on your mobile nav bar height */
+    width: 100% !important;
+    height: calc(100% - 60px) !important; /* Adjust based on your mobile nav bar height */
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 5;
+  }
+
+  #map {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .mobile-nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
   }
 }

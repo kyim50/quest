@@ -196,3 +196,123 @@ input:checked + .slider:before {
 .main-content.privacy-active .map-container {
   width: calc(100% - 375px);
 }
+
+/* Existing styles remain unchanged */
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .privacy-container {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50%; /* Adjust this value to control how much of the map is visible */
+    max-width: none;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background-color: var(--background-color);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .main-content2.privacy-active .privacy-container {
+    transform: translateY(0);
+  }
+
+  .privacy-header {
+    margin-bottom: 15px;
+  }
+
+  .privacy-header h2 {
+    font-size: 20px;
+  }
+
+  .privacy-section {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  .section-title1 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .privacy-option {
+    margin-bottom: 12px;
+  }
+
+  .toggle-switch {
+    width: 50px;
+    height: 28px;
+  }
+
+  .slider:before {
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(22px);
+  }
+
+  .search-user input {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .search-result-item, .custom-list-item {
+    padding: 8px;
+  }
+
+  .user-avatar {
+    width: 25px;
+    height: 25px;
+  }
+
+  /* Ensure there's enough space for scrolling */
+  body, html {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Style for the map container */
+  .map-container2 {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 60px !important; /* Adjust based on your mobile nav bar height */
+    width: 100% !important;
+    height: calc(100% - 60px) !important; /* Adjust based on your mobile nav bar height */
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 5;
+  }
+
+  #map {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .mobile-nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  /* Remove the desktop-specific map expansion */
+  .main-content.privacy-active .map-container {
+    width: 100%;
+  }
+}

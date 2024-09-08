@@ -722,153 +722,210 @@
   color: var(--text-color);
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
+.connections-container1 {
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
   .connections-container1 {
-      padding: 15px;
-  }
-  
-  .connections-container1.user-locked1 {
-      max-width: 100%;
-      border-radius: 0;
-  }
-
-  .friends-section,
-  .people-section,
-  .pending-requests-section {
-      padding: 15px;
-  }
-
-  .friend-item1,
-  .people-item,
-  .pending-request {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 10px 0;
-  }
-
-  .friend-item1 img,
-  .people-item img,
-  .pending-request img {
-      margin-bottom: 10px;
-  }
-
-  .button-group {
-      width: 140px;
-      margin-top: 10px;
-      margin-left: 0;
-  }
-
-  .chat-container1 {
-      width: 100%;
-      height: 100%;
-      bottom: 0;
-      right: 0;
-      border-radius: 0;
-  }
-
-  .add-friend-btn1 {
-      width: 100px;
-      font-size: 12px;
-  }
-
-  .chat-btn1 {
-      width: 36px;
-      height: 36px;
-  }
-
-  .icon-img {
-      width: auto;
-      height: 18px;
+    max-width: 450px;
+    height: auto;
   }
 }
 
-@media (max-width: 480px) {
-  .connections-container1 {
-      padding: 10px;
-  }
+.connections-container1.user-locked1 {
+  max-width: 100%;
+  margin: 0;
+  height: 100vh;
+  border-radius: 0;
+}
 
-  .friends-section,
-  .people-section,
-  .pending-requests-section {
-      padding: 10px;
+@media (min-width: 768px) {
+  .connections-container1.user-locked1 {
+    max-width: 400px;
+    border-radius: 20px;
+  }
+}
+
+.profile-container4 {
+  padding: 15px;
+}
+
+@media (min-width: 768px) {
+  .profile-container4 {
+    padding: 20px;
+  }
+}
+
+.profile-actions4 {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.add-friend-btn1,
+.chat-btn1,
+.unlock-btn1 {
+  width: 100%;
+  max-width: 200px;
+}
+
+@media (min-width: 480px) {
+  .add-friend-btn1,
+  .chat-btn1,
+  .unlock-btn1 {
+    width: auto;
+  }
+}
+
+.chat-btn2 {
+  width: 40px;
+  height: 40px;
+}
+
+/* ... (existing section styling remains unchanged) ... */
+
+.friend-item1,
+.people-item,
+.pending-request {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.friend-item1 img,
+.people-item img,
+.pending-request img {
+  width: 40px;
+  height: 40px;
+}
+
+.button-group {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .button-group {
+    width: auto;
+    justify-content: flex-end;
+  }
+}
+
+.view-profile-btn1,
+.remove-friend-btn1,
+.accept-btn,
+.decline-btn {
+  padding: 8px 12px;
+  font-size: 0.8em;
+}
+
+/* ... (existing popup styling remains unchanged) ... */
+
+.search-bar1 input {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .search-bar1 input {
+    font-size: 16px;
+  }
+}
+
+.chat-container1 {
+  width: 100%;
+  height: 100vh;
+  bottom: 0;
+  right: 0;
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .chat-container1 {
+    width: 350px;
+    height: 500px;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 16px;
+  }
+}
+
+.chat-header1 {
+  padding: 10px;
+}
+
+@media (min-width: 768px) {
+  .chat-header1 {
+    padding: 15px;
+  }
+}
+
+.chat-input1 input {
+  font-size: 14px;
+}
+
+.chat-input1 button {
+  padding: 8px 15px;
+}
+
+.tabs1 {
+  flex-wrap: wrap;
+}
+
+.tab-button1 {
+  flex: 1 0 50%;
+  font-size: 12px;
+  height: 40px;
+}
+
+@media (min-width: 480px) {
+  .tab-button1 {
+    flex: 1;
+    font-size: 14px;
+    height: 50px;
+  }
+}
+
+.notification1 {
+  width: 90%;
+  max-width: 300px;
+  font-size: 12px;
+}
+
+@media (min-width: 768px) {
+  .notification1 {
+    font-size: 14px;
+  }
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 320px) {
+  .connections-container1 {
+    padding: 10px;
   }
 
   .friend-item1,
   .people-item,
   .pending-request {
-      padding: 8px 0;
+    font-size: 12px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .view-profile-btn1,
   .remove-friend-btn1,
   .accept-btn,
   .decline-btn,
+  .add-friend-btn1,
   .chat-btn1 {
-      font-size: 0.8em;
-      padding: 6px 12px;
-  }
-
-  .user-popup1 {
-      width: 95%;
-      padding: 20px;
-  }
-
-  .user-popup1 img {
-      width: 80px;
-      height: 80px;
-  }
-
-  .chat-container1 {
-      width: 100%;
-      height: 100%;
-      bottom: 0;
-      right: 0;
-      border-radius: 0;
-  }
-
-  .chat-header1 {
-      padding: 10px;
-  }
-
-  .chat-header1 img {
-      width: 30px;
-      height: 30px;
-  }
-
-  .chat-messages1 {
-      padding: 10px;
-  }
-
-  .chat-input1 {
-      padding: 10px;
-  }
-
-  .chat-input1 input {
-      font-size: 12px;
-  }
-
-  .chat-input1 button {
-      padding: 8px 15px;
-      font-size: 12px;
-  }
-
-  .button-group {
-      width: 120px;
-  }
-
-  .add-friend-btn1 {
-      width: 80px;
-      font-size: 11px;
-  }
-
-  .chat-btn1 {
-      width: 32px;
-      height: 32px;
-  }
-
-  .icon-img {
-      width: auto;
-      height: 16px;
+    width: 100%;
+    margin-top: 5px;
   }
 }

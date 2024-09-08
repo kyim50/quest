@@ -410,8 +410,58 @@
     background-color: #ff3333;
 }
 
-@media (max-width: 1200px) {
-    .profile-container {
-        width: calc(60% - 80px);
+
+    @media (min-width: 768px) {
+        .home-screen-container2 {
+          flex-direction: row;
+        }
+      
+        .content-area {
+          width: 30%;
+        }
+      
+        .profile-container {
+          max-width: 420px;
+          height: auto;
+          margin: 2vh 2vw;
+          margin-top: 0;
+          padding-top: 0;
+        }
+      
+        .profile-header {
+          flex-direction: row;
+          text-align: left;
+        }
+      
+        .profile-photo-container {
+          margin-right: 20px;
+          margin-bottom: 0;
+        }
+      
+        .profile-actions {
+          flex-direction: row;
+        }
+      
+        .edit-profile-button,
+        .add-tag button {
+          width: auto;
+          margin-bottom: 0;
+        }
+      }
+      
+      @media (max-width: 767px) {
+        .content-area {
+            width: 100%;
+        }
+    
+    
+        /* Ensure there's enough space for scrolling */
+        body, html {
+            height: 100%;
+        }
+    
+        /* Add padding at the bottom to ensure logout button is not covered by navigation */
+        .profile-container {
+            padding-bottom: 120px; /* Adjust based on your bottom navigation height */
+        }
     }
-}

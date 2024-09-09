@@ -64,6 +64,11 @@
   padding: 20px;
   color: var(--text-color);
   display: none;
+  touch-action: none; /* Prevent default touch actions */
+}
+
+.main-content2.quests-active{
+  touch-action: pan-y;
 }
 
 .drag-handle {
@@ -73,6 +78,7 @@
   border-radius: 2.5px;
   margin: 0px auto;
   cursor: grab;
+  touch-action: none; /* Prevent default touch actions */
 }
 
 .main-content2.quests-active .quests-page {
@@ -492,6 +498,7 @@ input:checked + .slider:before {
     z-index: 1000;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
     transform: none;
+    touch-action: none; /* Prevent default touch actions */
   }
 
   .main-content2.quests-active .quests-page {

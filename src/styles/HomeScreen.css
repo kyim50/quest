@@ -1855,7 +1855,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
-    z-index: 1000 !important;
+    z-index: 9999 !important;
   }
 
   .mobile-nav-button {

@@ -60,6 +60,7 @@
     overflow-y: auto;
     z-index: 1000;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    touch-action: none;
 }
 
 .drag-handle {
@@ -573,6 +574,11 @@
         overflow-y: auto;
         z-index: 1000;
         box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        touch-action: none; /* Prevent default touch actions */
+    }
+
+    .profile-content {
+        touch-action: pan-y; /* Allow vertical scrolling within the content */
     }
 
     .drag-handle {

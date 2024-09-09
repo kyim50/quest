@@ -59,6 +59,7 @@
   box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
   padding: 20px;
   color: var(--text-color);
+  touch-action: none; /* Prevent default touch actions */
 }
 
 .drag-handle {
@@ -68,6 +69,7 @@
   border-radius: 2.5px;
   margin: 10px auto;
   cursor: grab;
+  touch-action: none; /* Prevent default touch actions */
 }
 
 .connections-container1.user-locked1 {
@@ -613,8 +615,14 @@
     overflow-y: auto;
     z-index: 1000;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    transform: none;
+    touch-action: none; /* Prevent default touch actions */
   }
 
+  .connections-content{
+    touch-action: pan-y; /* Prevent default touch actions */
+  }
+  
   .connections-container1.user-locked1 {
     height: calc(100% - 60px);
     border-radius: 0;

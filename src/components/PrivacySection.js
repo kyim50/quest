@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import '../styles/privacy.css';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from 'react-use-gesture';
 
 const PrivacySection = () => {
   const [privacySettings, setPrivacySettings] = useState({
@@ -13,6 +15,9 @@ const PrivacySection = () => {
   const [customList, setCustomList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+
+  // New state for managing the container height
+  const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
 
   useEffect(() => {
     fetchPrivacySettings();
@@ -91,8 +96,22 @@ const PrivacySection = () => {
     }
   };
 
+  // Draggable functionality
+  const bindDrag = useDrag(({ movement: [, my], down }) => {
+    if (down) {
+      const newHeight = window.innerHeight * 0.5 - my;
+      setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+    }
+  });
+
+  const springProps = useSpring({
+    height: containerHeight,
+    config: { tension: 300, friction: 30 }
+  });
+
   return (
-    <div className="privacy-container">
+    <animated.div className="privacy-container" style={springProps}>
+      <div className="drag-handle" {...bindDrag()} />
       <h2>Privacy Settings</h2>
 
       <div className="privacy-section">
@@ -175,7 +194,7 @@ const PrivacySection = () => {
           </>
         )}
       </div>
-    </div>
+    </animated.div>
   );
 };
 

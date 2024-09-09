@@ -48,6 +48,7 @@ const HomeScreen = React.memo(() => {
   const [isHomeActive, setIsHomeActive] = useState(true);
   const [cameraResolution, setCameraResolution] = useState({ width: 1920, height: 1080 });
   const [friends, setFriends] = useState([]);
+  const [isFullScreenCamera, setIsFullScreenCamera] = useState(false);
   
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -259,6 +260,7 @@ const HomeScreen = React.memo(() => {
 
   const toggleCamera = useCallback(() => {
     setShowCamera(prev => !prev);
+    setIsFullScreenCamera(prev => !prev);
   }, []);
 
   const toggleFullMap = useCallback(() => {
@@ -618,8 +620,8 @@ const HomeScreen = React.memo(() => {
           <div className="section-container">
             <h2 className="section-title">Camera & Map</h2>
             <div className="camera-map-area">
-              {showCamera ? (
-                <div className="camera-container">
+              {isFullScreenCamera ? (
+                <div className="full-screen-camera">
                   <Camera
                     ref={cameraRef}
                     facingMode={facingMode}

@@ -46,18 +46,33 @@
 }
 
 .privacy-container {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  border-radius: 20px;
-  padding: 20px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100%;
-  max-width: 375px;
-  height: 96vh;
-  margin: 2vh 1%;
+  height: 50%;
+  min-height: 100px;
+  max-height: calc(100% - 60px);
+  transition: height 0.3s ease;
+  background-color: var(--background-color);
+  border-radius: 20px 20px 0 0;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  color: var(--text-color);
 }
+
+.drag-handle {
+  width: 40px;
+  height: 5px;
+  background-color: var(--secondary-text-color);
+  border-radius: 2.5px;
+  margin: 10px auto;
+  cursor: grab;
+}
+
 
 .privacy-header {
   display: flex;
@@ -203,21 +218,18 @@ input:checked + .slider:before {
 @media (max-width: 767px) {
   .privacy-container {
     position: fixed;
+    bottom: 60px;
     left: 0;
     right: 0;
-    bottom: 0;
     width: 100%;
-    height: 50%; /* Adjust this value to control how much of the map is visible */
-    max-width: none;
-    margin: 0;
+    height: 50%;
+    min-height: 100px;
+    max-height: calc(100% - 120px);
     border-radius: 20px 20px 0 0;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 1000;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    background-color: var(--background-color);
-    transform: translateY(100%);
-    transition: transform 0.3s ease-in-out;
+    transform: none;
   }
 
   .main-content2.privacy-active .privacy-container {

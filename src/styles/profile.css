@@ -47,20 +47,32 @@
 }
 
 .profile-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%; /* Default height */
+    min-height: 100px; /* Minimum height when fully collapsed */
+    max-height: calc(100% - 60px); /* Maximum height, leaving space for the top bar */
+    transition: height 0.3s ease;
     background-color: var(--background-color);
-    border-radius: 20px;
-    padding: 20px;
-    width: 100%;
-    max-width: 420px;
-    height: 96vh;
-    margin-top: 2vh;
-    margin-bottom: 2vh;
-    margin-left: 3vw;
-    margin-right: 2vw;
+    border-radius: 20px 20px 0 0;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    color: var(--text-color);
+    z-index: 1000;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.drag-handle {
+    width: 40px;
+    height: 5px;
+    background-color: var(--secondary-text-color);
+    border-radius: 2.5px;
+    margin: 10px auto;
+    cursor: grab;
+}
+
+.profile-content {
+    padding: 0 20px 80px; /* Add bottom padding to account for the drag handle */
 }
 
 .profile-header {
@@ -398,6 +410,28 @@
     background-color: #ff3333;
 }
 
+/* Adjust the map container to take full height */
+.map-container2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.profile-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.profile-container {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
 @media (min-width: 768px) {
     .home-screen-container2 {
         flex-direction: row;
@@ -474,22 +508,6 @@
         height: 100% !important;
     }
 
-    .profile-container {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 50%;
-        width: 100%;
-        max-width: none;
-        margin: 0;
-        border-radius: 20px 20px 0 0;
-        overflow-y: auto;
-        z-index: 10;
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-        padding: 20px 20px 80px;
-    }
-
     body, html {
         height: 100%;
         overflow: hidden;
@@ -517,5 +535,109 @@
         left: 0;
         width: 100%;
         z-index: 1000;
+        background-color: var(--background-color);
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
     }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--secondary-text-color);
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .mobile-nav-item i {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .mobile-nav-item.active {
+        color: var(--text-color);
+    }
+
+    /* Adjustments for the draggable profile container */
+    .profile-container {
+        position: fixed;
+        bottom: 60px; /* Account for the mobile nav bar */
+        left: 0;
+        right: 0;
+        height: 50%; /* Default height */
+        min-height: 100px;
+        max-height: calc(100% - 120px); /* Account for top bar and mobile nav */
+        border-radius: 20px 20px 0 0;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .drag-handle {
+        width: 40px;
+        height: 5px;
+        background-color: var(--secondary-text-color);
+        border-radius: 2.5px;
+        margin: 10px auto;
+        cursor: grab;
+    }
+
+    /* Ensure the map takes up the full screen behind the profile */
+    .map-container2 {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 60px !important; /* Account for the mobile nav bar */
+        width: 100% !important;
+        height: calc(100% - 60px) !important;
+        z-index: 1;
+    }
+
+    /* Adjust other elements for better mobile view */
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-photo-container {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+
+    .edit-profile-button,
+    .add-tag button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .tags-container {
+        justify-content: center;
+    }
+
+    .logout-button {
+        margin-bottom: 20px;
+    }
+}
+
+/* Smooth scrolling for iOS devices */
+@supports (-webkit-overflow-scrolling: touch) {
+    .profile-container {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Prevent text selection during drag */
+.profile-container * {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }

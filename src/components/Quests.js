@@ -6,6 +6,8 @@ import { centerMapOnUser } from './UserLocationService';
 import addFriendIcon from '../assets/addfriend.png';
 import mapboxgl from 'mapbox-gl';
 import { useNotification } from '../NotificationContext';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from 'react-use-gesture';
 
 const removeRoute = (map) => {
   if (map.getLayer('route')) {
@@ -36,6 +38,9 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [activeQuests, setActiveQuests] = useState([]);
   const [activeTab, setActiveTab] = useState('public');
+
+  // New state for managing the container height
+  const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
 
   const { showNotification } = useNotification();
 
@@ -727,12 +732,26 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
     }
   };
 
+  // Draggable functionality
+  const bindDrag = useDrag(({ movement: [, my], down }) => {
+    if (down) {
+      const newHeight = window.innerHeight * 0.5 - my;
+      setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+    }
+  });
+
+  const springProps = useSpring({
+    height: containerHeight,
+    config: { tension: 300, friction: 30 }
+  });
+
   return (
-    <div className="quests-page">
+    <animated.div className="quests-page" style={springProps}>
+      <div className="drag-handle" {...bindDrag()} />
       <div className="quests-header">
         <h2>Quests</h2>
         <button onClick={togglePopup}>+</button>
-        </div>
+      </div>
 
       <div className="tabs">
         <button 
@@ -883,7 +902,7 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
           </div>
         </div>
       )}
-    </div>
+    </animated.div>
   );
 };
 

@@ -23,47 +23,42 @@ const PreviewContainer = styled('div')({
   maxWidth: '1200px',
   height: '90%',
   display: 'flex',
+  flexDirection: 'column',
   overflow: 'hidden',
 });
 
-const ImageContainer = styled('div')({
-  flex: 2,
+const FullImageContainer = styled('div')({
+  position: 'relative',
+  width: '100%',
+  height: 'calc(100% - 200px)', // Adjust based on your layout
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  position: 'relative',
   overflow: 'hidden',
   backgroundColor: '#2C2C2C',
 });
 
-const PreviewImage = styled('div')(({ size }) => ({
-  position: 'relative',
-  overflow: 'hidden',
-  borderRadius: '16px',
-  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-  ...(size === 'small' && { width: '200px', height: '200px' }),
-  ...(size === 'medium' && { width: '300px', height: '300px' }),
-  ...(size === 'large' && { width: '400px', height: '400px' }),
-}));
+const FullImage = styled('img')({
+  maxWidth: '100%',
+  maxHeight: '100%',
+  objectFit: 'contain',
+});
 
-const StyledImg = styled('img')({
+const CardOutline = styled('div')({
   position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
+  border: '2px solid white',
+  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+  cursor: 'move',
 });
 
 const ControlsContainer = styled('div')({
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '30px',
+  padding: '20px',
   backgroundColor: '#2C2C2C',
 });
 
-const SizeSelect = styled(RadioGroup)({
+const AspectRatioSelect = styled(RadioGroup)({
+  display: 'flex',
+  justifyContent: 'space-between',
   marginBottom: '20px',
 });
 
@@ -84,7 +79,6 @@ const StyledTextField = styled(TextField)({
 const ButtonGroup = styled('div')({
   display: 'flex',
   justifyContent: 'space-between',
-  marginTop: 'auto',
 });
 
 const StyledButton = styled(Button)({
@@ -95,36 +89,23 @@ const StyledButton = styled(Button)({
   padding: '12px 0',
 });
 
-const UserInfo = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: '#3C3C3C',
-  padding: '15px',
-  borderRadius: '10px',
-  marginTop: '20px',
-});
+const aspectRatios = [
+  { value: '9:16', label: '9:16' },
+  { value: '2:3', label: '2:3' },
+  { value: '3:4', label: '3:4' },
+  { value: '4:5', label: '4:5' },
+  { value: '1:1', label: '1:1' },
+];
 
-const UserAvatar = styled('img')({
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%',
-  marginRight: '15px',
-});
-
-const Username = styled('span')({
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: '18px',
-});
-
-const PhotoUploadPreview = ({ photoPreview, initialPhotoSize, initialCaption, onUpload, onCancel, currentUser }) => {
-  const [photoSize, setPhotoSize] = useState(initialPhotoSize);
-  const [caption, setCaption] = useState(initialCaption);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(1);
+const PhotoUpload = ({ photoPreview, onUpload, onCancel, currentUser }) => {
+  const [aspectRatio, setAspectRatio] = useState('1:1');
+  const [caption, setCaption] = useState('');
+  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
+  const [cardSize, setCardSize] = useState({ width: 0, height: 0 });
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-  const previewRef = useRef(null);
+  const containerRef = useRef(null);
   const imageRef = useRef(null);
+  const cardRef = useRef(null);
 
   useEffect(() => {
     const img = new Image();
@@ -135,52 +116,59 @@ const PhotoUploadPreview = ({ photoPreview, initialPhotoSize, initialCaption, on
   }, [photoPreview]);
 
   useEffect(() => {
-    adjustImagePosition();
-  }, [photoSize, imageSize]);
+    adjustCardSize();
+  }, [aspectRatio, imageSize]);
 
-  const adjustImagePosition = () => {
-    if (previewRef.current && imageSize.width && imageSize.height) {
-      const previewRect = previewRef.current.getBoundingClientRect();
+  const adjustCardSize = () => {
+    if (containerRef.current && imageSize.width && imageSize.height) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const [aspectWidth, aspectHeight] = aspectRatio.split(':').map(Number);
+      const containerAspect = containerRect.width / containerRect.height;
       const imageAspect = imageSize.width / imageSize.height;
-      const previewAspect = previewRect.width / previewRect.height;
+      const cardAspect = aspectWidth / aspectHeight;
 
-      let newScale, newX, newY;
+      let newWidth, newHeight;
 
-      if (imageAspect > previewAspect) {
+      if (imageAspect > containerAspect) {
         // Image is wider
-        newScale = previewRect.height / imageSize.height;
-        newX = (previewRect.width - imageSize.width * newScale) / 2;
-        newY = 0;
+        newHeight = containerRect.height;
+        newWidth = newHeight * cardAspect;
       } else {
         // Image is taller
-        newScale = previewRect.width / imageSize.width;
-        newX = 0;
-        newY = (previewRect.height - imageSize.height * newScale) / 2;
+        newWidth = containerRect.width;
+        newHeight = newWidth / cardAspect;
       }
 
-      setScale(newScale);
-      setPosition({ x: newX, y: newY });
+      // Ensure card doesn't exceed image bounds
+      newWidth = Math.min(newWidth, imageSize.width * (containerRect.height / imageSize.height));
+      newHeight = Math.min(newHeight, imageSize.height * (containerRect.width / imageSize.width));
+
+      setCardSize({ width: newWidth, height: newHeight });
+      setCardPosition({
+        x: (containerRect.width - newWidth) / 2,
+        y: (containerRect.height - newHeight) / 2,
+      });
     }
   };
 
   const handleMouseDown = (e) => {
     e.preventDefault();
-    const startX = e.clientX - position.x;
-    const startY = e.clientY - position.y;
+    const startX = e.clientX - cardPosition.x;
+    const startY = e.clientY - cardPosition.y;
 
     const handleMouseMove = (e) => {
-      if (previewRef.current && imageRef.current) {
-        const previewRect = previewRef.current.getBoundingClientRect();
+      if (containerRef.current && cardRef.current && imageRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
         const imageRect = imageRef.current.getBoundingClientRect();
 
         let newX = e.clientX - startX;
         let newY = e.clientY - startY;
 
-        // Constrain movement
-        newX = Math.min(0, Math.max(previewRect.width - imageRect.width, newX));
-        newY = Math.min(0, Math.max(previewRect.height - imageRect.height, newY));
+        // Constrain movement within the image bounds
+        newX = Math.max(imageRect.left - containerRect.left, Math.min(newX, imageRect.right - containerRect.left - cardSize.width));
+        newY = Math.max(imageRect.top - containerRect.top, Math.min(newY, imageRect.bottom - containerRect.top - cardSize.height));
 
-        setPosition({ x: newX, y: newY });
+        setCardPosition({ x: newX, y: newY });
       }
     };
 
@@ -194,55 +182,56 @@ const PhotoUploadPreview = ({ photoPreview, initialPhotoSize, initialCaption, on
   };
 
   const handleUpload = () => {
-    const previewRect = previewRef.current.getBoundingClientRect();
-    const imageRect = imageRef.current.getBoundingClientRect();
-    
-    const cropInfo = {
-      x: (previewRect.left - imageRect.left) / imageRect.width,
-      y: (previewRect.top - imageRect.top) / imageRect.height,
-      width: previewRect.width / imageRect.width,
-      height: previewRect.height / imageRect.height
-    };
+    if (imageRef.current && cardRef.current) {
+      const imageRect = imageRef.current.getBoundingClientRect();
+      const cardRect = cardRef.current.getBoundingClientRect();
+      
+      const cropInfo = {
+        x: (cardRect.left - imageRect.left) / imageRect.width,
+        y: (cardRect.top - imageRect.top) / imageRect.height,
+        width: cardRect.width / imageRect.width,
+        height: cardRect.height / imageRect.height
+      };
 
-    onUpload(cropInfo, photoSize, caption);
+      onUpload(cropInfo, aspectRatio, caption);
+    }
   };
 
   return (
     <PreviewOverlay>
       <PreviewContainer>
-        <ImageContainer>
-          <PreviewImage ref={previewRef} size={photoSize}>
-            <StyledImg
-              ref={imageRef}
-              src={photoPreview}
-              alt="Preview"
-              style={{
-                transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-                transformOrigin: 'top left',
-              }}
-              onMouseDown={handleMouseDown}
-            />
-          </PreviewImage>
-        </ImageContainer>
+        <FullImageContainer ref={containerRef}>
+          <FullImage ref={imageRef} src={photoPreview} alt="Preview" />
+          <CardOutline
+            ref={cardRef}
+            style={{
+              width: `${cardSize.width}px`,
+              height: `${cardSize.height}px`,
+              left: `${cardPosition.x}px`,
+              top: `${cardPosition.y}px`,
+            }}
+            onMouseDown={handleMouseDown}
+          />
+        </FullImageContainer>
         <ControlsContainer>
-          <SizeSelect
+          <AspectRatioSelect
             row
-            aria-label="photo-size"
-            name="photo-size"
-            value={photoSize}
-            onChange={(e) => setPhotoSize(e.target.value)}
+            aria-label="aspect-ratio"
+            name="aspect-ratio"
+            value={aspectRatio}
+            onChange={(e) => setAspectRatio(e.target.value)}
           >
-            <FormControlLabel value="small" control={<Radio />} label="Small" />
-            <FormControlLabel value="medium" control={<Radio />} label="Medium" />
-            <FormControlLabel value="large" control={<Radio />} label="Large" />
-          </SizeSelect>
+            {aspectRatios.map((ratio) => (
+              <FormControlLabel key={ratio.value} value={ratio.value} control={<Radio />} label={ratio.label} />
+            ))}
+          </AspectRatioSelect>
           <StyledTextField
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             placeholder="Add a caption..."
             fullWidth
             multiline
-            rows={4}
+            rows={2}
             variant="outlined"
           />
           <ButtonGroup>
@@ -253,14 +242,10 @@ const PhotoUploadPreview = ({ photoPreview, initialPhotoSize, initialCaption, on
               Cancel
             </StyledButton>
           </ButtonGroup>
-          <UserInfo>
-            <UserAvatar src={currentUser?.profilePhoto || '/default-profile-image.jpg'} alt={currentUser?.name} />
-            <Username>{currentUser?.name}</Username>
-          </UserInfo>
         </ControlsContainer>
       </PreviewContainer>
     </PreviewOverlay>
   );
 };
 
-export default PhotoUploadPreview;
+export default PhotoUpload;

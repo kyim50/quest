@@ -47,14 +47,32 @@
 }
 
 .quests-page {
-  display: none; /* Hide by default */
-  background-color: var(--background-color);
-  color: var(--text-color);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100%;
-  height: 100%;
+  height: 50%;
+  min-height: 100px;
+  max-height: calc(100% - 60px);
+  transition: height 0.3s ease;
+  background-color: var(--background-color);
+  border-radius: 20px 20px 0 0;
   overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  box-sizing: border-box;
+  color: var(--text-color);
+  display: none;
+}
+
+.drag-handle {
+  width: 60px;
+  height: 5px;
+  background-color: var(--secondary-text-color);
+  border-radius: 2.5px;
+  margin: 0px auto;
+  cursor: grab;
 }
 
 .main-content2.quests-active .quests-page {
@@ -462,21 +480,18 @@ input:checked + .slider:before {
 @media (max-width: 767px) {
   .quests-page {
     position: fixed;
+    bottom: 60px;
     left: 0;
     right: 0;
-    bottom: 0;
     width: 100%;
-    height: 50%; /* Adjust this value to control how much of the map is visible */
-    max-width: none;
-    margin: 0;
+    height: 50%;
+    min-height: 100px;
+    max-height: calc(100% - 120px);
     border-radius: 20px 20px 0 0;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 1000;
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    background-color: var(--background-color);
-    transform: translateY(100%);
-    transition: transform 0.3s ease-in-out;
+    transform: none;
   }
 
   .main-content2.quests-active .quests-page {

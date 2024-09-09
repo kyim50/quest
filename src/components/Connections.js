@@ -4,6 +4,8 @@ import { db, auth } from '../firebase';
 import './connections.css';
 import { centerMapOnUser } from './UserLocationService';
 import chatIcon from './chatbubble.png';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from 'react-use-gesture';
 
 const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
   const [people, setPeople] = useState([]);
@@ -20,6 +22,9 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [lockedUser, setLockedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('friends');
+
+  // New state for managing the container height
+  const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
 
   const fetchPeople = useCallback(async () => {
     if (!auth.currentUser) {
@@ -193,7 +198,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       setLockedUser(null);
       if (map && auth.currentUser) {
         centerMapOnUser(map, auth.currentUser.uid);
-        setTimeout(() => map.resize(), 300); // Trigger resize after animation
+        setTimeout(() => map.resize(), 300);
       }
     } else {
       setLockedUser(user.id);
@@ -201,7 +206,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
       const userData = userDoc.data();
       if (userData && userData.location && map) {
         centerMapOnUser(map, user.id);
-        setTimeout(() => map.resize(), 300); // Trigger resize after animation
+        setTimeout(() => map.resize(), 300);
       }
     }
   };
@@ -344,7 +349,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
 
     const isFriend = friends.some(friend => friend.id === user.id);
     
-
     return (
       <div className="profile-container">
         <div className="profile-header">
@@ -379,7 +383,6 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
           </button>
           <button className="chat-btn2" onClick={() => handleChatClick(user)}>
           <img src={chatIcon} alt="Chat" className='icon-img' />
-
           </button>
         </div>
 
@@ -408,8 +411,9 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
                   <button className="chat-btn1" onClick={(e) => {
                     e.stopPropagation();
                     handleChatClick(friend);
-                  }}>                  <img src={chatIcon} alt="Chat" className='icon-img' />
-</button>
+                  }}>
+                    <img src={chatIcon} alt="Chat" className='icon-img' />
+                  </button>
                 </div>
               </div>
             ))}
@@ -431,36 +435,36 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
             ))}
           </div>
         );
-        case 'people':
-      return (
-        <div className="people-section">
-          <h2>People</h2>
-          {filteredPeople.map(user => (
-            <div 
-              key={user.id} 
-              className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
-              onClick={() => handleUserClick(user)}
-            >
-              <img src={user.profilePhoto} alt="User" />
-              <div>{user.name}</div>
-              <div className="button-group">
-                <button className="add-friend-btn1" onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddFriend(user.id);
-                }}>
-                  Add Friend
-                </button>
-                <button className="chat-btn1" onClick={(e) => {
-                  e.stopPropagation();
-                  handleChatClick(user);
-                }}>
-                  <img src={chatIcon} alt="Chat" className='icon-img' />
-                </button>
+      case 'people':
+        return (
+          <div className="people-section">
+            <h2>People</h2>
+            {filteredPeople.map(user => (
+              <div 
+                key={user.id} 
+                className={`people-item ${lockedUser === user.id ? 'locked' : ''}`}
+                onClick={() => handleUserClick(user)}
+              >
+                <img src={user.profilePhoto} alt="User" />
+                <div>{user.name}</div>
+                <div className="button-group">
+                  <button className="add-friend-btn1" onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddFriend(user.id);
+                  }}>
+                    Add Friend
+                  </button>
+                  <button className="chat-btn1" onClick={(e) => {
+                    e.stopPropagation();
+                    handleChatClick(user);
+                  }}>
+                    <img src={chatIcon} alt="Chat" className='icon-img' />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      );
+            ))}
+          </div>
+        );
       case 'recentChats':
         return (
           <div className="recent-chats-section">
@@ -478,8 +482,22 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
     }
   };
 
+  // Draggable functionality
+  const bindDrag = useDrag(({ movement: [, my], down }) => {
+    if (down) {
+      const newHeight = window.innerHeight * 0.5 - my;
+      setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+    }
+  });
+
+  const springProps = useSpring({
+    height: containerHeight,
+    config: { tension: 300, friction: 30 }
+  });
+
   return (
-    <div className={`connections-container1 ${lockedUser ? 'user-locked1' : ''}`}>
+    <animated.div className={`connections-container1 ${lockedUser ? 'user-locked1' : ''}`} style={springProps}>
+      <div className="drag-handle" {...bindDrag()} />
       {notification && <div className="notification1">{notification}</div>}
 
       {lockedUser ? (
@@ -565,11 +583,11 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
               value={newMessage}
               onChange={handleInputChange}
             />
-            <button onClick={handleSendMessage}><img className="sendchatimg" src="sendchat.png"/></button>
+            <button onClick={handleSendMessage}><img className="sendchatimg" src="sendchat.png" alt="Send"/></button>
           </div>
         </div>
       )}
-    </div>
+    </animated.div>
   );
 };
 

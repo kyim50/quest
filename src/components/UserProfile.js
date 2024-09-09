@@ -3,7 +3,9 @@ import { auth, uploadImage, updateUserProfile, fetchUserData, db } from '../fire
 import { useNotification } from '../NotificationContext';
 import { useUserStatus } from '../components/UserStatusContext';
 import { Privacy } from './Privacy';
-import { collection, query, where, getDocs, orderBy, limit, doc, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from 'react-use-gesture';
 import '../styles/profile.css';
 
 const UserProfile = ({ handleLogout }) => {
@@ -21,6 +23,9 @@ const UserProfile = ({ handleLogout }) => {
   const fileInputRef = useRef(null);
   const { showNotification } = useNotification();
   const { userStatus } = useUserStatus();
+
+  // New state for managing the profile container height
+  const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
 
   const predefinedTags = [
     { img: '/education.png', value: 'education' },
@@ -201,135 +206,151 @@ const UserProfile = ({ handleLogout }) => {
     }
   };
 
-  return (
-    <div className="profile-container">
-      <div className="profile-header">
-        <div className="profile-photo-container" onClick={handleProfilePhotoClick}>
-          <img src={profilePhoto} alt="Profile" className="profile-photo" />
-          {isEditing && (
-            <>
-              <input type="file" ref={fileInputRef} onChange={handlePhotoChange} style={{ display: 'none' }} />
-              <div className="edit-photo-overlay">Edit Profile Photo</div>
-            </>
-          )}
-        </div>
-        <div className="profile-name-status">
-          <h2 className="profile-name">{name}</h2>
-          <p className="profile-username">@{username}</p>
-          <p className="profile-status">
-            <span className={`status-dot ${getStatusColor()}`}></span>
-            {userStatus.charAt(0).toUpperCase() + userStatus.slice(1)}
-          </p>
-        </div>
-        <div className="privacy-icon">
-          <Privacy isPrivate={isPrivate} onPrivacyChange={handlePrivacyModeChange} />
-        </div>
-      </div>
+  // Draggable functionality
+  const bindDrag = useDrag(({ movement: [, my], down }) => {
+    if (down) {
+      const newHeight = window.innerHeight * 0.5 - my;
+      setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+    }
+  });
 
-      {isEditing ? (
-        <div className="profile-section">
-          <h3 className="section-title">Edit Profile</h3>
-          <div className='nameedit'>
-            <input 
-              type="text" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              className="profile-input" 
-              placeholder="Name"
-            />
-            <input 
-              type="text" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              className="profile-input" 
-              placeholder="Username"
+  const springProps = useSpring({
+    height: containerHeight,
+    config: { tension: 300, friction: 30 }
+  });
+
+  return (
+    <animated.div className="profile-container" style={springProps}>
+      <div className="drag-handle" {...bindDrag()} />
+      <div className="profile-content">
+        <div className="profile-header">
+          <div className="profile-photo-container" onClick={handleProfilePhotoClick}>
+            <img src={profilePhoto} alt="Profile" className="profile-photo" />
+            {isEditing && (
+              <>
+                <input type="file" ref={fileInputRef} onChange={handlePhotoChange} style={{ display: 'none' }} />
+                <div className="edit-photo-overlay">Edit Profile Photo</div>
+              </>
+            )}
+          </div>
+          <div className="profile-name-status">
+            <h2 className="profile-name">{name}</h2>
+            <p className="profile-username">@{username}</p>
+            <p className="profile-status">
+              <span className={`status-dot ${getStatusColor()}`}></span>
+              {userStatus.charAt(0).toUpperCase() + userStatus.slice(1)}
+            </p>
+          </div>
+          <div className="privacy-icon">
+            <Privacy isPrivate={isPrivate} onPrivacyChange={handlePrivacyModeChange} />
+          </div>
+        </div>
+
+        {isEditing ? (
+          <div className="profile-section">
+            <h3 className="section-title">Edit Profile</h3>
+            <div className='nameedit'>
+              <input 
+                type="text" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                className="profile-input" 
+                placeholder="Name"
+              />
+              <input 
+                type="text" 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)} 
+                className="profile-input" 
+                placeholder="Username"
+              />
+            </div>
+            <textarea 
+              value={bio} 
+              onChange={(e) => setBio(e.target.value)} 
+              className="profile-bio-edit" 
+              placeholder="Bio"
+              maxLength={150}
             />
           </div>
-          <textarea 
-            value={bio} 
-            onChange={(e) => setBio(e.target.value)} 
-            className="profile-bio-edit" 
-            placeholder="Bio"
-            maxLength={150}
-          />
-        </div>
-      ) : (
-        <div className="profile-section">
-          <h3 className="section-title">Bio</h3>
-          <p className="profile-bio">{bio}</p>
-        </div>
-      )}
+        ) : (
+          <div className="profile-section">
+            <h3 className="section-title">Bio</h3>
+            <p className="profile-bio">{bio}</p>
+          </div>
+        )}
 
-      <div className="profile-actions">
-        <button className="edit-profile-button" onClick={isEditing ? handleSaveProfile : handleEditProfile}>
-          <i className="fas fa-user-edit"></i> {isEditing ? 'Save Profile' : 'Edit Profile'}
-        </button>
-        <div className="add-tag">
-          <button onClick={toggleTagOptions}>Add Tags</button>
-          {showTagOptions && (
-            <div className="tag-options">
-              {predefinedTags.map(({ img, value }) => (
-                <button key={value} onClick={() => handleAddTag(value)}>
-                  <img src={img} alt={value} className="tag-icon" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="profile-section">
-        <h3 className="section-title">Tags</h3>
-        <div className="tags-container">
-          {tags.map((tag) => (
-            <div key={tag} className="tag">
-              <img src={predefinedTags.find(t => t.value === tag)?.img || '/other.png'} alt={tag} className="tag-icon" />
-              <button onClick={() => handleRemoveTag(tag)}>x</button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="profile-section">
-        <h3 className="section-title">Active Quests</h3>
-        {activeQuest ? (
-          <div className="quest-item">
-            <p>"{activeQuest.title}" with</p>
-            {activeQuest.partnerName && (
-              <div className="quest-partner">
-                <img src={activeQuest.partnerPhoto || 'placeholder.jpg'} alt={activeQuest.partnerName} className="partner-photo" />
-                <p>{activeQuest.partnerName} @{activeQuest.partnerUsername}</p>
+        <div className="profile-actions">
+          <button className="edit-profile-button" onClick={isEditing ? handleSaveProfile : handleEditProfile}>
+            <i className="fas fa-user-edit"></i> {isEditing ? 'Save Profile' : 'Edit Profile'}
+          </button>
+          <div className="add-tag">
+            <button onClick={toggleTagOptions}>Add Tags</button>
+            {showTagOptions && (
+              <div className="tag-options">
+                {predefinedTags.map(({ img, value }) => (
+                  <button key={value} onClick={() => handleAddTag(value)}>
+                    <img src={img} alt={value} className="tag-icon" />
+                  </button>
+                ))}
               </div>
             )}
           </div>
-        ) : (
-          <div className="no-quests">
-            <p>No quests ongoing. Ready to start a new adventure?</p>
-          </div>
-        )}
-      </div>
+        </div>
 
-      <div className="profile-section">
-        <h3 className="section-title">Recent Quests</h3>
-        {recentQuests.length > 0 ? (
-          recentQuests.map(quest => (
-            <div key={quest.id} className="quest-item">
-              <p>{quest.title}</p>
-              {quest.targetUser && <p>with {typeof quest.targetUser === 'string' ? quest.targetUser : (quest.targetUser.name || 'Unknown User')}</p>}
+        <div className="profile-section">
+          <h3 className="section-title">Tags</h3>
+          <div className="tags-container">
+            {tags.map((tag) => (
+              <div key={tag} className="tag">
+                <img src={predefinedTags.find(t => t.value === tag)?.img || '/other.png'} alt={tag} className="tag-icon" />
+                <button onClick={() => handleRemoveTag(tag)}>x</button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="profile-section">
+          <h3 className="section-title">Active Quests</h3>
+          {activeQuest ? (
+            <div className="quest-item">
+              <p>"{activeQuest.title}" with</p>
+              {activeQuest.partnerName && (
+                <div className="quest-partner">
+                  <img src={activeQuest.partnerPhoto || 'placeholder.jpg'} alt={activeQuest.partnerName} className="partner-photo" />
+                  <p>{activeQuest.partnerName} @{activeQuest.partnerUsername}</p>
+                </div>
+              )}
             </div>
-          ))
-        ) : (
-          <div className="no-quests">
-            <p>No recent quests. Time to explore!</p>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="no-quests">
+              <p>No quests ongoing. Ready to start a new adventure?</p>
+            </div>
+          )}
+        </div>
 
-      <button className="logout-button" onClick={handleLogout}>
-        <img src="/logout.png" alt="Logout" />
-        <p className='logouttext'>Logout</p>
-      </button>
-    </div>
+        <div className="profile-section">
+          <h3 className="section-title">Recent Quests</h3>
+          {recentQuests.length > 0 ? (
+            recentQuests.map(quest => (
+              <div key={quest.id} className="quest-item">
+                <p>{quest.title}</p>
+                {quest.targetUser && <p>with {typeof quest.targetUser === 'string' ? quest.targetUser : (quest.targetUser.name || 'Unknown User')}</p>}
+              </div>
+            ))
+          ) : (
+            <div className="no-quests">
+              <p>No recent quests. Time to explore!</p>
+            </div>
+          )}
+        </div>
+
+        <button className="logout-button" onClick={handleLogout}>
+          <img src="/logout.png" alt="Logout" />
+          <p className='logouttext'>Logout</p>
+        </button>
+      </div>
+    </animated.div>
   );
 };
 

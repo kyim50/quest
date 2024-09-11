@@ -1,6 +1,5 @@
 import { auth } from '../firebase';
 import { setUserIsActive } from './UserLocationService';
-import { showNotification } from '../NotificationDisplay'
 
 export const checkAuthStatus = (navigate) => {
   return auth.onAuthStateChanged(user => {
@@ -22,7 +21,6 @@ export const handleLogout = (navigate, showNotification) => {
           navigate('/login');
         }).catch((error) => {
           console.error('Error signing out:', error);
-          showNotification('Error signing out', 'error');
         });
       });
   } else {
@@ -31,7 +29,6 @@ export const handleLogout = (navigate, showNotification) => {
       navigate('/login');
     }).catch((error) => {
       console.error('Error signing out:', error);
-      showNotification('Error signing out', 'error');
     });
   }
 };

@@ -17,10 +17,10 @@ const PreviewOverlay = styled('div')({
 });
 
 const PreviewContainer = styled('div')({
-  backgroundColor: '#1E1E1E',
+  backgroundColor: '#000000',
   borderRadius: '20px',
   width: '90%',
-  maxWidth: '1200px',
+  maxWidth: '500px',
   height: '90%',
   display: 'flex',
   flexDirection: 'column',
@@ -30,12 +30,12 @@ const PreviewContainer = styled('div')({
 const FullImageContainer = styled('div')({
   position: 'relative',
   width: '100%',
-  height: 'calc(100% - 200px)', // Adjust based on your layout
+  height: 'calc(100% - 150px)',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   overflow: 'hidden',
-  backgroundColor: '#2C2C2C',
+  backgroundColor: '#000000',
 });
 
 const FullImage = styled('img')({
@@ -53,7 +53,7 @@ const CardOutline = styled('div')({
 
 const ControlsContainer = styled('div')({
   padding: '20px',
-  backgroundColor: '#2C2C2C',
+  backgroundColor: '#000000',
 });
 
 const AspectRatioSelect = styled(RadioGroup)({
@@ -62,17 +62,16 @@ const AspectRatioSelect = styled(RadioGroup)({
   marginBottom: '20px',
 });
 
-const StyledTextField = styled(TextField)({
-  marginBottom: '20px',
-  '& .MuiInputBase-root': {
+const StyledRadio = styled(Radio)({
+  color: 'white',
+  '&.Mui-checked': {
     color: 'white',
-    backgroundColor: '#3C3C3C',
   },
-  '& .MuiInputLabel-root': {
-    color: '#CCCCCC',
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#4C4C4C',
+});
+
+const StyledFormControlLabel = styled(FormControlLabel)({
+  '& .MuiFormControlLabel-label': {
+    color: 'white',
   },
 });
 
@@ -90,16 +89,15 @@ const StyledButton = styled(Button)({
 });
 
 const aspectRatios = [
-  { value: '9:16', label: '9:16' },
-  { value: '2:3', label: '2:3' },
-  { value: '3:4', label: '3:4' },
-  { value: '4:5', label: '4:5' },
   { value: '1:1', label: '1:1' },
+  { value: '4:5', label: '4:5' },
+  { value: '3:4', label: '3:4' },
+  { value: '2:3', label: '2:3' },
+  { value: '9:16', label: '9:16' },
 ];
 
-const PhotoUpload = ({ photoPreview, onUpload, onCancel, currentUser }) => {
+const PhotoUploadPreview = ({ photoPreview, onUpload, onCancel }) => {
   const [aspectRatio, setAspectRatio] = useState('1:1');
-  const [caption, setCaption] = useState('');
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
   const [cardSize, setCardSize] = useState({ width: 0, height: 0 });
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -129,19 +127,15 @@ const PhotoUpload = ({ photoPreview, onUpload, onCancel, currentUser }) => {
 
       let newWidth, newHeight;
 
-      if (imageAspect > containerAspect) {
-        // Image is wider
-        newHeight = containerRect.height;
-        newWidth = newHeight * cardAspect;
-      } else {
-        // Image is taller
+      if (cardAspect > imageAspect) {
+        // Card is wider than image
         newWidth = containerRect.width;
         newHeight = newWidth / cardAspect;
+      } else {
+        // Card is taller than image
+        newHeight = containerRect.height;
+        newWidth = newHeight * cardAspect;
       }
-
-      // Ensure card doesn't exceed image bounds
-      newWidth = Math.min(newWidth, imageSize.width * (containerRect.height / imageSize.height));
-      newHeight = Math.min(newHeight, imageSize.height * (containerRect.width / imageSize.width));
 
       setCardSize({ width: newWidth, height: newHeight });
       setCardPosition({
@@ -193,7 +187,7 @@ const PhotoUpload = ({ photoPreview, onUpload, onCancel, currentUser }) => {
         height: cardRect.height / imageRect.height
       };
 
-      onUpload(cropInfo, aspectRatio, caption);
+      onUpload(cropInfo, aspectRatio);
     }
   };
 
@@ -222,21 +216,12 @@ const PhotoUpload = ({ photoPreview, onUpload, onCancel, currentUser }) => {
             onChange={(e) => setAspectRatio(e.target.value)}
           >
             {aspectRatios.map((ratio) => (
-              <FormControlLabel key={ratio.value} value={ratio.value} control={<Radio />} label={ratio.label} />
+              <StyledFormControlLabel key={ratio.value} value={ratio.value} control={<StyledRadio />} label={ratio.label} />
             ))}
           </AspectRatioSelect>
-          <StyledTextField
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder="Add a caption..."
-            fullWidth
-            multiline
-            rows={2}
-            variant="outlined"
-          />
           <ButtonGroup>
             <StyledButton onClick={handleUpload} variant="contained" color="primary">
-              Upload
+              Done
             </StyledButton>
             <StyledButton onClick={onCancel} variant="outlined">
               Cancel
@@ -248,4 +233,4 @@ const PhotoUpload = ({ photoPreview, onUpload, onCancel, currentUser }) => {
   );
 };
 
-export default PhotoUpload;
+export default PhotoUploadPreview;

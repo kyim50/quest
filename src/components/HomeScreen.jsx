@@ -320,17 +320,19 @@ const HomeScreen = React.memo(() => {
     }
   }, [selectedImage, fetchUserDataCallback]);
 
-  const handleUploadPhoto = useCallback(async (cropInfo, size, captionText) => {
+  const handleUploadPhoto = useCallback(async (cropInfo, aspectRatio, captionText = '') => {
     if (auth.currentUser && photoPreview) {
       try {
         const photoRef = doc(collection(db, 'photos'));
         const newPhoto = { 
           id: photoRef.id, 
           userId: auth.currentUser.uid, 
-          username: auth.currentUser.displayName,
-          userProfileImage: currentUser?.profilePhoto || null,
+          user: {
+            name: auth.currentUser.displayName || 'Unknown User',
+            profilePhoto: currentUser?.profilePhoto || null,
+          },
           image: photoPreview, 
-          size: size, 
+          aspectRatio: aspectRatio, 
           caption: captionText,
           cropInfo: cropInfo,
           timestamp: serverTimestamp(),
@@ -344,7 +346,7 @@ const HomeScreen = React.memo(() => {
         setGridData(prev => [newPhoto, ...prev]);
         
         // Fetch updated data immediately after upload
-        fetchGridData();
+        fetchGridData(auth.currentUser.uid);
       } catch (error) {
         console.error('Error uploading photo:', error);
         showNotification('Failed to upload photo. Please try again.');
@@ -361,7 +363,7 @@ const HomeScreen = React.memo(() => {
         showNotification('Post deleted successfully');
         
         // Fetch updated data immediately after deletion
-        fetchGridData();
+        fetchGridData(auth.currentUser.uid);
       } catch (error) {
         console.error('Error deleting post:', error);
         showNotification('Failed to delete post. Please try again.');
@@ -377,12 +379,12 @@ const HomeScreen = React.memo(() => {
       <div className="profile-photo-container">
         <img 
           src={currentUser?.profilePhoto || '/default-profile-image.jpg'} 
-          alt={currentUser?.name || 'Profile'} 
+          alt={currentUser?.name || 'Profile'}
           className="profile-photo" 
         />
       </div>
       <div className="profile-name-status">
-      <h2 className="profile-name">{currentUser?.name || 'Loading...'}</h2>
+        <h2 className="profile-name">{currentUser?.name || 'Loading...'}</h2>
         <p className="profile-status">
           <span className="status-dot"></span>
           Active now
@@ -391,26 +393,31 @@ const HomeScreen = React.memo(() => {
     </div>  
   ), [currentUser]);
 
-  const Card = React.memo(({ size, user, image, caption, onClick }) => {
+  const PinterestLayout = React.memo(({ items, onItemClick }) => {
+    const getCardSize = (aspectRatio) => {
+      const [width, height] = aspectRatio.split(':').map(Number);
+      const ratio = height / width;
+      if (ratio <= 1) return 26; // Square or landscape
+      if (ratio <= 1.5) return 33; // Portrait
+      return 45; // Tall portrait
+    };
+  
     return (
-      <div className="card-wrapper">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3 }}
-          className={`card ${size}`}
-          onClick={onClick}
-        >
-          <img src={image} alt={`Photo by ${user.name}`} className="card-image" />
-        </motion.div>
-        {caption && (
-          <div className="card-caption">
-            <p>{caption}</p>
-          </div>
-        )}
-        <div className="card-user-info">
-          <img src={user.profilePhoto || '/default-profile-image.jpg'} alt={user.name} className="card-user-avatar" />
-          <span className="card-username">{user.name}</span>
-        </div>
+      <div className="pin-container">
+        {items.map((item) => {
+          const size = getCardSize(item.aspectRatio || '1:1');
+          return (
+            <div key={item.id} className="card-wrapper" style={{ gridRowEnd: `span ${size}` }}>
+              <div className="card" onClick={() => onItemClick(item)}>
+                <img src={item.image} alt={item.caption || `Photo by ${item.user.name}`} className="card-image" />
+              </div>
+              <div className="card-user-info">
+                <img src={item.user.profilePhoto || '/default-profile-image.jpg'} alt={item.user.name} className="card-user-avatar" />
+                <span className="card-username">— {item.user.name}</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   });
@@ -432,8 +439,8 @@ const HomeScreen = React.memo(() => {
           <div className="image-preview-sidebar">
             <div className="image-preview-header">
               <div className="user-info">
-                <img src={selectedImage?.userProfileImage || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
-                <span className="username">{selectedImage?.username || 'Unknown User'}</span>
+                <img src={selectedImage?.user?.profilePhoto || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
+                <span className="username">{selectedImage?.user?.name || 'Unknown User'}</span>
               </div>
               <IconButton onClick={onClose} className="close-button">
                 <Close />
@@ -479,7 +486,7 @@ const HomeScreen = React.memo(() => {
                 }}
               />
             </div>
-            {selectedImage?.userId === auth.currentUser.uid && (
+            {selectedImage?.userId === auth.currentUser?.uid && (
               <Button
                 startIcon={<Delete />}
                 onClick={onDeletePost}
@@ -494,60 +501,11 @@ const HomeScreen = React.memo(() => {
     );
   });
 
-  const PinterestLayout = React.memo(() => {
-    useEffect(() => {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        setIsLoading(false);
-        if (user) {
-          fetchGridData();
-        } else {
-          setGridData([]);
-        }
-      });
-
-      return () => unsubscribe();
-    }, []);
-
-    if (isLoading) {
-      return <div>Loading...</div>;
-    }
-
-    return (
-      <div className="pin-container">
-        {gridData.map((item) => (
-          <Card 
-            key={item.id}
-            size={item.size} 
-            user={item.user}
-            image={item.image} 
-            caption={item.caption}
-            onClick={() => toggleImagePreview(item)} 
-          />
-        ))}
-      </div>
-    );
-  });
-
   const renderHomeContent = useCallback(() => (
     <div className="home-content">
       <div className="top-bar">
-          <div className="profile-display">
-            <div className="profile-photo-container">
-              <img 
-                src={currentUser?.profilePhoto || '/default-profile-image.jpg'} 
-                alt={currentUser?.name || 'Profile'} 
-                className="profile-photo" 
-              />
-            </div>
-            <div className="profile-name-status">
-              <div className="profile-name">{currentUser?.name || 'Loading...'}</div>
-              <div className="profile-status">
-                <span className="status-dot"></span>
-                Active now
-              </div>
-            </div>
-          </div>
-          <div className="top-bar-center">
+        <ProfileDisplay />
+        <div className="top-bar-center">
           <TextField
             className="search-bar-home"
             placeholder="Search..."
@@ -562,7 +520,7 @@ const HomeScreen = React.memo(() => {
             }}
           />
         </div>
-          <div className="top-bar-right">
+        <div className="top-bar-right">
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">
               <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
@@ -613,7 +571,7 @@ const HomeScreen = React.memo(() => {
         <div className="grid-area">
           <div className="section-container">
             <h2 className="section-title3">Feed</h2>
-            <PinterestLayout />
+            <PinterestLayout items={gridData} onItemClick={toggleImagePreview} />
           </div>
         </div>
         <div className="side-area">
@@ -679,8 +637,6 @@ const HomeScreen = React.memo(() => {
         {photoPreview && (
           <PhotoUploadPreview
             photoPreview={photoPreview}
-            initialPhotoSize={photoSize}
-            initialCaption={caption}
             onUpload={handleUploadPhoto}
             onCancel={() => setPhotoPreview(null)}
             currentUser={currentUser}
@@ -688,7 +644,7 @@ const HomeScreen = React.memo(() => {
         )}
       </AnimatePresence>
     </div>
-  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, photoSize, caption, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution, friends]);
+  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution, friends, gridData]);
 
   const renderFullMap = useCallback(() => (
     <div className="full-map-container">
@@ -770,31 +726,31 @@ const HomeScreen = React.memo(() => {
         showSection={showSection}
         logo="Questslogo blue.png"
         title="QUESTS"
-        />
-        {window.innerWidth <= 768 && (
-          <nav className="mobile-nav-bar">
-            <a href="#home" className={`mobile-nav-button ${activeSection === '' ? 'active' : ''}`} onClick={() => showSection('')}>
-              <img src="home.png" alt="Home" />
-              <span>Home</span>
-            </a>
-            <a href="#profile" className={`mobile-nav-button ${activeSection === 'profile' ? 'active' : ''}`} onClick={() => showSection('profile')}>
-              <img src="user-avatar.png" alt="Profile" />
-              <span>Profile</span>
-            </a>
-            <a href="#connections" className={`mobile-nav-button ${activeSection === 'connections' ? 'active' : ''}`} onClick={() => showSection('connections')}>
-              <img src="happy.png" alt="Connections" />
-              <span>Connections</span>
-            </a>
-            <a href="#quests" className={`mobile-nav-button ${activeSection === 'quests' ? 'active' : ''}`} onClick={() => showSection('quests')}>
-              <img src="letter.png" alt="Quests" />
-              <span>Quests</span>
-            </a>
-            <a href="#privacy" className={`mobile-nav-button ${activeSection === 'privacy' ? 'active' : ''}`} onClick={() => showSection('privacy')}>
-              <img src="privacy1.png" alt="Privacy" />
-              <span>Privacy</span>
-            </a>
-          </nav>
-        )}
+      />
+      {window.innerWidth <= 768 && (
+        <nav className="mobile-nav-bar">
+          <a href="#home" className={`mobile-nav-button ${activeSection === '' ? 'active' : ''}`} onClick={() => showSection('')}>
+            <img src="home.png" alt="Home" />
+            <span>Home</span>
+          </a>
+          <a href="#profile" className={`mobile-nav-button ${activeSection === 'profile' ? 'active' : ''}`} onClick={() => showSection('profile')}>
+            <img src="user-avatar.png" alt="Profile" />
+            <span>Profile</span>
+          </a>
+          <a href="#connections" className={`mobile-nav-button ${activeSection === 'connections' ? 'active' : ''}`} onClick={() => showSection('connections')}>
+            <img src="happy.png" alt="Connections" />
+            <span>Connections</span>
+          </a>
+          <a href="#quests" className={`mobile-nav-button ${activeSection === 'quests' ? 'active' : ''}`} onClick={() => showSection('quests')}>
+            <img src="letter.png" alt="Quests" />
+            <span>Quests</span>
+          </a>
+          <a href="#privacy" className={`mobile-nav-button ${activeSection === 'privacy' ? 'active' : ''}`} onClick={() => showSection('privacy')}>
+            <img src="privacy1.png" alt="Privacy" />
+            <span>Privacy</span>
+          </a>
+        </nav>
+      )}
       <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}
         {!isHomeActive && !showFullMap && (

@@ -13,19 +13,17 @@ const NavigationBar = ({ activeSection, showSection, logo, title }) => {
   return (
     <div className="nav-bar">
       <div className="nav-header">
-        <img 
-          src={logo}
-          alt="Quests Logo" 
-          className="qlogo" 
-        />
+        <img src={logo} alt="Quests Logo" className="qlogo" />
         <span className="nav-title">{title}</span>
       </div>
       <nav>
         {navItems.map((item) => (
-          <button 
+          <button
             key={item.id}
-            onClick={() => showSection(item.id)} 
-            className={`nav-button ${activeSection === item.id ? 'active' : ''}`}
+            onClick={() => showSection(item.id)}
+            className={`nav-button ${
+              activeSection === item.id ? 'active' : ''
+            }`}
           >
             <img src={item.icon} alt={item.label} />
             <span>{item.label}</span>

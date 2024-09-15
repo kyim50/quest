@@ -8,7 +8,7 @@ import { useSpring, animated } from 'react-spring';
 import { useDrag } from 'react-use-gesture';
 import '../styles/profile.css';
 
-const UserProfile = ({ handleLogout }) => {
+const UserProfile = ({ handleLogout, isNavExpanded }) => {
   const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
   const [name, setName] = useState('Default Name');
   const [username, setUsername] = useState('default_username');
@@ -24,7 +24,7 @@ const UserProfile = ({ handleLogout }) => {
   const { showNotification } = useNotification();
   const { userStatus } = useUserStatus();
 
-  // New state for managing the profile container height
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
 
   const predefinedTags = [
@@ -33,6 +33,15 @@ const UserProfile = ({ handleLogout }) => {
     { img: '/games.png', value: 'games' },
     { img: '/other.png', value: 'other' }
   ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -206,22 +215,30 @@ const UserProfile = ({ handleLogout }) => {
     }
   };
 
-  // Draggable functionality
-  const bindDrag = useDrag(({ movement: [, my], down }) => {
-    if (down) {
-      const newHeight = window.innerHeight * 0.5 - my;
-      setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+  const bindDrag = useDrag(({ movement: [, my], down, event }) => {
+    if (isMobile) {
+      if (down) {
+        const newHeight = window.innerHeight * 0.5 - my;
+        setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+      }
+      event.preventDefault();
     }
+  }, {
+    delay: 0,
+    threshold: 5,
   });
 
   const springProps = useSpring({
-    height: containerHeight,
+    height: isMobile ? containerHeight : 'auto',
     config: { tension: 300, friction: 30 }
   });
 
   return (
-    <animated.div className="profile-container" style={springProps}>
-      <div className="drag-handle" {...bindDrag()} />
+    <animated.div 
+      className={`profile-container ${isMobile ? 'mobile' : 'desktop'} ${isNavExpanded ? 'nav-expanded' : ''}`} 
+      style={isMobile ? springProps : {}}
+    >
+      {isMobile && <div className="drag-handle" {...bindDrag()} />}
       <div className="profile-content">
         <div className="profile-header">
           <div className="profile-photo-container" onClick={handleProfilePhotoClick}>

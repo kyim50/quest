@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { IconButton, TextField, Button, Badge, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import { Search, Notifications, ArrowBack, CameraAlt, Refresh, Close, Delete, Send } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from 'react-use-gesture';
 import { auth, db, fetchUserData } from '../firebase';
 import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, doc, serverTimestamp, query, where, orderBy, limit } from 'firebase/firestore';
 import { Camera } from 'react-camera-pro';
@@ -49,6 +51,8 @@ const HomeScreen = React.memo(() => {
   const [cameraResolution, setCameraResolution] = useState({ width: 1920, height: 1080 });
   const [friends, setFriends] = useState([]);
   const [isFullScreenCamera, setIsFullScreenCamera] = useState(false);
+  const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -87,6 +91,14 @@ const HomeScreen = React.memo(() => {
     const unsubscribeAuth = checkAuthStatus(navigate);
     return () => unsubscribeAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const updateCameraResolution = () => {
@@ -364,8 +376,7 @@ const HomeScreen = React.memo(() => {
         
         // Fetch updated data immediately after deletion
         fetchGridData(auth.currentUser.uid);
-      } catch (error) {
-        console.error('Error deleting post:', error);
+      } catch (error) {console.error('Error deleting post:', error);
         showNotification('Failed to delete post. Please try again.');
       }
     }
@@ -373,6 +384,18 @@ const HomeScreen = React.memo(() => {
 
   const toggleNotifications = useCallback(() => setShowNotifications(prev => !prev), []);
   const clearNotifications = useCallback(() => setNotifications([]), []);
+
+  const bindDrag = useDrag(({ movement: [, my], down }) => {
+    if (down && isMobile) {
+      const newHeight = window.innerHeight * 0.5 - my;
+      setContainerHeight(Math.max(100, Math.min(newHeight, window.innerHeight - 60)));
+    }
+  });
+
+  const springProps = useSpring({
+    height: containerHeight,
+    config: { tension: 300, friction: 30 }
+  });
 
   const ProfileDisplay = useMemo(() => () => (
     <div className="profile-display">
@@ -397,23 +420,30 @@ const HomeScreen = React.memo(() => {
     const getCardSize = (aspectRatio) => {
       const [width, height] = aspectRatio.split(':').map(Number);
       const ratio = height / width;
-      if (ratio <= 1) return 26; // Square or landscape
-      if (ratio <= 1.5) return 33; // Portrait
-      return 45; // Tall portrait
+      if (ratio <= 1) return 'landscape';
+      if (ratio <= 1.5) return 'portrait';
+      return 'tall';
     };
   
     return (
       <div className="pin-container">
         {items.map((item) => {
-          const size = getCardSize(item.aspectRatio || '1:1');
+          const sizeClass = getCardSize(item.aspectRatio || '1:1');
           return (
-            <div key={item.id} className="card-wrapper" style={{ gridRowEnd: `span ${size}` }}>
-              <div className="card" onClick={() => onItemClick(item)}>
-                <img src={item.image} alt={item.caption || `Photo by ${item.user.name}`} className="card-image" />
+            <div key={item.id} className={`pin-item ${sizeClass}`}>
+              <div className="card-wrapper">
+                <div className="card" onClick={() => onItemClick(item)}>
+                  <div className="card-image-container">
+                    <img src={item.image} alt={item.caption || `Photo by ${item.user.name}`} className="card-image" />
+                  </div>
+                </div>
               </div>
-              <div className="card-user-info">
-                <img src={item.user.profilePhoto || '/default-profile-image.jpg'} alt={item.user.name} className="card-user-avatar" />
-                <span className="card-username">— {item.user.name}</span>
+              <div className="card-info">
+                <div className="card-user-info">
+                  <img src={item.user.profilePhoto || '/default-profile-image.jpg'} alt={item.user.name} className="card-user-avatar" />
+                  <span className="card-username">{item.user.name}</span>
+                </div>
+                {item.caption && <p className="card-caption">{item.caption}</p>}
               </div>
             </div>
           );
@@ -568,60 +598,91 @@ const HomeScreen = React.memo(() => {
       )}
 
       <div className="main-area">
-        <div className="grid-area">
-          <div className="section-container">
-            <h2 className="section-title3">Feed</h2>
-            <PinterestLayout items={gridData} onItemClick={toggleImagePreview} />
-          </div>
-        </div>
-        <div className="side-area">
-          <div className="section-container">
-            <h2 className="section-title">Camera & Map</h2>
-            <div className="camera-map-area">
-              {isFullScreenCamera ? (
-                <div className="full-screen-camera">
-                  <Camera
-                    ref={cameraRef}
-                    facingMode={facingMode}
-                    aspectRatio="cover"
-                    errorMessages={{}}
-                    videoSourceDeviceId={undefined}
-                    numberOfCamerasCallback={(i) => console.log(i)}
-                    videoResolution={cameraResolution}
-                  />
-                  <div className="camera-controls">
-                    <IconButton onClick={toggleCamera} className="back-button">
-                      <ArrowBack />
-                    </IconButton>
-                    <IconButton onClick={handleCapture} className="capture-button">
-                      <div className="capture-button-inner" />
-                    </IconButton>
-                    <IconButton onClick={handleFlipCamera} className="flip-button">
-                      <Refresh />
-                    </IconButton>
-                  </div>
-                </div>
-              ) : (
-                <div className="camera-placeholder" onClick={toggleCamera}>
+        {isMobile ? (
+          <div className="mobile-layout">
+            <div className="full-map-container">
+              <MapComponent 
+                address={address} 
+                setAddress={setAddress} 
+                setCurrentUserIds={setCurrentUserIds}
+                setMap={setMap}
+                activeSection={activeSection}
+                lockedUser={lockedUser}
+                showAddressBar={false}
+                isFullScreen={true}
+              />
+            </div>
+            <animated.div className="draggable-container" style={springProps}>
+              <div className="drag-handle" {...bindDrag()} />
+              <div className="mobile-content">
+                <div className="camera-button" onClick={toggleCamera}>
                   <CameraAlt />
-                  <span>Open Camera</span>
                 </div>
-              )}
-              <div className="mini-map" onClick={toggleFullMap}>
-                <MapComponent 
-                  address={address} 
-                  setAddress={setAddress} 
-                  setCurrentUserIds={setCurrentUserIds}
-                  setMap={setMap}
-                  activeSection={activeSection}
-                  lockedUser={lockedUser}
-                  showAddressBar={false}
-                  isFullScreen={false}
-                />
+                <div className="section-container">
+                  <h2 className="section-title3">Feed</h2>
+                  <PinterestLayout items={gridData} onItemClick={toggleImagePreview} />
+                </div>
+              </div>
+            </animated.div>
+          </div>
+        ) : (
+          <>
+            <div className="grid-area">
+              <div className="section-container">
+                <h2 className="section-title3">Feed</h2>
+                <PinterestLayout items={gridData} onItemClick={toggleImagePreview} />
               </div>
             </div>
-          </div>
-        </div>
+            <div className="side-area">
+              <div className="section-container">
+                <h2 className="section-title">Camera & Map</h2>
+                <div className="camera-map-area">
+                  {isFullScreenCamera ? (
+                    <div className="full-screen-camera">
+                      <Camera
+                        ref={cameraRef}
+                        facingMode={facingMode}
+                        aspectRatio="cover"
+                        errorMessages={{}}
+                        videoSourceDeviceId={undefined}
+                        numberOfCamerasCallback={(i) => console.log(i)}
+                        videoResolution={cameraResolution}
+                      />
+                      <div className="camera-controls">
+                        <IconButton onClick={toggleCamera} className="back-button">
+                          <ArrowBack />
+                        </IconButton>
+                        <IconButton onClick={handleCapture} className="capture-button">
+                          <div className="capture-button-inner" />
+                        </IconButton>
+                        <IconButton onClick={handleFlipCamera} className="flip-button">
+                          <Refresh />
+                        </IconButton>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="camera-placeholder" onClick={toggleCamera}>
+                      <CameraAlt />
+                      <span>Open Camera</span>
+                    </div>
+                  )}
+                  <div className="mini-map" onClick={toggleFullMap}>
+                    <MapComponent 
+                      address={address} 
+                      setAddress={setAddress} 
+                      setCurrentUserIds={setCurrentUserIds}
+                      setMap={setMap}
+                      activeSection={activeSection}
+                      lockedUser={lockedUser}
+                      showAddressBar={false}
+                      isFullScreen={false}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <AnimatePresence>
@@ -644,7 +705,7 @@ const HomeScreen = React.memo(() => {
         )}
       </AnimatePresence>
     </div>
-  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution, friends, gridData]);
+  ), [showCamera, facingMode, toggleCamera, handleCapture, handleFlipCamera, toggleFullMap, address, activeSection, lockedUser, showImagePreview, selectedImage, comments, handleAddComment, handleDeletePost, photoPreview, handleUploadPhoto, currentUser, notifications, toggleNotifications, clearNotifications, cameraResolution, friends, gridData, isMobile, springProps, bindDrag]);
 
   const renderFullMap = useCallback(() => (
     <div className="full-map-container">
@@ -676,30 +737,56 @@ const HomeScreen = React.memo(() => {
   }, [showNotification, navigate]);
 
   const renderSection = useCallback(() => {
-    if (isHomeActive) {
-      return renderHomeContent();
+    const sectionContent = isHomeActive ? renderHomeContent() : (
+      <div className={`section-content ${isMobile ? 'mobile-section' : ''}`}>
+        {(() => {
+          switch(activeSection) {
+            case 'profile':
+              return <UserProfile handleLogout={handleLogoutClick} />;
+            case 'quests':
+              return <QuestsComponent currentUserIds={currentUserIds} map={map} />;
+            case 'connections':
+              return <Connections 
+                currentUserIds={currentUserIds}
+                map={map}
+                setLockedUser={handleSetLockedUser}
+                lockedUser={lockedUser}
+                lockedUserData={lockedUserData}
+              />;
+            case 'privacy':
+              return <PrivacySection />;
+            default:
+              return null;
+          }
+        })()}
+      </div>
+    );
+  
+    if (isMobile && !isHomeActive) {
+      return (
+        <div className="mobile-section-with-map">
+          <div className="mobile-map-container">
+            <MapComponent 
+              address={address} 
+              setAddress={setAddress} 
+              setCurrentUserIds={setCurrentUserIds}
+              setMap={setMap}
+              activeSection={activeSection}
+              lockedUser={lockedUser}
+              showAddressBar={false}
+              isFullScreen={false}
+            />
+          </div>
+          <div className="mobile-section-content">
+            {sectionContent}
+          </div>
+        </div>
+      );
     }
-
-    switch(activeSection) {
-      case 'profile':
-        return <UserProfile handleLogout={handleLogoutClick} />;
-      case 'quests':
-        return <QuestsComponent currentUserIds={currentUserIds} map={map} />;
-      case 'connections':
-        return <Connections 
-          currentUserIds={currentUserIds}
-          map={map}
-          setLockedUser={handleSetLockedUser}
-          lockedUser={lockedUser}
-          lockedUserData={lockedUserData}
-        />;
-      case 'privacy':
-        return <PrivacySection />;
-      default:
-        return renderHomeContent();
-    }
-  }, [activeSection, isHomeActive, currentUserIds, map, handleSetLockedUser, lockedUser, lockedUserData, renderHomeContent, handleLogoutClick]);
-
+  
+    return sectionContent;
+  }, [activeSection, isHomeActive, currentUserIds, map, handleSetLockedUser, lockedUser, lockedUserData, renderHomeContent, handleLogoutClick, isMobile, address]);
+  
   const getActiveClass = useCallback(() => {
     if (isHomeActive) {
       return 'home-active';
@@ -720,42 +807,37 @@ const HomeScreen = React.memo(() => {
   }, [isHomeActive]);
 
   return (
-    <div className="home-screen-container2">
+    <div className={`home-screen-container2 ${isMobile ? 'mobile-view' : ''}`}>
       <NavigationBar 
         activeSection={activeSection} 
         showSection={showSection}
         logo="Questslogo blue.png"
         title="QUESTS"
-        />
-        {window.innerWidth <= 768 && (
-          <nav className="mobile-nav-bar-container">
-            <nav className="mobile-nav-bar">
-                <a href="#home" className={`mobile-nav-button ${activeSection === '' ? 'active' : ''}`} onClick={() => showSection('')}>
-                <img src="home.png" alt="Home" />
-                {/* <span>Home</span> */}
-                </a>
-                <a href="#profile" className={`mobile-nav-button ${activeSection === 'profile' ? 'active' : ''}`} onClick={() => showSection('profile')}>
-                <img src="user-avatar.png" alt="Profile" />
-                {/* <span>Profile</span> */}
-                </a>
-                <a href="#connections" className={`mobile-nav-button ${activeSection === 'connections' ? 'active' : ''}`} onClick={() => showSection('connections')}>
-                <img src="happy.png" alt="Connections" />
-                {/* <span>Connections</span> */}
-                </a>
-                <a href="#quests" className={`mobile-nav-button ${activeSection === 'quests' ? 'active' : ''}`} onClick={() => showSection('quests')}>
-                <img src="letter.png" alt="Quests" />
-                {/* <span>Quests</span> */}
-                </a>
-                <a href="#privacy" className={`mobile-nav-button ${activeSection === 'privacy' ? 'active' : ''}`} onClick={() => showSection('privacy')}>
-                <img src="privacy1.png" alt="Privacy" />
-                {/* <span>Privacy</span> */}
-                </a>
-            </nav>
+      />
+      {isMobile && (
+        <nav className="mobile-nav-bar-container">
+          <nav className="mobile-nav-bar">
+          <a href="#home" className={`mobile-nav-button ${activeSection === '' ? 'active' : ''}`} onClick={() => showSection('')}>
+              <img src="home.png" alt="Home" />
+            </a>
+            <a href="#profile" className={`mobile-nav-button ${activeSection === 'profile' ? 'active' : ''}`} onClick={() => showSection('profile')}>
+              <img src="user-avatar.png" alt="Profile" />
+            </a>
+            <a href="#connections" className={`mobile-nav-button ${activeSection === 'connections' ? 'active' : ''}`} onClick={() => showSection('connections')}>
+              <img src="happy.png" alt="Connections" />
+            </a>
+            <a href="#quests" className={`mobile-nav-button ${activeSection === 'quests' ? 'active' : ''}`} onClick={() => showSection('quests')}>
+              <img src="letter.png" alt="Quests" />
+            </a>
+            <a href="#privacy" className={`mobile-nav-button ${activeSection === 'privacy' ? 'active' : ''}`} onClick={() => showSection('privacy')}>
+              <img src="privacy1.png" alt="Privacy" />
+            </a>
           </nav>
-        )}
+        </nav>
+      )}
       <div className={`main-content2 ${getActiveClass()}`}>
         {showFullMap ? renderFullMap() : renderSection()}
-        {!isHomeActive && !showFullMap && (
+        {!isHomeActive && !showFullMap && !isMobile && (
           <div className="map-container2">
             <MapComponent 
               address={address} 

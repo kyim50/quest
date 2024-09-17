@@ -89,15 +89,13 @@ const StyledButton = styled(Button)({
 });
 
 const aspectRatios = [
-  { value: '1:1', label: '1:1' },
-  { value: '4:5', label: '4:5' },
-  { value: '3:4', label: '3:4' },
-  { value: '2:3', label: '2:3' },
-  { value: '9:16', label: '9:16' },
+  { value: 'standard', label: 'Standard (2:3)', width: 1000, height: 1500 },
+  { value: 'square', label: 'Square (1:1)', width: 1000, height: 1000 },
+  { value: 'long', label: 'Long (1:2.1)', width: 1000, height: 2100 },
 ];
 
 const PhotoUploadPreview = ({ photoPreview, onUpload, onCancel }) => {
-  const [aspectRatio, setAspectRatio] = useState('1:1');
+  const [aspectRatio, setAspectRatio] = useState('standard');
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
   const [cardSize, setCardSize] = useState({ width: 0, height: 0 });
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -120,10 +118,10 @@ const PhotoUploadPreview = ({ photoPreview, onUpload, onCancel }) => {
   const adjustCardSize = () => {
     if (containerRef.current && imageSize.width && imageSize.height) {
       const containerRect = containerRef.current.getBoundingClientRect();
-      const [aspectWidth, aspectHeight] = aspectRatio.split(':').map(Number);
+      const selectedAspect = aspectRatios.find(ratio => ratio.value === aspectRatio);
       const containerAspect = containerRect.width / containerRect.height;
       const imageAspect = imageSize.width / imageSize.height;
-      const cardAspect = aspectWidth / aspectHeight;
+      const cardAspect = selectedAspect.width / selectedAspect.height;
 
       let newWidth, newHeight;
 
@@ -187,7 +185,8 @@ const PhotoUploadPreview = ({ photoPreview, onUpload, onCancel }) => {
         height: cardRect.height / imageRect.height
       };
 
-      onUpload(cropInfo, aspectRatio);
+      const selectedAspect = aspectRatios.find(ratio => ratio.value === aspectRatio);
+      onUpload(cropInfo, `${selectedAspect.width}:${selectedAspect.height}`);
     }
   };
 

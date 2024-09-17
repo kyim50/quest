@@ -422,111 +422,78 @@ body.light-mode .camera-placeholder span {
   margin-bottom: 15px;
 }
 
-/* Pinterest layout styles */
+/* ... (keep other existing styles) ... */
+
 .pin-container {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-auto-rows: 10px;
-  grid-gap: 16px; /* Reduce the gap between items */
-  position: relative;
-  justify-content: center;
+  column-count: 5;
+  column-gap: 16px;
+  padding: 20px ;
+}
+
+@media (max-width: 1600px) {
+  .pin-container {
+    column-count: 4;
+  }
+}
+
+@media (max-width: 1200px) {
+  .pin-container {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .pin-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .pin-container {
+    column-count: 2;
+  }
 }
 
 .pin-item {
-  display: flex;
-  flex-direction: column;
   break-inside: avoid;
-  margin-bottom: 0; /* Remove bottom margin */
-  grid-row-end: span auto; /* Let the grid calculate the row span automatically */
-}
-
-.pin-item.landscape {
-  grid-row-end: span 26;
-}
-
-.pin-item.portrait {
-  grid-row-end: span 33;
-}
-
-.pin-item.tall {
-  grid-row-end: span 45;
+  margin-bottom: 24px;
+  display: inline-block;
+  width: 100%;
 }
 
 .card-wrapper {
-  width: 100%;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #222;
+  transition: transform 0.3s ease;
+}
+
+.card-wrapper:hover {
+  transform: translateY(-5px);
 }
 
 .card {
   width: 100%;
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: scale(1.02);
+  display: flex;
+  flex-direction: column;
 }
 
 .card-image-container {
   width: 100%;
-  padding-top: 100%; /* Default 1:1 aspect ratio */
   position: relative;
   overflow: hidden;
 }
 
-.pin-item.landscape .card-image-container {
-  padding-top: 75%; /* 4:3 aspect ratio */
-}
-
-.pin-item.portrait .card-image-container {
-  padding-top: 133.33%; /* 3:4 aspect ratio */
-}
-
-.pin-item.tall .card-image-container {
-  padding-top: 166.67%; /* 3:5 aspect ratio */
-}
-
 .card-image {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.card-info {
-  padding: 12px 4px;
-}
-
-.card-user-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.card-user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.card-username {
-  font-size: 14px;
-  font-weight: bold;
-  color: #333333;
+  display: block;
 }
 
 .card-caption {
   font-size: 14px;
-  color: #666666;
+  color: #ccc;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -534,6 +501,42 @@ body.light-mode .camera-placeholder span {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+
+.card-user-info {
+  display: flex;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #444;
+}
+
+.card-user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.card-username {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Pinterest-specific pin sizes */
+.pin-standard .card-image-container {
+  aspect-ratio: 2 / 3;
+}
+
+.pin-square .card-image-container {
+  aspect-ratio: 1 / 1;
+}
+
+.pin-long .card-image-container {
+  aspect-ratio: 1 / 2.1;
+}
+
+/* ... (keep other existing styles) ... */
 
 body:not(.light-mode) .card-username {
   color: #ffffff;

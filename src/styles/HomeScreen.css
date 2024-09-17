@@ -618,8 +618,7 @@ body.light-mode .image-preview-sidebar {
 
 .user-info {
   display: flex;
-  align-items:;
-  center;
+  align-items:center;
 }
 
 .user-avatar {

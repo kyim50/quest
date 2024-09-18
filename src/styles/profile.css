@@ -68,14 +68,14 @@
     height: calc(100vh - 20px);
     position: fixed;
     top: 10px;
-    left: 95px;
+    left: 75px; /* Slightly more than the collapsed navbar width */
     transition: left 0.3s ease, width 0.3s ease;
-    z-index: 1000;
+    z-index: 999; /* Lower than the navbar */
     border-radius: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--background-color);
     overflow-y: auto;
-}
+}  
 
 /* Updated styles */
 .profile-container.nav-collapsed {

@@ -1249,7 +1249,7 @@ body.light-mode .mid-bar::-webkit-scrollbar-thumb {
 
 /* Profile display styles */
 .profile-display {
-  display: flex;
+    display: flex;
   align-items: center;
 }
 

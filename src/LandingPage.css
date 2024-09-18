@@ -3,13 +3,13 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgb(28, 28, 30);
-    margin: 0; /* Remove default margin */
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    margin: 0;
+    overflow-x: hidden;
     overflow-y: auto;
-    font-family: Arial, sans-serif; /* Add a font for consistency */
+    font-family: Arial, sans-serif;
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
     display: none;
 }
 
@@ -17,7 +17,7 @@ body {
 .logo {
     position: absolute;
     display: block;
-    height: 60px; /* Default logo size */
+    height: 60px;
     top: 5%;
     left: 2%;
 }
@@ -25,17 +25,17 @@ body {
 /* Button Styles */
 .login-button {
     position: absolute;
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Shift left by half its width */
-    background-color: rgb(10, 145, 255); /* Vivid blue color */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(10, 145, 255);
     color: white;
     border: none;
-    font-size: 36px;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
     font-weight: bolder;
     cursor: pointer;
     border-radius: 10px;
-    width: 300px;
-    height: 90px;
+    width: clamp(200px, 30vw, 300px);
+    height: clamp(60px, 8vh, 90px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -43,22 +43,23 @@ body {
 }
 
 .login-button:hover {
-    background-color: rgb(7, 106, 187); /* Slightly darker blue for hover effect */
-    height: 100px;
-    width: 320px;
+    background-color: rgb(7, 106, 187);
+    width: clamp(220px, 32vw, 320px);
+    height: clamp(70px, 9vh, 100px);
 }
 
 /* Main Content Styles */
 .landing-main {
     text-align: center;
-    width: 80%;
+    width: 90%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding-bottom: 100px; /* Add padding to create space for scrolling */
+    padding: 100px 0;
 }
 
 .headline {
-    font-size: 24px; /* Headline main text must be the biggest */
-    margin-top: 150px;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    margin-top: 5vh;
     font-weight: 500;
     color: #999999;
 }
@@ -69,272 +70,172 @@ body {
 }
 
 .mainheadline {
-    font-size: 48px;
+    font-size: clamp(1.75rem, 5vw, 3rem);
     margin-bottom: 15px;
-    color: #ffffff; /* White color */
+    color: #ffffff;
     font-weight: bold;
 }
 
 .subtext {
-    font-size: 18px;
-    color: #999999; /* Light gray color */
-    margin: 0 auto;
-    margin-bottom: 50px;
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    color: #999999;
+    margin: 0 auto 50px;
     font-weight: 400;
     text-align: center;
+    max-width: 800px;
 }
 
 /* Functions Section Styles */
 .Functions {
-    color: #ffffff; /* White text for contrast */
-    padding: 30px 5px; /* Reduced padding for mobile */
+    color: #ffffff;
+    padding: 30px 5px;
     text-align: center;
-    margin-top: 60px; /* Adjust margin to fit mobile view */
+    margin-top: 60px;
 }
 
-/* Functions Heading */
 .Functionsh1 {
-    font-size: 24px;
+    font-size: clamp(1.5rem, 4vw, 2rem);
     margin-bottom: 20px;
     font-weight: bold;
 }
 
-/* Container for rectangles */
 .functions-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px; /* Space between rectangles */
+    gap: 20px;
 }
 
 span {
     color: rgb(10, 145, 255);
 }
 
-/* Individual rectangles */
 .function-box {
-    background-color: #403D39; /* Dark taupe color */
-    width: 100%; /* Full width of grid cell */
-    max-width: 350px;
-    height: 225px; /* Adjust height for mobile */
-    border-radius: 10px; /* Rounded corners */
+    background-color: #403D39;
+    width: calc(33.33% - 20px);
+    min-width: 250px;
+    height: 225px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: #ffffff; /* White text */
-    font-size: 14px; /* Adjust font size */
+    color: #ffffff;
+    font-size: 14px;
     font-weight: bold;
-    padding: 10px; /* Padding inside the box */
-    box-sizing: border-box; /* Ensure padding is included in the width and height */
-    overflow: hidden; /* Hide overflow text */
-    position: relative; /* Required for positioning of absolute elements */
-    transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease; /* Add transition for smooth animation */
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, height 0.3s ease, width 0.3s ease;
 }
 
-/* Add specific styles for the content inside the rectangles */
 .functionicon {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: transform 0.3s ease; /* Transition for smooth movement */
+    transition: transform 0.3s ease;
 }
 
 .functionicon img {
-    width: auto; /* Adjust icon size */
-    height: 30px; /* Adjust icon size */
+    width: auto;
+    height: 30px;
     margin-bottom: 5px;
 }
 
 .functionrectheader {
-    font-size: 18px; /* Adjust font size for mobile */
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
     margin-bottom: 5px;
     text-align: center;
-    transition: transform 0.3s ease; /* Transition for smooth movement */
+    transition: transform 0.3s ease;
 }
 
 .functiontext {
-    font-size: 12px; /* Adjust font size for mobile */
+    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
     text-align: center;
-    line-height: 1.2; /* Line height for readability */
-    overflow-y: auto; /* Allow vertical scrolling if text is too long */
+    line-height: 1.2;
+    overflow-y: auto;
     font-weight: 500;
     max-width: 300px;
-    opacity: 0; /* Initially hidden */
-    transition: opacity 0.3s ease; /* Transition for smooth fade-in */
+    opacity: 0;
+    transition: opacity 0.3s ease;
     position: absolute;
     margin-top: 30px;
-}
-
-/* Hover effects only on laptops */
-@media (min-width: 992px) {
-    .function-box:hover {
-        transform: scale(1.02); /* Slightly increase size */
-        width: 110%;
-    }
-
-    .function-box:hover .functionicon {
-        transform: translateY(-60px); /* Move icon and header up on hover */
-    }
-
-    .function-box:hover .functionrectheader {
-        transform: translateY(-60px); /* Move icon and header up on hover */
-    }
-
-    .function-box:hover .functiontext {
-        opacity: 1; /* Show text on hover */
-    }
 }
 
 /* Footer Styles */
 footer {
     position: absolute;
-    bottom: 20px;
+    top: 20px;
     right: 20px;
-    color: #999999; /* Light gray color */
-    font-size: 10px;
+    color: #999999;
+    font-size: clamp(0.625rem, 1.5vw, 0.75rem);
 }
 
 /* Responsive Styles */
-@media (max-width: 1200px) {
-    /* Adjust styles for smaller desktop screens */
-    .mainheadline {
-        font-size: 40px;
+@media (min-width: 992px) {
+    .function-box:hover {
+        transform: scale(1.02);
+        width: calc(33.33% - 10px);
     }
-    .Functionsh1 {
-        font-size: 30px;
+
+    .function-box:hover .functionicon,
+    .function-box:hover .functionrectheader {
+        transform: translateY(-60px);
     }
-    .function-box {
-        width: 300px;
-        height: 180px;
+
+    .function-box:hover .functiontext {
+        opacity: 1;
     }
 }
 
 @media (max-width: 992px) {
-    /* Adjust styles for tablets */
     .logo {
         height: 50px;
     }
-    .login-button {
-        font-size: 28px;
-        width: 260px;
-        height: 80px;
-    }
-    .mainheadline {
-        font-size: 36px;
-    }
-    .headline {
-        font-size: 20px;
-    }
-    .subtext {
-        font-size: 16px;
-    }
-    .Functionsh1 {
-        font-size: 28px;
-    }
     .function-box {
-        width: 280px;
-        height: 160px;
-    }
-    footer {
-        font-size: 9px;
+        width: calc(50% - 20px);
     }
 }
+
 @media (max-width: 768px) {
-    /* Adjust styles for mobile devices */
     .logo {
         position: relative;
         left: 50%;
         transform: translateX(-50%);
-        height: 70px; /* Increase logo size for mobile */
-        top: 60px; /* Adjust top position to bring the logo closer to the text */
+        height: 70px;
+        top: 20px;
     }
     .login-button {
-        font-size: 24px;
-        width: 240px;
-        height: 70px;
-        position: absolute; /* Position it absolutely within its container */
-        bottom: 20px; /* Move closer to the bottom */
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        margin-top: 30px;
     }
     .landing-main {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: calc(100vh - 120px); /* Adjust height to fit in the viewport minus margins */
-        text-align: center;
-    }
-    .headline {
-        font-size: 18px;
-        margin-top: 0; /* Remove top margin to center vertically */
-    }
-    .mainheadline {
-        font-size: 28px; /* Reduced font size to fit text better */
-        margin-bottom: 10px; /* Reduce space below mainheadline */
-    }
-    .subtext {
-        font-size: 12px; /* Reduced font size */
-        margin-top: 10px; /* Adjust top margin to match spacing */
-        margin-bottom: 30px;
-    }
-    .Functions {
-        padding: 40px 10px;
-        margin-top: 60px; /* Reduce margin to bring the section closer */
-    }
-    .Functionsh1 {
-        font-size: 24px;
+        padding: 50px 0;
     }
     .function-box {
-        width: 240px;
-        height: 140px;
+        width: 100%;
+        max-width: 400px;
     }
 }
 
 @media (max-width: 576px) {
-    /* Adjust styles for small mobile devices */
     .logo {
         height: 60px;
     }
-    .login-button {
-        font-size: 20px;
-        width: 200px;
-        height: 60px;
+    .functionicon {
+        transform: translateY(-30px);
     }
-    .headline {
-        font-size: 16px;
+    .functionrectheader {
+        transform: translateY(-30px);
     }
-    .mainheadline {
-        font-size: 24px;
-    }
-    .subtext {
-        font-size: 14px;
-    }
-    .Functionsh1 {
-        font-size: 22px;
-    }
-    .function-box {
-        width: 170px;
-        height: 200px;
-    }
-.functionicon{
-    transform:translateY(-50px);
-}
-.functionrectheader{
-    font-size: 16px;
-    transform:translateY(-50px);
-}
-
-    .functiontext{
-        opacity:1;
-        font-size: 9px;
-        margin-top: 60px; 
+    .functiontext {
+        opacity: 1;
+        font-size: clamp(0.5625rem, 1.5vw, 0.75rem);
+        margin-top: 60px;
         font-weight: 600;
     }
-    
-    
     footer {
-        display:none;
+        display: none;
     }
 }

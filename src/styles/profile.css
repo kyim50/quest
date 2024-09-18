@@ -257,7 +257,7 @@
 
 .edit-profile-button,
 .add-tag button {
-    background-color: var(--input-background);
+    /* background-color: var(--input-background); */
     color: var(--text-color);
     padding: 10px 20px;
     border-radius: 5px;
@@ -675,13 +675,13 @@ body.light-mode .profile-bio-edit {
 /* Enhance button styles for better visibility */
 .edit-profile-button,
 .add-tag button {
-    background-color: #4CAF50;
+    background-color: rgb(58, 58, 60);
     color: white;
 }
 
 .edit-profile-button:hover,
 .add-tag button:hover {
-    background-color: #45a049;
+    background-color: rgb(84, 84, 85);
 }
 
 /* Improve readability of placeholder text */

@@ -26,14 +26,14 @@ body.light-mode {
   position: fixed;
   left: 0;
   top: 0;
-  width: 80px;
+  width: 60px; /* Collapsed width */
   height: 100vh;
   background-color: #1a1a1a;
   display: flex;
   flex-direction: column;
   align-items: flex;
   z-index: 1000;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
   border-right: 1px solid #333;
   padding: 20px 0;
   overflow: hidden;
@@ -430,6 +430,25 @@ body.light-mode .camera-placeholder span {
   padding: 20px ;
 }
 
+@media (min-width: 769px) {
+  .nav-bar:hover {
+    width: 200px; /* Expanded width */
+  }
+
+  .nav-bar:hover + .main-content2 .profile-container {
+    left: 215px; /* Slightly more than the expanded navbar width */
+  }
+
+  .main-content2 {
+    transition: margin-left 0.3s ease;
+    margin-left: 60px; /* Same as collapsed navbar width */
+  }
+
+  .nav-bar:hover ~ .main-content2 {
+    margin-left: 200px; /* Same as expanded navbar width */
+  }
+}
+
 @media (max-width: 1600px) {
   .pin-container {
     column-count: 4;
@@ -618,8 +637,7 @@ body.light-mode .image-preview-sidebar {
 
 .user-info {
   display: flex;
-  align-items:;
-  center;
+  align-items:center;
 }
 
 .user-avatar {
@@ -1250,7 +1268,7 @@ body.light-mode .mid-bar::-webkit-scrollbar-thumb {
 
 /* Profile display styles */
 .profile-display {
-  display: flex;
+    display: flex;
   align-items: center;
 }
 

@@ -68,14 +68,14 @@
     height: calc(100vh - 20px);
     position: fixed;
     top: 10px;
-    left: 95px;
+    left: 75px; /* Slightly more than the collapsed navbar width */
     transition: left 0.3s ease, width 0.3s ease;
-    z-index: 1000;
+    z-index: 999; /* Lower than the navbar */
     border-radius: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--background-color);
     overflow-y: auto;
-}
+}  
 
 /* Updated styles */
 .profile-container.nav-collapsed {
@@ -257,7 +257,7 @@
 
 .edit-profile-button,
 .add-tag button {
-    background-color: var(--input-background);
+    /* background-color: var(--input-background); */
     color: var(--text-color);
     padding: 10px 20px;
     border-radius: 5px;
@@ -675,13 +675,13 @@ body.light-mode .profile-bio-edit {
 /* Enhance button styles for better visibility */
 .edit-profile-button,
 .add-tag button {
-    background-color: #4CAF50;
+    background-color: rgb(58, 58, 60);
     color: white;
 }
 
 .edit-profile-button:hover,
 .add-tag button:hover {
-    background-color: #45a049;
+    background-color: rgb(84, 84, 85);
 }
 
 /* Improve readability of placeholder text */

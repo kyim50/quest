@@ -7,7 +7,7 @@ function LandingPage() {
   return (
     <div className="landing-page">
       <header className="landing-header">
-        <img src="quests logo.png" alt="Quests Logo" className="logo" />
+        <img src="Quests Logo.png" alt="Quests Logo" className="logo" />
       </header>
 
       <main className="landing-main">

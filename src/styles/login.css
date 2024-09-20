@@ -18,6 +18,8 @@
   width: 70%;
   padding: 20px 30px;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .login-form {
@@ -26,14 +28,15 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  margin-top: 70px;
+  margin-top: 20px;
+  flex-grow: 1;
 }
 
 .login-form input {
   width: 100%;
   padding: 10px;
   height: 40px;
-  margin: 15px 0;
+  margin: 10px 0;
   background-color: rgb(99, 99, 102);
   border: none;
   box-shadow: none;
@@ -87,12 +90,23 @@
   cursor: pointer;
 }
 
+.error-container {
+  min-height: 20px;
+  margin-top: 10px;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 14px;
+}
+
 .buttons {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-top: 50px;
+  margin-top: auto;
+  padding-top: 20px;
 }
 
 .loginbtn {
@@ -174,9 +188,9 @@
   .login-container {
     width: 90%;
     height: auto;
-    flex-direction: column-reverse;  /* Change to column-reverse */
-    max-height: 90vh;  /* Add max-height to prevent overflow */
-    overflow-y: auto;  /* Allow scrolling if content exceeds max-height */
+    flex-direction: column-reverse;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .login-form-container {
@@ -187,7 +201,7 @@
   .blue-rectangle {
     width: 100%;
     padding: 20px;
-    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.3);  /* Change shadow direction */
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.3);
   }
 
   .login-form {

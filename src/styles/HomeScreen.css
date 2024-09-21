@@ -136,9 +136,7 @@ body.light-mode .nav-bar {
   z-index: 900;
 }
 
-.nav-bar:hover ~ .main-content2 {
-  padding-left: 120px;
-}
+
 
 .home-content {
   display: flex;
@@ -157,8 +155,8 @@ body.light-mode .nav-bar {
   background-color: rgb(18, 18, 20);
   transition: background-color 0.3s, border-color 0.3s;
   position: sticky;
-  margin-left: 20px;
   margin-right: 400px;
+  left:0;
   top: 0;
   z-index: 1000;
 }
@@ -435,7 +433,7 @@ body.light-mode .camera-placeholder span {
     width: 200px; /* Expanded width */
   }
 
-  .nav-bar:hover + .main-content2 .profile-container {
+  .nav-bar:hover + .main-content2 .profile-container, .nav-bar:hover + .main-content2 .connections-container2, .nav-bar:hover + .main-content2 .quests-page, .nav-bar:hover + .main-content2 .privacy-container{
     left: 215px; /* Slightly more than the expanded navbar width */
   }
 
@@ -445,7 +443,7 @@ body.light-mode .camera-placeholder span {
   }
 
   .nav-bar:hover ~ .main-content2 {
-    margin-left: 200px; /* Same as expanded navbar width */
+    margin-left: 200px; /*Makes the main feed move when hovered*/
   }
 }
 

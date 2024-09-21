@@ -91,7 +91,7 @@
 /* Adjust the map container to account for the profile container's new width */
 .map-container2 {
     flex-grow: 1;
-    margin-left: calc(var(--nav-bar-width-collapsed) + var(--profile-container-width) + 20px);
+    margin-left: calc(var(--nav-bar-width-collapsed) + var(--profile-container-width) - 70px);
     height: 100vh;
     transition: margin-left 0.3s ease;
 }

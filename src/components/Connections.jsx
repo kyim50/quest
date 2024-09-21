@@ -496,7 +496,7 @@ const Connections = ({ currentUserIds, map, setLockedUserId, lockedUserId, locke
   });
 
   return (
-    <animated.div className={`connections-container1 ${lockedUser ? 'user-locked1' : ''}`} style={springProps}>
+    <animated.div className={`connections-container2 ${lockedUser ? 'user-locked1' : ''}`} style={springProps}>
       <div className="drag-handle" {...bindDrag()} />
       {notification && <div className="notification1">{notification}</div>}
 

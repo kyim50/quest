@@ -1,0 +1,26 @@
+.main-page {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0 auto;
+    padding: 1.5rem;
+
+    max-width: 100rem;
+
+    color: black;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: Roboto, sans-serif;
+}
+
+.left-panel {
+    width: auto;
+    border: 1px solid pink;
+}
+.middle-panel {
+    width: 70%;
+    border: 1px solid pink;
+}
+.right-panel {
+    width: 30%;
+    border: 1px solid pink;
+}

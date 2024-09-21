@@ -1,0 +1,30 @@
+.navigation-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+  padding: 0.5rem;
+
+  width: 5rem;
+
+  border: 3px solid black;
+  border-radius: 0.75rem;
+}
+
+.navigation-bar-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  aspect-ratio: 1/1;
+
+  background-color: black;
+  border-radius: 0.5rem;
+}
+
+.navigation-bar-button:hover {
+  
+}

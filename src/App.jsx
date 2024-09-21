@@ -8,6 +8,7 @@ import NotificationDisplay from "./NotificationDisplay";
 import LandingPage from "./LandingPage";
 import { initializeTheme } from "./theme-toggle";
 import { UserStatusProvider } from "./components/UserStatusContext"; // Import the UserStatusProvider
+import MainPage from "./pages/MainPage";
 
 function App() {
   useEffect(() => {
@@ -26,7 +27,7 @@ function App() {
               path="/home"
               element={
                 <>
-                  <HomeScreen />
+                  <MainPage />
                   <NotificationDisplay />
                 </>
               }

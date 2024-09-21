@@ -21,8 +21,12 @@
   width: 100%;
   aspect-ratio: 1/1;
 
-  background-color: black;
+  background-color: #6289EC;
   border-radius: 0.5rem;
+}
+
+.navigation-bar-button > svg {
+    fill: black;
 }
 
 .navigation-bar-button:hover {

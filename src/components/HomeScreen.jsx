@@ -10,7 +10,7 @@ import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, doc,
 import { Camera } from 'react-camera-pro';
 import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
-import MapComponent from './MapComponent';
+import MapComponent from '././map/MapComponent';
 import NavigationBar from './NavigationBar';
 import UserProfile from './UserProfile';
 import QuestsComponent from './QuestsComponent';

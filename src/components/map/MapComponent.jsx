@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { setupUserLocationsListener, trackUserLocation, centerMapOnUser } from './UserLocationService';
-import QuestsComponent from './QuestsComponent';
-import { getCurrentTheme, initializeTheme } from '../theme-toggle';
+import QuestsComponent from '../QuestsComponent';
+import { getCurrentTheme, initializeTheme } from '../../theme-toggle';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, serverTimestamp, arrayRemove, getDoc, arrayUnion, query, where, orderBy, limit, setDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import '../styles/quests.css';
-import { centerMapOnUser } from './UserLocationService';
+import { centerMapOnUser } from '././map/UserLocationService';
 import addFriendIcon from '../assets/addfriend.png';
 import mapboxgl from 'mapbox-gl';
 import { useNotification } from '../NotificationContext';

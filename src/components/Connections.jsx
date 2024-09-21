@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, doc, serverTimestamp, arrayRemove, getDoc, arrayUnion, query, where, orderBy, limit } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import './connections.css';
-import { centerMapOnUser } from './UserLocationService';
+import { centerMapOnUser } from '././map/UserLocationService';
 import chatIcon from './chatbubble.png';
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from 'react-use-gesture';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './MainPage.css';
 import NavigationBar from '../components/navigation-bar/NavigationBar';
 import Feed from '../components/feed/Feed';

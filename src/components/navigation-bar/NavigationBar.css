@@ -1,3 +1,7 @@
+.navigation-bar > * {
+  transition: none;
+}
+
 .navigation-bar {
   display: flex;
   flex-direction: column;
@@ -9,7 +13,7 @@
 
   width: 5rem;
 
-  border: 3px solid black;
+  border: 4px solid black;
   border-radius: 0.75rem;
 }
 
@@ -21,14 +25,19 @@
   width: 100%;
   aspect-ratio: 1/1;
 
-  background-color: #6289EC;
   border-radius: 0.5rem;
+}
+.navigation-bar-button.selected {
+  background-color: #6289ec;
 }
 
 .navigation-bar-button > svg {
-    fill: black;
+  fill: black;
+  width: 2rem;
+  height: 2rem;
 }
 
 .navigation-bar-button:hover {
-  
+  border: 4px solid #6289ec;
+  /* border-radius: 0.5rem; */
 }

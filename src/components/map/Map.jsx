@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Map.css'
 import MapComponent from '././MapComponent';
 
 function Map() {
@@ -9,7 +10,7 @@ function Map() {
   const [lockedUser, setLockedUser] = useState(null);
 
   return (
-    <div>
+    <div className='map-container'>
       <MapComponent
         address={address}
         setAddress={setAddress}

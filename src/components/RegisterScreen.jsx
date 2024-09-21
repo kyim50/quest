@@ -10,6 +10,7 @@ import '../styles/register.css';
 const RegisterScreen = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [registerError, setRegisterError] = useState('');
 
   const initialValues = {
     name: '',
@@ -18,13 +19,14 @@ const RegisterScreen = () => {
   };
 
   const validationSchema = Yup.object({
-    name: Yup.string().required('Required'),
-    email: Yup.string().email('Invalid email address').required('Required'),
-    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Required')
+    name: Yup.string().required('Name required'),
+    email: Yup.string().email('Invalid email address').required('Email required'),
+    password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password required')
   });
 
   const onSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
+      setRegisterError('');
       const userCredential = await signUpWithEmailAndPassword(values.email, values.password, values.name);
       if (!userCredential || !userCredential.user) {
         throw new Error('Failed to sign up');
@@ -47,7 +49,7 @@ const RegisterScreen = () => {
       navigate('/login');
     } catch (error) {
       console.error('Error signing up:', error);
-      setErrors({ general: 'Failed to sign up. Please check your details and try again.' });
+      setRegisterError('Failed to sign up. Please check your details and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -55,11 +57,13 @@ const RegisterScreen = () => {
 
   const handleGoogleSignUp = async () => {
     try {
+      setRegisterError('');
       const user = await signUpWithGoogle();
       console.log('Google user signed up:', user);
       navigate('/login');
     } catch (error) {
       console.error('Error signing up with Google:', error);
+      setRegisterError('Error signing up with Google');
     }
   };
 
@@ -71,20 +75,17 @@ const RegisterScreen = () => {
           Already a user? <Link to="/login" style={{ color: 'rgb(10,145,255)' }}>Login here.</Link>
         </p>
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-          {({ isSubmitting, errors }) => (
+          {({ isSubmitting, errors, touched }) => (
             <Form className="register-form">
-              <Field className="username" type="text" name="name" placeholder="Username" required />
-              <ErrorMessage name="name" component="div" style={{ color: 'red' }} />
+              <Field className="username" type="text" name="name" placeholder="Name" />
               
-              <Field type="email" name="email" placeholder="Email" required />
-              <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
+              <Field type="email" name="email" placeholder="Email" />
               
               <div className="password-container">
                 <Field
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Password"
-                  required
                 />
                 <div
                   className="password-toggle"
@@ -95,7 +96,14 @@ const RegisterScreen = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </div>
               </div>
-              <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+              
+              <div className="error-container">
+                {(errors.name && touched.name) || (errors.email && touched.email) || (errors.password && touched.password) ? (
+                  <div className="error-message">{errors.name || errors.email || errors.password}</div>
+                ) : registerError ? (
+                  <div className="error-message">{registerError}</div>
+                ) : null}
+              </div>
               
               <div className="button-container">
                 <button className="google-register-btn" onClick={handleGoogleSignUp} type="button">
@@ -103,8 +111,6 @@ const RegisterScreen = () => {
                 </button>
                 <button className="register-btn" type="submit" disabled={isSubmitting}>Register</button>
               </div>
-              
-              {errors.general && <div style={{ color: 'red', marginTop: '10px' }}>{errors.general}</div>}
             </Form>
           )}
         </Formik>

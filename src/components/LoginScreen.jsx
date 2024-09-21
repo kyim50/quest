@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { signInWithEmailAndPassword, signInWithGoogle } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import '../styles/login.css';
 const LoginScreen = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState('');
 
   const initialValues = {
     email: '',
@@ -16,11 +17,12 @@ const LoginScreen = () => {
   };
 
   const validationSchema = Yup.object({
-    email: Yup.string().email('Invalid email address').required('Required'),
-    password: Yup.string().required('Required')
+    email: Yup.string().email('Invalid email address').required('Enter email'),
+    password: Yup.string().required('Enter password')
   });
 
   const onSubmit = (values, { setSubmitting }) => {
+    setLoginError('');
     signInWithEmailAndPassword(values.email, values.password)
       .then((userCredential) => {
         const user = userCredential.user;
@@ -29,6 +31,7 @@ const LoginScreen = () => {
       })
       .catch((error) => {
         console.error('Error signing in:', error);
+        setLoginError('Incorrect username or password');
       })
       .finally(() => {
         setSubmitting(false);
@@ -47,6 +50,7 @@ const LoginScreen = () => {
       }
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      setLoginError('Error signing in with Google');
     }
   };
 
@@ -59,17 +63,15 @@ const LoginScreen = () => {
         </p>
 
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-          {({ isSubmitting }) => (
+          {({ isSubmitting, errors, touched }) => (
             <Form className="login-form">
-              <Field type="email" name="email" placeholder="Email Address" required />
-              <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
+              <Field type="email" name="email" placeholder="Email Address" />
               
               <div className="password-container">
                 <Field
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   placeholder="Password"
-                  required
                 />
                 <span
                   className="password-toggle"
@@ -80,7 +82,14 @@ const LoginScreen = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-              <ErrorMessage name="password" component="div" style={{ color: 'red' }} />
+
+              <div className="error-container">
+                {(errors.email && touched.email) || (errors.password && touched.password) ? (
+                  <div className="error-message">{errors.email || errors.password}</div>
+                ) : loginError ? (
+                  <div className="error-message">{loginError}</div>
+                ) : null}
+              </div>
 
               <div className='buttons'>
                 <button className="google-login-btn" onClick={handleGoogleLogin} type="button">

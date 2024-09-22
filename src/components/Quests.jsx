@@ -746,7 +746,7 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
   });
 
   return (
-    <animated.div className="quests-page" style={springProps}>
+    <div className="quests-page" style={springProps}>
       <div className="drag-handle" {...bindDrag()} />
       <div className="quests-header">
         <h2>Quests</h2>
@@ -902,7 +902,7 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
           </div>
         </div>
       )}
-    </animated.div>
+    </div>
   );
 };
 

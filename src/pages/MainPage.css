@@ -1,4 +1,8 @@
 .main-page {
+    --border-radius: 0.75rem;
+}
+
+.main-page {
   display: flex;
   gap: 1.5rem;
   margin: 0 auto;
@@ -13,6 +17,7 @@
 }
 
 .left-panel {
+  display: flex;
   width: auto;
   border: 1px solid pink;
 }
@@ -51,7 +56,7 @@
   background-color: #6289ec;
 
   border: 3px solid black;
-  border-radius: 0.75rem;
+  border-radius: var(--border-radius);
 
   font-weight: 600;
   font-size: 1rem;
@@ -92,7 +97,8 @@
   max-width: 20rem;
   height: 4rem;
 
-  background: rgba(0, 11, 40, 0.80) url(../assets/images/create-quest-button-map-background.jpg);
+  background: rgba(0, 11, 40, 0.8)
+    url(../assets/images/create-quest-button-map-background.jpg);
   background-blend-mode: overlay;
   background-size: cover;
 

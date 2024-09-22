@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './MainPage.css';
 
 import NavigationBar from '../components/navigation-bar/NavigationBar';
+import NavigationModal from '../components/navigation-modal/NavigationModal';
 import Feed from '../components/feed/Feed';
 import Map from '../components/map/Map';
 
@@ -14,6 +15,7 @@ function MainPage() {
     <div className="main-page">
       <div className="left-panel">
         <NavigationBar />
+        <NavigationModal />
       </div>
       <div className="middle-panel">
         <Feed />
@@ -52,7 +54,7 @@ function Filter() {
 function CreateQuestButton() {
   return (
     <button className="create-button">
-      <CreateQuestIcon /> 
+      <CreateQuestIcon />
       Create Quest
     </button>
   );

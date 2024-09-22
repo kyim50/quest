@@ -234,7 +234,7 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
   });
 
   return (
-    <animated.div 
+    <div 
       className={`profile-container ${isMobile ? 'mobile' : 'desktop'} ${isNavExpanded ? 'nav-expanded' : ''}`} 
       style={isMobile ? springProps : {}}
     >
@@ -367,7 +367,7 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
           <p className='logouttext'>Logout</p>
         </button>
       </div>
-    </animated.div>
+    </div>
   );
 };
 

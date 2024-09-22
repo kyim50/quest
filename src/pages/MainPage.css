@@ -1,26 +1,109 @@
 .main-page {
-    display: flex;
-    gap: 1.5rem;
-    margin: 0 auto;
-    padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0 auto;
+  padding: 1.5rem;
 
-    max-width: 100rem;
+  max-width: 100rem;
 
-    color: black;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: Roboto, sans-serif;
+  color: black;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: Roboto, sans-serif;
 }
 
 .left-panel {
-    width: auto;
-    border: 1px solid pink;
+  width: auto;
+  border: 1px solid pink;
 }
 .middle-panel {
-    width: 70%;
-    border: 1px solid pink;
+  width: 60%;
+  border: 1px solid pink;
 }
 .right-panel {
-    width: 30%;
-    border: 1px solid pink;
+  width: 40%;
+  max-width: 30rem;
+  border: 1px solid pink;
+}
+
+.actions-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.actions-container svg {
+  fill: black;
+  width: 2rem;
+  height: 2rem;
+}
+
+.search,
+.filter-button,
+.create-button {
+  display: flex;
+  align-items: center;
+
+  padding: 0 0.75rem;
+
+  width: 50%;
+  height: 3.5rem;
+
+  background-color: #6289ec;
+
+  border: 3px solid black;
+  border-radius: 0.75rem;
+
+  font-weight: 600;
+  font-size: 1rem;
+
+  cursor: pointer;
+}
+
+.search-input {
+  padding-left: 0.5rem;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: transparent;
+  border: none;
+
+  font-weight: 600;
+  font-size: 1rem;
+  color: black;
+}
+.search-input::placeholder {
+  font-weight: 600;
+  font-size: 1rem;
+  color: black;
+}
+
+.filter-button {
+  padding: 0 0.5rem;
+}
+
+.create-button {
+  padding-left: 2rem;
+  gap: 0.5rem;
+
+  margin-top: 1rem;
+
+  width: 75%;
+  max-width: 20rem;
+  height: 4rem;
+
+  background: rgba(0, 11, 40, 0.80) url(../assets/images/create-quest-button-map-background.jpg);
+  background-blend-mode: overlay;
+  background-size: cover;
+
+  border-color: #6289ec;
+  box-shadow: inset 0 0 0 2px white;
+
+  font-size: 1.25rem;
+  color: white;
+}
+.create-button svg {
+  fill: #6289ec;
+  width: 1.75rem;
+  height: 1.75rem;
 }

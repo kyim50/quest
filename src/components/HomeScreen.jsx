@@ -21,6 +21,9 @@ import { toggleTheme } from '../theme-toggle';
 import '../styles/HomeScreen.css';
 import notificationIcon from '../assets/notification.png';
 import themeToggleIcon from '../assets/day-and-night.png';
+import PinterestLayout from './PinterestLayout';
+import ImagePreview from './ImagePreview';
+import ProfileDisplay from './ProfileDisplay';
 
 const HomeScreen = React.memo(() => {
   const [activeSection, setActiveSection] = useState('');
@@ -397,143 +400,6 @@ const HomeScreen = React.memo(() => {
     config: { tension: 300, friction: 30 }
   });
 
-  const ProfileDisplay = useMemo(() => () => (
-    <div className="profile-display">
-      <div className="profile-photo-container">
-        <img 
-          src={currentUser?.profilePhoto || '/default-profile-image.jpg'} 
-          alt={currentUser?.name || 'Profile'}
-          className="profile-photo" 
-        />
-      </div>
-      <div className="profile-name-status">
-        <h2 className="profile-name">{currentUser?.name || 'Loading...'}</h2>
-        <p className="profile-status">
-          <span className="status-dot"></span>
-          Active now
-        </p>
-      </div>
-    </div>  
-  ), [currentUser]);
-
-  const PinterestLayout = React.memo(({ items, onItemClick }) => {
-    const getPinSize = useCallback((aspectRatio) => {
-      const ratio = aspectRatio.split(':').map(Number);
-      if (ratio[0] === ratio[1]) return 'square';
-      if (ratio[0] * 3 === ratio[1] * 2) return 'standard';
-      if (ratio[0] * 21 === ratio[1] * 10) return 'long';
-      return 'standard'; // default to standard if ratio doesn't match
-    }, []);
-  
-    return (
-      <div className="pin-container">
-        {items.map((item) => {
-          const pinSize = getPinSize(item.aspectRatio || '2:3');
-          return (
-            <div key={item.id} className="pin-item">
-              <div className={`card-wrapper pin-${pinSize}`}>
-                <div className="card" onClick={() => onItemClick(item)}>
-                  <div className="card-image-container">
-                    <img 
-                      src={item.image} 
-                      alt={item.caption || `Photo by ${item.user.name}`} 
-                      className="card-image"
-                    />
-                  </div>
-                  <div className="card-content">
-                    {item.caption && <p className="card-caption">{item.caption}</p>}
-                  </div>
-                </div>
-              </div>
-              <div className="card-user-info">
-                <img src={item.user.profilePhoto || '/default-profile-image.jpg'} alt={item.user.name} className="card-user-avatar" />
-                <span className="card-username">{item.user.name}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  });
-
-  const ImagePreview = React.memo(({ selectedImage, comments, onClose, onAddComment, onDeletePost }) => {
-    const [localComment, setLocalComment] = useState('');
-  
-    const handleAddComment = () => {
-      onAddComment(localComment);
-      setLocalComment('');
-    };
-  
-    return (
-      <div className="image-preview-overlay" onClick={onClose}>
-        <div className="image-preview-content" onClick={e => e.stopPropagation()}>
-          <div className="image-preview-main">
-            <img src={selectedImage?.image} alt="Preview" className="preview-image" />
-          </div>
-          <div className="image-preview-sidebar">
-            <div className="image-preview-header">
-              <div className="user-info">
-                <img src={selectedImage?.user?.profilePhoto || '/default-profile-image.jpg'} alt="User" className="user-avatar" />
-                <span className="username">{selectedImage?.user?.name || 'Unknown User'}</span>
-              </div>
-              <IconButton onClick={onClose} className="close-button">
-                <Close />
-              </IconButton>
-            </div>
-            <div className="quest-info">
-              {selectedImage?.questTitle ? (
-                <p className="quest-title">{selectedImage.questTitle}</p>
-              ) : (
-                <p className="quest-break">Taking a break from quests</p>
-              )}
-            </div>
-            {selectedImage?.caption && (
-              <p className="image-caption">{selectedImage.caption}</p>
-            )}
-            <div className="comments-section">
-              {comments.map(comment => (
-                <div key={comment.id} className="comment">
-                  <img 
-                    src={comment.userProfileImage || '/default-profile-image.jpg'} 
-                    alt={comment.username} 
-                    className="comment-user-avatar"
-                  />
-                  <div className="comment-content">
-                    <strong>{comment.username}</strong>
-                    <p>{comment.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="add-comment">
-              <TextField
-                value={localComment}
-                onChange={(e) => setLocalComment(e.target.value)}
-                placeholder="Add a comment..."
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={handleAddComment}>
-                      <Send />
-                    </IconButton>
-                  ),
-                }}
-              />
-            </div>
-            {selectedImage?.userId === auth.currentUser?.uid && (
-              <Button
-                startIcon={<Delete />}
-                onClick={onDeletePost}
-                className="delete-button"
-              >
-                Delete Post
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  });
 
   const renderHomeContent = useCallback(() => (
     <div className="home-content">

@@ -24,7 +24,7 @@ function App() {
             <Route path="/login" element={<LoginScreen />} />
             <Route path="/register" element={<RegisterScreen />} />
             <Route
-              path="/home"
+              path="/home/*"
               element={
                 <>
                   <MainPage />

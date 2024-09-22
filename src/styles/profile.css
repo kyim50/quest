@@ -1,6 +1,6 @@
 :root {
     /* Dark theme variables */
-    --dark-background: rgb(33, 33, 33);
+    --dark-background: rgb(255, 255, 255);
     --dark-text: #fffcf2;
     --dark-secondary-text: #ccc5b9;
     --dark-section-background: rgb(40, 40, 40);
@@ -22,7 +22,7 @@
     --light-quest-background: #f9f9f9;
 
     /* Default to dark theme */
-    --background-color: var(--dark-background);
+    --background-color: black;
     --text-color: var(--dark-text);
     --secondary-text-color: var(--dark-secondary-text);
     --section-background: var(--dark-section-background);
@@ -66,7 +66,6 @@
 .profile-container {
     width: 100%;
     height: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--background-color);
     overflow-y: scroll;
 }  

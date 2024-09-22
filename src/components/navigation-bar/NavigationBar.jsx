@@ -13,33 +13,33 @@ function NavigationBar() {
   return (
     <div className="navigation-bar-container">
       <div className="navigation-bar">
-        <NavigationButton type={'/home'}>
+        <NavigationButton link={'/home'}>
           <HomeIcon />
         </NavigationButton>
-        <NavigationButton type={'camera'}>
+        <NavigationButton link={'camera'}>
           <CameraIcon />
         </NavigationButton>
-        <NavigationButton type={'profile'}>
+        <NavigationButton link={'profile'}>
             <div className='profile-icon'></div>
         </NavigationButton>
-        <NavigationButton type={'connections'}>
+        <NavigationButton link={'connections'}>
           <SocialIcon />
         </NavigationButton>
-        <NavigationButton type={'quests'}>
+        <NavigationButton link={'quests'}>
           <QuestsIcon />
         </NavigationButton>
       </div>
     </div>
   );
 
-  function NavigationButton({ type, children }) {
-    const isSelected = type === currPage;
+  function NavigationButton({ link, children }) {
+    const isSelected = link === currPage;
 
     return (
       <Link
         className={`navigation-bar-button ${isSelected ? 'selected' : ''}`}
-        to={type}
-        onClick={() => setCurrPage(type)}
+        to={link}
+        onClick={() => setCurrPage(link)}
       >
         {children}
       </Link>

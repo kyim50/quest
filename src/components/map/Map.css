@@ -5,3 +5,10 @@
     border-radius: 0.75rem;
     overflow: hidden;
 }
+
+
+@media (max-width: 800px) {
+    .map-container {
+        width: 50%;
+    }
+}

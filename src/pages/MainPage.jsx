@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './MainPage.css';
 
 import { Routes, Route } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 import NavigationBar from '../components/navigation-bar/NavigationBar';
 import NavigationModal from '../components/navigation-modal/NavigationModalWrapper';
@@ -18,26 +19,42 @@ import CreateQuestIcon from '../assets/icons/new_window_24dp_E8EAED_FILL1_wght40
 import Quests from '../components/Quests';
 
 function MainPage() {
+  const isMobileBreak = useMediaQuery({ query: '(max-width: 800px)' });
+
   return (
     <div className="main-page">
       <div className="left-panel">
         <NavigationBar />
         <Routes>
-            <Route path="profile" element={<UserProfile/>}/>
-            <Route path="connections" element={<Connections/>}/>
-            <Route path="quests" element={<QuestsComponent/>}/>
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="connections" element={<Connections />} />
+          <Route path="quests" element={<QuestsComponent />} />
         </Routes>
       </div>
-      <div className="middle-panel">
-        <Feed />
-      </div>
-      <div className="right-panel">
-        <Map />
-        <div className="actions-container">
-          <Search />
-          <Filter />
+      <div className="body-section">
+        <div className="middle-panel">
+          <Feed />
         </div>
-        <CreateQuestButton />
+        <div className="right-panel">
+          <Map />
+          <div className="button-section">
+            {isMobileBreak ? (
+              <>
+                <Search />
+                <CreateQuestButton />
+                <Filter />
+              </>
+            ) : (
+              <>
+                <div className="actions-container">
+                  <Search />
+                  <Filter />
+                </div>
+                <CreateQuestButton />
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -46,8 +63,10 @@ function MainPage() {
 function Search() {
   return (
     <div className="search">
-      <SearchIcon />
-      <input className="search-input" type="text" placeholder="Search" />
+      <div className="icon-container">
+        <SearchIcon />
+      </div>
+      <input className="search-input" type="text" placeholder="Find Quests" />
     </div>
   );
 }
@@ -56,7 +75,9 @@ function Filter() {
 
   return (
     <button className="filter-button">
-      <DropDownIcon />
+      <div className="icon-container">
+        <DropDownIcon />
+      </div>
       {filter}
     </button>
   );
@@ -65,7 +86,9 @@ function Filter() {
 function CreateQuestButton() {
   return (
     <button className="create-button">
-      <CreateQuestIcon />
+      <div className="icon-container">
+        <CreateQuestIcon />
+      </div>
       Create Quest
     </button>
   );

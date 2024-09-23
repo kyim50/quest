@@ -15,6 +15,7 @@
 
   border: 3px solid black;
   border-radius: var(--border-radius);
+  background-color: white;
 }
 
 .navigation-bar-button {
@@ -47,4 +48,20 @@
 .navigation-bar-button:hover {
   border: 4px solid #6289ec;
   border-radius: 0.5rem;
+}
+
+@media (max-width: 550px) {
+  .navigation-bar {
+    flex-direction: row;
+    margin: 0 auto;
+
+    height: 4rem;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+  }
+
+  .navigation-bar-button {
+    height: 100%;
+    aspect-ratio: 1/1;
+  }
 }

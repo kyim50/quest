@@ -30,15 +30,7 @@ function MainPage() {
       console.debug('scroll');
       if (topSectionRef.current) {
         const rect = topSectionRef.current.getBoundingClientRect();
-        // const isVisible =
-        //   rect.top >= 0 &&
-        //   rect.left >= 0 &&
-        //   rect.bottom <=
-        //     (window.innerHeight || document.documentElement.clientHeight) &&
-        //   rect.right <=
-        //     (window.innerWidth || document.documentElement.clientWidth);
-        // console.debug(isVisible);
-
+        // show top bar if top section is off screen
         setShowTopBar(rect.bottom < 48);
       }
     };

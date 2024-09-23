@@ -6,12 +6,17 @@ import QuestCard from './card/QuestCard';
 function Feed() {
   return (
     <div className="feed">
-      <QuestCard />
-      <QuestCard />
-      <QuestCard />
-      <QuestCard />
-      <QuestCard />
-      <QuestCard />
+      <QuestCard aspectRatio={3/4}/>
+      <QuestCard aspectRatio={9/16}/>
+      <QuestCard aspectRatio={1/1}/>
+      <QuestCard aspectRatio={3/4}/>
+      <QuestCard aspectRatio={1/1}/>
+      <QuestCard aspectRatio={9/16}/>
+      <QuestCard aspectRatio={1/1}/>
+      <QuestCard aspectRatio={1/1}/>
+      <QuestCard aspectRatio={9/16}/>
+      <QuestCard aspectRatio={3/4}/>
+      <QuestCard aspectRatio={9/16}/>
     </div>
   );
 }

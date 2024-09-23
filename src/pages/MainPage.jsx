@@ -12,17 +12,19 @@ import UserProfile from '../components/UserProfile';
 import QuestsComponent from '../components/QuestsComponent';
 import Connections from '../components/Connections';
 import PrivacySection from '../components/PrivacySection';
+import TopBar from '../components/top-bar/TopBar';
 
 import SearchIcon from '../assets/icons/search_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import DropDownIcon from '../assets/icons/arrow_drop_down_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import CreateQuestIcon from '../assets/icons/new_window_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
-import Quests from '../components/Quests';
 
 function MainPage() {
-  const isMobileBreak = useMediaQuery({ query: '(max-width: 800px)' });
+  const isFirstBreak = useMediaQuery({ query: '(max-width: 800px)' });
+  const isMobileBreak = useMediaQuery({ query: '(max-width: 550px)' });
 
   return (
     <div className="main-page">
+      {isMobileBreak && <TopBar />}
       <div className="left-panel">
         <NavigationBar />
         <Routes>
@@ -38,7 +40,7 @@ function MainPage() {
         <div className="right-panel">
           <Map />
           <div className="button-section">
-            {isMobileBreak ? (
+            {isFirstBreak ? (
               <>
                 <Search />
                 <CreateQuestButton />
@@ -60,21 +62,23 @@ function MainPage() {
   );
 }
 
-function Search() {
+export function Search({ small = false }) {
   return (
-    <div className="search">
+    <div className={`search ${small && 'small'}`}>
       <div className="icon-container">
         <SearchIcon />
       </div>
-      <input className="search-input" type="text" placeholder="Find Quests" />
+      {!small && (
+        <input className="search-input" type="text" placeholder="Find Quests" />
+      )}
     </div>
   );
 }
-function Filter() {
+export function Filter({ small = false }) {
   const [filter, setFilter] = useState('Near You');
 
   return (
-    <button className="filter-button">
+    <button className={`filter-button ${small && 'small'}`}>
       <div className="icon-container">
         <DropDownIcon />
       </div>
@@ -83,13 +87,13 @@ function Filter() {
   );
 }
 
-function CreateQuestButton() {
+export function CreateQuestButton({ small = false }) {
   return (
-    <button className="create-button">
+    <button className={`create-button ${small && 'small'}`}>
       <div className="icon-container">
         <CreateQuestIcon />
       </div>
-      Create Quest
+      {!small && 'Create Quest'}
     </button>
   );
 }

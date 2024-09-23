@@ -1,15 +1,16 @@
 .main-page {
+  --main-page-padding: 1.5rem;
   --border-radius: 0.75rem;
 }
 .main-page * {
-    transition: none;
+  transition: none;
 }
 
 .main-page {
   display: flex;
   gap: 1.5rem;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: var(--main-page-padding);
 
   max-width: 100rem;
   min-width: 320px;
@@ -28,16 +29,16 @@
 .left-panel {
   display: flex;
   width: auto;
-  border: 1px solid pink;
+  /* border: 1px solid pink; */
 }
 .middle-panel {
   width: 60%;
-  border: 1px solid pink;
+  /* border: 1px solid pink; */
 }
 .right-panel {
   width: 40%;
   max-width: 30rem;
-  border: 1px solid pink;
+  /* border: 1px solid pink; */
 }
 
 .actions-container {
@@ -50,7 +51,9 @@
   aspect-ratio: 1/1;
   fill: black;
 }
-.button-section .icon-container {
+.icon-container {
+  display: flex;
+  align-items: center;
   height: 100%;
   margin-right: 0.5rem;
 }
@@ -124,13 +127,13 @@
   }
 }
 .create-button {
-  background: rgba(0, 11, 40, 0.8)
+  background: rgba(0, 5, 19, 0.85)
     url(../assets/images/create-quest-button-map-background.jpg);
   background-blend-mode: overlay;
   background-size: cover;
 
-  border: 2px solid #6289ec;
-  box-shadow: inset 0 0 0 2px white;
+  border: 3px solid #6289ec;
+  box-shadow: inset 0 0 0 3px white;
 
   color: white;
 }
@@ -190,6 +193,8 @@
     height: 90%;
     margin: 0;
 
+    text-wrap: nowrap;
+
     font-size: 1rem;
   }
   .create-button {
@@ -204,8 +209,9 @@
 
 @media (max-width: 550px) {
   .main-page {
+    --main-page-padding: 0.75rem;
+
     flex-direction: column-reverse;
-    padding: 0.75rem;
   }
   .left-panel {
     position: fixed;
@@ -222,6 +228,42 @@
 @media (max-width: 400px) {
   .main-page {
     flex-direction: column-reverse;
-    padding: 0.5rem;
+    --main-page-padding: 0.5rem;
   }
+}
+
+.search.small,
+.create-button.small {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+
+  width: 4rem;
+  min-width: 4rem;
+  height: 100%;
+}
+.create-button.small {
+  box-shadow: inset 0 0 0 3px black;
+}
+.search.small svg,
+.filter-button.small svg {
+  fill: black;
+}
+.search.small .icon-container,
+.create-button.small .icon-container {
+  margin-right: 0;
+}
+.filter-button.small {
+  height: 100%;
+}
+.filter-button.small svg {
+  height: 100%;
+}
+.map-container.small {
+  height: 100%;
+  width: 4rem;
+  min-width: 4rem;
+
+  border: 3px solid black;
 }

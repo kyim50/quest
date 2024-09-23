@@ -403,9 +403,9 @@ const HomeScreen = React.memo(() => {
 
   const renderHomeContent = useCallback(() => (
     <div className="home-content">
-      <div className="top-bar">
+      <div className="top-bar-old">
         <ProfileDisplay />
-        <div className="top-bar-center">
+        <div className="top-bar-old-center">
           <TextField
             className="search-bar-home"
             placeholder="Search..."
@@ -420,14 +420,14 @@ const HomeScreen = React.memo(() => {
             }}
           />
         </div>
-        <div className="top-bar-right">
+        <div className="top-bar-old-right">
           <IconButton onClick={toggleNotifications}>
             <Badge badgeContent={notifications.length} color="primary">
-              <img src={notificationIcon} alt="Notifications" className="top-bar-icon" />
+              <img src={notificationIcon} alt="Notifications" className="top-bar-old-icon" />
             </Badge>
           </IconButton>
           <IconButton onClick={toggleTheme}>
-            <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-icon" />        
+            <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-old-icon" />        
           </IconButton>
         </div>
       </div>

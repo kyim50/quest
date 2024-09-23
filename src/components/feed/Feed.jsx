@@ -10,6 +10,8 @@ function Feed() {
       <QuestCard />
       <QuestCard />
       <QuestCard />
+      <QuestCard />
+      <QuestCard />
     </div>
   );
 }

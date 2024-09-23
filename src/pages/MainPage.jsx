@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './MainPage.css';
 
 import { Routes, Route } from 'react-router-dom';
@@ -21,10 +21,39 @@ import CreateQuestIcon from '../assets/icons/new_window_24dp_E8EAED_FILL1_wght40
 function MainPage() {
   const isFirstBreak = useMediaQuery({ query: '(max-width: 800px)' });
   const isMobileBreak = useMediaQuery({ query: '(max-width: 550px)' });
+  const topSectionRef = useRef(null);
+
+  const [showTopBar, setShowTopBar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      console.debug('scroll');
+      if (topSectionRef.current) {
+        const rect = topSectionRef.current.getBoundingClientRect();
+        // const isVisible =
+        //   rect.top >= 0 &&
+        //   rect.left >= 0 &&
+        //   rect.bottom <=
+        //     (window.innerHeight || document.documentElement.clientHeight) &&
+        //   rect.right <=
+        //     (window.innerWidth || document.documentElement.clientWidth);
+        // console.debug(isVisible);
+
+        setShowTopBar(rect.bottom < 48);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, true);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, []);
 
   return (
     <div className="main-page">
-      {isMobileBreak && <TopBar />}
+      {isMobileBreak && <TopBar show={showTopBar} />}
       <div className="left-panel">
         <NavigationBar />
         <Routes>
@@ -37,7 +66,7 @@ function MainPage() {
         <div className="middle-panel">
           <Feed />
         </div>
-        <div className="right-panel">
+        <div className="right-panel" ref={topSectionRef}>
           <Map />
           <div className="button-section">
             {isFirstBreak ? (

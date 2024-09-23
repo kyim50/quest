@@ -19,6 +19,7 @@ const removeRoute = (map) => {
 };
 
 const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
+  console.log('Quests component rendering');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -746,7 +747,7 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
   });
 
   return (
-    <div className="quests-page" style={springProps}>
+    <div className="quests-page">
       <div className="drag-handle" {...bindDrag()} />
       <div className="quests-header">
         <h2>Quests</h2>

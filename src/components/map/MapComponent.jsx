@@ -178,7 +178,7 @@ const MapComponent = ({ address, setAddress, setCurrentUserIds, setMap, activeSe
     <>
       <div ref={mapContainerRef} className={`map-placeholder ${isFullScreen ? 'full-screen' : ''}`} style={{ width: '100%', height: '100%' }}></div>
       {showAddressBar && <div className="address-bar" id="address-bar">{address}</div>}
-      {mapInstanceRef.current && <QuestsComponent map={mapInstanceRef.current} currentUserIds={currentUserIds} onQuestAccepted={handleQuestAccepted} />}
+      {/* {mapInstanceRef.current && <QuestsComponent map={mapInstanceRef.current} currentUserIds={currentUserIds} onQuestAccepted={handleQuestAccepted} />} */}
     </>
   );
 };

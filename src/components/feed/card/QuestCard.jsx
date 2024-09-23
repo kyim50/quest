@@ -1,9 +1,8 @@
-import React from 'react'
+import React from 'react';
+import './QuestCard.css';
 
-function Card() {
-  return (
-    <div>Card</div>
-  )
+function QuestCard() {
+  return <div className="quest-card"></div>;
 }
 
-export default Card
+export default QuestCard;

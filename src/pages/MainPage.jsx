@@ -9,10 +9,11 @@ import NavigationModal from '../components/navigation-modal/NavigationModalWrapp
 import Feed from '../components/feed/Feed';
 import Map from '../components/map/Map';
 import UserProfile from '../components/UserProfile';
-import QuestsComponent from '../components/QuestsComponent';
+import Quests from '../components/Quests';
 import Connections from '../components/Connections';
 import PrivacySection from '../components/PrivacySection';
 import TopBar from '../components/top-bar/TopBar';
+import CreateQuestModal from '../components/CreateQuestModal'; // New import
 
 import SearchIcon from '../assets/icons/search_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import DropDownIcon from '../assets/icons/arrow_drop_down_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
@@ -24,13 +25,13 @@ function MainPage() {
   const topSectionRef = useRef(null);
 
   const [showTopBar, setShowTopBar] = useState(false);
+  const [isCreateQuestOpen, setIsCreateQuestOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       console.debug('scroll');
       if (topSectionRef.current) {
         const rect = topSectionRef.current.getBoundingClientRect();
-        // show top bar if top section is off screen
         setShowTopBar(rect.bottom < 48);
       }
     };
@@ -43,6 +44,10 @@ function MainPage() {
     };
   }, []);
 
+  const handleCreateQuestClick = () => {
+    setIsCreateQuestOpen(true);
+  };
+
   return (
     <div className="main-page">
       {isMobileBreak && <TopBar show={showTopBar} />}
@@ -51,7 +56,15 @@ function MainPage() {
         <Routes>
           <Route path="profile" element={<UserProfile />} />
           <Route path="connections" element={<Connections />} />
-          <Route path="quests" element={<QuestsComponent />} />
+          <Route
+            path="quests"
+            element={
+              <Quests
+                isCreateQuestOpen={isCreateQuestOpen}
+                setIsCreateQuestOpen={setIsCreateQuestOpen}
+              />
+            }
+          />
         </Routes>
       </div>
       <div className="body-section">
@@ -64,7 +77,7 @@ function MainPage() {
             {isFirstBreak ? (
               <>
                 <Search />
-                <CreateQuestButton />
+                <CreateQuestButton onClick={handleCreateQuestClick} />
                 <Filter />
               </>
             ) : (
@@ -73,12 +86,18 @@ function MainPage() {
                   <Search />
                   <Filter />
                 </div>
-                <CreateQuestButton />
+                <CreateQuestButton onClick={handleCreateQuestClick} />
               </>
             )}
           </div>
         </div>
       </div>
+      {isCreateQuestOpen && (
+        <CreateQuestModal
+          isOpen={isCreateQuestOpen}
+          onClose={() => setIsCreateQuestOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -108,9 +127,9 @@ export function Filter({ small = false }) {
   );
 }
 
-export function CreateQuestButton({ small = false }) {
+export function CreateQuestButton({ small = false, onClick }) {
   return (
-    <button className={`create-button ${small && 'small'}`}>
+    <button className={`create-button ${small && 'small'}`} onClick={onClick}>
       <div className="icon-container">
         <CreateQuestIcon />
       </div>

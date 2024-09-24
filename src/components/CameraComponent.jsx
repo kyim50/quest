@@ -3,6 +3,7 @@ import { IconButton } from '@mui/material';
 import { Camera } from 'react-camera-pro';
 import { ArrowBack, Refresh } from '@mui/icons-material';
 import '../styles/HomeScreen.css';
+import { useNavigate } from 'react-router-dom';
 
 const CameraComponent = ({
   facingMode,
@@ -13,6 +14,8 @@ const CameraComponent = ({
   cameraResolution
 }) => {
   const cameraRef = useRef(null);
+
+  const navigate = useNavigate();
 
   const handleCaptureInternal = useCallback(() => {
     if (cameraRef.current) {
@@ -34,6 +37,11 @@ const CameraComponent = ({
     }
   }, [handleCapture]);
 
+  const handleBack = () => {
+    navigate('/home'); // Navigate back to the home page
+    onClose();
+  };
+
   return (
     <div className={`camera-container ${isFullScreenCamera ? 'full-screen-camera' : ''}`}>
       <Camera
@@ -46,7 +54,7 @@ const CameraComponent = ({
         videoResolution={cameraResolution}
       />
       <div className="camera-controls">
-        <IconButton onClick={toggleCamera} className="back-button">
+        <IconButton onClick={handleBack} className="back-button">
           <ArrowBack />
         </IconButton>
         <IconButton onClick={handleCaptureInternal} className="capture-button">

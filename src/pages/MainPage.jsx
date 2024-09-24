@@ -28,6 +28,11 @@ function MainPage() {
   const [showTopBar, setShowTopBar] = useState(false);
   const [isCreateQuestOpen, setIsCreateQuestOpen] = useState(false);
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
+  const [showCamera, setShowCamera] = React.useState(false);
+
+  const handleCameraToggle = () => {
+    setShowCamera(prev => !prev);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +63,7 @@ function MainPage() {
         <Routes>
           <Route path="profile" element={<UserProfile />} />
           <Route path="connections" element={<Connections />} />
+          <Route path="camera" element={<CameraOverlay />} />
           <Route
             path="quests"
             element={

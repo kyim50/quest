@@ -6,7 +6,7 @@ import { useUser } from '../UserProvider'; // Import the useUser hook
 import HomeIcon from '../../assets/icons/home_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import CameraIcon from '../../assets/icons/photo_camera_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import SocialIcon from '../../assets/icons/supervised_user_circle_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
-import QuestsIcon from '../../assets/icons/not_listed_location_24dp_E8EAED_FILL0_wght400_GRAD0_opsz24.svg?react'
+import QuestsIcon from '../../assets/icons/not_listed_location_24dp_E8EAED_FILL0_wght400_GRAD0_opsz24.svg?react';
 
 function NavigationBar() {
   const [currPage, setCurrPage] = useState('/home');
@@ -20,10 +20,10 @@ function NavigationBar() {
         <NavigationButton link={'/home'}>
           <HomeIcon />
         </NavigationButton>
-        <NavigationButton link={'camera'}>
+        <NavigationButton link={'/camera'}>
           <CameraIcon />
         </NavigationButton>
-        <NavigationButton link={'profile'}>
+        <NavigationButton link={'/profile'}>
           {/* Profile icon with user's image */}
           <div className='profile-icon'>
             <img
@@ -33,10 +33,10 @@ function NavigationBar() {
             />
           </div>
         </NavigationButton>
-        <NavigationButton link={'connections'}>
+        <NavigationButton link={'/connections'}>
           <SocialIcon />
         </NavigationButton>
-        <NavigationButton link={'quests'}>
+        <NavigationButton link={'/quests'}>
           <QuestsIcon />
         </NavigationButton>
       </div>

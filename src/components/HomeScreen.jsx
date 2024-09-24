@@ -7,7 +7,6 @@ import { useSpring, animated } from 'react-spring';
 import { useDrag } from 'react-use-gesture';
 import { auth, db, fetchUserData } from '../firebase';
 import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, doc, serverTimestamp, query, where, orderBy, limit } from 'firebase/firestore';
-import { Camera } from 'react-camera-pro';
 import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
 import MapComponent from '././map/MapComponent';
@@ -24,6 +23,7 @@ import themeToggleIcon from '../assets/day-and-night.png';
 import PinterestLayout from './PinterestLayout';
 import ImagePreview from './ImagePreview';
 import ProfileDisplay from './ProfileDisplay';
+import CameraComponent from './CameraComponent';
 
 const HomeScreen = React.memo(() => {
   const [activeSection, setActiveSection] = useState('');
@@ -56,10 +56,9 @@ const HomeScreen = React.memo(() => {
   const [isFullScreenCamera, setIsFullScreenCamera] = useState(false);
   const [containerHeight, setContainerHeight] = useState(window.innerHeight * 0.5);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  
+
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-  const cameraRef = useRef(null);
   const imagePreviewRef = useRef(null);
 
   const fetchUserDataCallback = useCallback(async (uid) => {
@@ -117,7 +116,7 @@ const HomeScreen = React.memo(() => {
   const fetchFriends = useCallback(async (userId) => {
     const userRef = doc(db, 'users', userId);
     const userSnap = await getDoc(userRef);
-    
+
     if (userSnap.exists()) {
       const userData = userSnap.data();
       const friendIds = userData.friends || [];
@@ -128,17 +127,17 @@ const HomeScreen = React.memo(() => {
           const friendSnap = await getDoc(friendRef);
           if (friendSnap.exists()) {
             const friendData = friendSnap.data();
-            
+
             const activeQuestQuery = query(
               collection(db, 'quests'),
               where('uid', '==', friendId),
               where('status', '==', 'accepted')
             );
             const activeQuestSnap = await getDocs(activeQuestQuery);
-            
+
             let questStatus = 'Idle';
             let questPartner = null;
-            
+
             if (!activeQuestSnap.empty) {
               const questData = activeQuestSnap.docs[0].data();
               questStatus = 'On a quest';
@@ -166,18 +165,18 @@ const HomeScreen = React.memo(() => {
       setFriends(friendsData.filter(friend => friend !== null));
     }
   }, []);
-  
+
   const fetchGridData = useCallback(async (userId) => {
     if (!userId) return;
-    
+
     try {
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
-      
+
       if (userSnap.exists()) {
         const userData = userSnap.data();
         const friendIds = userData.friends || [];
-        
+
         const photosRef = collection(db, 'photos');
         const q = query(
           photosRef,
@@ -188,9 +187,9 @@ const HomeScreen = React.memo(() => {
         const photos = await Promise.all(photosSnapshot.docs.map(async doc => {
           const photoData = doc.data();
           const userData = await fetchUserData(photoData.userId);
-          return { 
-            id: doc.id, 
-            ...photoData, 
+          return {
+            id: doc.id,
+            ...photoData,
             username: userData?.name || 'Unknown User',
             user: {
               name: userData?.name || 'Unknown User',
@@ -248,25 +247,9 @@ const HomeScreen = React.memo(() => {
     }
   }, [map, fetchUserDataCallback]);
 
-  const handleCapture = useCallback(() => {
-    if (cameraRef.current) {
-      const imageSrc = cameraRef.current.takePhoto();
-      
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-
-        const highQualityImageSrc = canvas.toDataURL('image/png', 1);
-
-        setPhotoPreview(highQualityImageSrc);
-        setShowCamera(false);
-      };
-      img.src = imageSrc;
-    }
+  const handleCapture = useCallback((imageSrc) => {
+    setPhotoPreview(imageSrc);
+    setShowCamera(false);
   }, []);
 
   const handleFlipCamera = useCallback(() => {
@@ -306,8 +289,8 @@ const HomeScreen = React.memo(() => {
     const fetchedComments = await Promise.all(commentsSnapshot.docs.map(async doc => {
       const commentData = doc.data();
       const userData = await fetchUserDataCallback(commentData.userId);
-      return { 
-        id: doc.id, 
+      return {
+        id: doc.id,
         ...commentData,
         userProfileImage: userData.profilePhoto
       };
@@ -324,11 +307,11 @@ const HomeScreen = React.memo(() => {
         timestamp: new Date()
       });
       const userData = await fetchUserDataCallback(auth.currentUser.uid);
-      setComments(prev => [...prev, { 
-        id: commentRef.id, 
-        text: commentText, 
-        userId: auth.currentUser.uid, 
-        username: auth.currentUser.displayName, 
+      setComments(prev => [...prev, {
+        id: commentRef.id,
+        text: commentText,
+        userId: auth.currentUser.uid,
+        username: auth.currentUser.displayName,
         timestamp: new Date(),
         userProfileImage: userData.profilePhoto
       }]);
@@ -339,27 +322,27 @@ const HomeScreen = React.memo(() => {
     if (auth.currentUser && photoPreview) {
       try {
         const photoRef = doc(collection(db, 'photos'));
-        const newPhoto = { 
-          id: photoRef.id, 
-          userId: auth.currentUser.uid, 
+        const newPhoto = {
+          id: photoRef.id,
+          userId: auth.currentUser.uid,
           user: {
             name: auth.currentUser.displayName || 'Unknown User',
             profilePhoto: currentUser?.profilePhoto || null,
           },
-          image: photoPreview, 
-          aspectRatio: aspectRatio, 
+          image: photoPreview,
+          aspectRatio: aspectRatio,
           caption: captionText,
           cropInfo: cropInfo,
           timestamp: serverTimestamp(),
         };
-        
+
         await setDoc(photoRef, newPhoto);
-        
+
         showNotification('Photo uploaded successfully');
         setPhotoPreview(null);
         setCaption('');
         setGridData(prev => [newPhoto, ...prev]);
-        
+
         // Fetch updated data immediately after upload
         fetchGridData(auth.currentUser.uid);
       } catch (error) {
@@ -376,7 +359,7 @@ const HomeScreen = React.memo(() => {
         setShowImagePreview(false);
         setGridData(prev => prev.filter(item => item.id !== selectedImage.id));
         showNotification('Post deleted successfully');
-        
+
         // Fetch updated data immediately after deletion
         fetchGridData(auth.currentUser.uid);
       } catch (error) {console.error('Error deleting post:', error);
@@ -399,7 +382,6 @@ const HomeScreen = React.memo(() => {
     height: containerHeight,
     config: { tension: 300, friction: 30 }
   });
-
 
   const renderHomeContent = useCallback(() => (
     <div className="home-content">
@@ -427,7 +409,7 @@ const HomeScreen = React.memo(() => {
             </Badge>
           </IconButton>
           <IconButton onClick={toggleTheme}>
-            <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-old-icon" />        
+            <img src={themeToggleIcon} alt="Toggle Theme" className="top-bar-old-icon" />
           </IconButton>
         </div>
       </div>
@@ -471,9 +453,9 @@ const HomeScreen = React.memo(() => {
         {isMobile ? (
           <div className="mobile-layout">
             <div className="full-map-container">
-              <MapComponent 
-                address={address} 
-                setAddress={setAddress} 
+              <MapComponent
+                address={address}
+                setAddress={setAddress}
                 setCurrentUserIds={setCurrentUserIds}
                 setMap={setMap}
                 activeSection={activeSection}
@@ -508,28 +490,14 @@ const HomeScreen = React.memo(() => {
                 <h2 className="section-title">Camera & Map</h2>
                 <div className="camera-map-area">
                   {isFullScreenCamera ? (
-                    <div className="full-screen-camera">
-                      <Camera
-                        ref={cameraRef}
-                        facingMode={facingMode}
-                        aspectRatio="cover"
-                        errorMessages={{}}
-                        videoSourceDeviceId={undefined}
-                        numberOfCamerasCallback={(i) => console.log(i)}
-                        videoResolution={cameraResolution}
-                      />
-                      <div className="camera-controls">
-                        <IconButton onClick={toggleCamera} className="back-button">
-                          <ArrowBack />
-                        </IconButton>
-                        <IconButton onClick={handleCapture} className="capture-button">
-                          <div className="capture-button-inner" />
-                        </IconButton>
-                        <IconButton onClick={handleFlipCamera} className="flip-button">
-                          <Refresh />
-                        </IconButton>
-                      </div>
-                    </div>
+                    <CameraComponent
+                      facingMode={facingMode}
+                      toggleCamera={toggleCamera}
+                      handleCapture={handleCapture}
+                      handleFlipCamera={handleFlipCamera}
+                      isFullScreenCamera={isFullScreenCamera}
+                      cameraResolution={cameraResolution}
+                    />
                   ) : (
                     <div className="camera-placeholder" onClick={toggleCamera}>
                       <CameraAlt />
@@ -537,9 +505,9 @@ const HomeScreen = React.memo(() => {
                     </div>
                   )}
                   <div className="mini-map" onClick={toggleFullMap}>
-                    <MapComponent 
-                      address={address} 
-                      setAddress={setAddress} 
+                    <MapComponent
+                      address={address}
+                      setAddress={setAddress}
                       setCurrentUserIds={setCurrentUserIds}
                       setMap={setMap}
                       activeSection={activeSection}
@@ -557,7 +525,7 @@ const HomeScreen = React.memo(() => {
 
       <AnimatePresence>
         {showImagePreview && (
-          <ImagePreview 
+          <ImagePreview
             selectedImage={selectedImage}
             comments={comments}
             onClose={() => setShowImagePreview(false)}
@@ -582,9 +550,9 @@ const HomeScreen = React.memo(() => {
       <IconButton onClick={toggleFullMap} className="back-button">
         <ArrowBack />
       </IconButton>
-      <MapComponent 
-        address={address} 
-        setAddress={setAddress} 
+      <MapComponent
+        address={address}
+        setAddress={setAddress}
         setCurrentUserIds={setCurrentUserIds}
         setMap={setMap}
         activeSection={activeSection}
@@ -616,7 +584,7 @@ const HomeScreen = React.memo(() => {
             case 'quests':
               return <QuestsComponent currentUserIds={currentUserIds} map={map} />;
             case 'connections':
-              return <Connections 
+              return <Connections
                 currentUserIds={currentUserIds}
                 map={map}
                 setLockedUser={handleSetLockedUser}
@@ -631,14 +599,14 @@ const HomeScreen = React.memo(() => {
         })()}
       </div>
     );
-  
+
     if (isMobile && !isHomeActive) {
       return (
         <div className="mobile-section-with-map">
           <div className="mobile-map-container">
-            <MapComponent 
-              address={address} 
-              setAddress={setAddress} 
+            <MapComponent
+              address={address}
+              setAddress={setAddress}
               setCurrentUserIds={setCurrentUserIds}
               setMap={setMap}
               activeSection={activeSection}
@@ -653,10 +621,10 @@ const HomeScreen = React.memo(() => {
         </div>
       );
     }
-  
+
     return sectionContent;
   }, [activeSection, isHomeActive, currentUserIds, map, handleSetLockedUser, lockedUser, lockedUserData, renderHomeContent, handleLogoutClick, isMobile, address]);
-  
+
   const getActiveClass = useCallback(() => {
     if (isHomeActive) {
       return 'home-active';
@@ -678,8 +646,8 @@ const HomeScreen = React.memo(() => {
 
   return (
     <div className={`home-screen-container2 ${isMobile ? 'mobile-view' : ''}`}>
-      <NavigationBar 
-        activeSection={activeSection} 
+      <NavigationBar
+        activeSection={activeSection}
         showSection={showSection}
         logo="Questslogo blue.png"
         title="QUESTS"
@@ -709,9 +677,9 @@ const HomeScreen = React.memo(() => {
         {showFullMap ? renderFullMap() : renderSection()}
         {!isHomeActive && !showFullMap && !isMobile && (
           <div className="map-container2">
-            <MapComponent 
-              address={address} 
-              setAddress={setAddress} 
+            <MapComponent
+              address={address}
+              setAddress={setAddress}
               setCurrentUserIds={setCurrentUserIds}
               setMap={setMap}
               activeSection={activeSection}

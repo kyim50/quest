@@ -14,6 +14,7 @@ import Connections from '../components/Connections';
 import PrivacySection from '../components/PrivacySection';
 import TopBar from '../components/top-bar/TopBar';
 import CreateQuestModal from '../components/CreateQuestModal'; // New import
+import CameraOverlay from '../components/CameraOverlay';
 
 import SearchIcon from '../assets/icons/search_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import DropDownIcon from '../assets/icons/arrow_drop_down_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
@@ -26,6 +27,7 @@ function MainPage() {
 
   const [showTopBar, setShowTopBar] = useState(false);
   const [isCreateQuestOpen, setIsCreateQuestOpen] = useState(false);
+  const [showCameraOverlay, setShowCameraOverlay] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {

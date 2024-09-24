@@ -1,0 +1,94 @@
+.camera-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .camera-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .full-screen-camera {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .camera-controls {
+    position: absolute;
+    bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+  }
+  
+  .back-button, .flip-button, .capture-button {
+    color: white;
+  }
+  
+  
+  .image-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+  }
+  
+  .captured-image {
+    max-width: 100%;
+    max-height: 80%;
+    object-fit: contain;
+  }
+  
+  .aspect-ratio-selector {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .aspect-ratio-selector button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    background-color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .description-input {
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 5px;
+  }
+  
+  .overlay-controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .back-button {
+    color: white;
+  }
+  
+  .confirm-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+  }
+  

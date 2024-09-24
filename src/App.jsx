@@ -10,6 +10,8 @@ import { initializeTheme } from "./theme-toggle";
 import { UserStatusProvider } from "./components/UserStatusContext";
 import MainPage from "./pages/MainPage";
 import { UserProvider } from "./components/UserProvider"; // Import the UserProvider
+import CameraComponent from "./components/CameraComponent"; // Import the CameraComponent
+import CameraOverlay from "./components/CameraOverlay";
 
 function App() {
   useEffect(() => {
@@ -42,6 +44,7 @@ function App() {
                   </>
                 }
               />
+              <Route path="/camera" element={<CameraOverlay />} /> {/* Add this route */}
             </Routes>
           </Router>
         </UserProvider>

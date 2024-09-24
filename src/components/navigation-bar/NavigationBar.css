@@ -15,7 +15,7 @@
 
   border: 3px solid black;
   border-radius: var(--border-radius);
-  background-color: white;
+  background-color: #6289ec;
 }
 
 .navigation-bar-button {
@@ -29,7 +29,7 @@
   border-radius: 0.5rem;
 }
 .navigation-bar-button.selected {
-  background-color: #6289ec;
+  background-color: #374d85;
 }
 
 .navigation-bar-button > svg {

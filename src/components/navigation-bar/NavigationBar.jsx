@@ -12,6 +12,8 @@ function NavigationBar() {
   const [currPage, setCurrPage] = useState('/home');
   const currentUser = useUser(); // Use the useUser hook to get the current user data
 
+  console.log('Current user in NavigationBar:', currentUser); // Add this line
+
   return (
     <div className="navigation-bar-container">
       <div className="navigation-bar">

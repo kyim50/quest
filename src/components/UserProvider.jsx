@@ -9,21 +9,26 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (auth.currentUser) {
-        const userData = await fetchUserData(auth.currentUser.uid);
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userData = await fetchUserData(user.uid);
+        console.log('Fetched user data:', userData); // Add this line
         setCurrentUser(userData);
+      } else {
+        setCurrentUser(null);
       }
-    };
+      setLoading(false);
+    });
 
-    fetchUser();
+    return () => unsubscribe();
   }, []);
 
   return (
     <UserContext.Provider value={currentUser}>
-      {children}
+      {loading ? <div></div> : children}
     </UserContext.Provider>
   );
 };

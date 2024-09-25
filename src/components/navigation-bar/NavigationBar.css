@@ -3,6 +3,9 @@
 }
 
 .navigation-bar {
+  position: sticky;
+  top: var(--main-page-padding);
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;

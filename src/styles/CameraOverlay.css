@@ -63,7 +63,7 @@
   .aspect-ratio-selector button {
     margin: 0 10px;
     padding: 10px 20px;
-    background-color: white;
+    background-color: #6289ec;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -71,7 +71,7 @@
   
   .description-input {
     margin-top: 20px;
-    background-color: white;
+    background-color: #6289ec;
     border-radius: 5px;
   }
   

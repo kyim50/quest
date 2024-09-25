@@ -16,7 +16,22 @@
   border: 3px solid black;
   border-radius: var(--border-radius);
   background-color: #6289ec;
+  z-index: 100;
+  
 }
+
+
+/* Code to make it so the nav bar is fixed when on desktop */
+/* @media (min-width: 1024px) and (max-width: 1440px)  {
+  .navigation-bar 
+  {
+    position:fixed
+
+  }
+  
+}  */
+  /* ------------------------------------------------------------ */
+
 
 .navigation-bar-button {
   display: flex;

@@ -68,7 +68,7 @@ const CameraOverlay = ({
       const storageRef = ref(storage, `quest_images/${Date.now()}_${auth.currentUser.uid}.jpg`);
       await uploadString(storageRef, croppedImage, 'data_url');
       const imageUrl = await getDownloadURL(storageRef);
-  
+
       const questData = {
         imageUrl,
         aspectRatio: selectedAspectRatio || '1:1', // Default to '1:1' if undefined
@@ -78,9 +78,9 @@ const CameraOverlay = ({
         createdAt: new Date().toISOString(), // Store createdAt as a valid date string
         userId: auth.currentUser.uid
       };
-  
+
       console.log('Quest data:', questData); // Log quest data to check the format
-  
+
       await addDoc(collection(db, 'quests'), questData);
       console.log('Quest uploaded successfully');
       navigate('/home/*');
@@ -90,7 +90,6 @@ const CameraOverlay = ({
       setIsUploading(false);
     }
   };
-  
 
   const cropImage = () => {
     return new Promise((resolve) => {

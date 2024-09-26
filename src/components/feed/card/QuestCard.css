@@ -13,6 +13,7 @@
   overflow: hidden;
   cursor: pointer;
 }
+
 .header {
   display: flex;
   justify-content: flex-end;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Feed.css';
 import QuestCard from './card/QuestCard';
 import { db } from '../../firebase';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 
 function Feed() {
   const [quests, setQuests] = useState([]);
@@ -22,6 +22,15 @@ function Feed() {
     return () => unsubscribe(); // Cleanup the listener on component unmount
   }, []);
 
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'quests', id));
+      setQuests(quests.filter(quest => quest.id !== id));
+    } catch (error) {
+      console.error('Error deleting quest:', error);
+    }
+  };
+
   return (
     <div className="feed">
       {quests.map((quest) => (
@@ -32,6 +41,7 @@ function Feed() {
           time={quest.time}
           user={quest.user}
           description={quest.description}
+          onClick={() => handleDelete(quest.id)}
         />
       ))}
     </div>

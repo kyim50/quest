@@ -23,7 +23,6 @@ import themeToggleIcon from '../assets/day-and-night.png';
 import PinterestLayout from './PinterestLayout';
 import ImagePreview from './ImagePreview';
 import ProfileDisplay from './ProfileDisplay';
-import CameraComponent from './CameraComponent';
 
 const HomeScreen = React.memo(() => {
   const [activeSection, setActiveSection] = useState('');

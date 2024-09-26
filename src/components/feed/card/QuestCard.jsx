@@ -1,24 +1,27 @@
 import React from 'react';
 import './QuestCard.css';
 
-function QuestCard({ aspectRatio }) {
+function QuestCard({ imageUrl, aspectRatio, time, user, description }) {
+  const [widthRatio, heightRatio] = aspectRatio ? aspectRatio.split(':').map(Number) : [1, 1];
+  const aspectRatioValue = widthRatio / heightRatio;
+
   return (
     <div
       className="quest-card"
       style={{
-        backgroundImage:
-          "url('https://media.tenor.com/o_5RQarGvJ0AAAAM/kiss.gif')",
-        aspectRatio: aspectRatio,
+        backgroundImage: `url(${imageUrl})`,
+        aspectRatio: aspectRatioValue,
       }}
     >
       <div className="header">
-        <div className="time">8:08 PM</div>
+        <div className="time">{time}</div>
       </div>
       <div className="footer">
-        <p className="user">Kiity :3</p>
-        <p className="description">I am cat and i love yuu</p>
+        <p className="user">{user}</p>
+        <p className="description">{description}</p>
       </div>
     </div>
+    
   );
 }
 

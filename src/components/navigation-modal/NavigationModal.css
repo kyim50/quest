@@ -1,6 +1,6 @@
 .navigation-modal-container {
-  position: absolute;
-  margin-left: 5.5rem;
+  position: relative;
+  margin-left: .5rem;
 
   width: 30rem;
   height: 90%;

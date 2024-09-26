@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './Map.css'
+import './Map.css';
 import MapComponent from '././MapComponent';
 
-function Map() {
+function Map({ small = false }) {
   const [address, setAddress] = useState('Loading address...');
   const [currentUserIds, setCurrentUserIds] = useState([]);
   const [map, setMap] = useState(null);
@@ -10,7 +10,7 @@ function Map() {
   const [lockedUser, setLockedUser] = useState(null);
 
   return (
-    <div className='map-container'>
+    <div className={`map-container ${small && 'small'}`}>
       <MapComponent
         address={address}
         setAddress={setAddress}

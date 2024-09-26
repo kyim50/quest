@@ -3,6 +3,9 @@
 }
 
 .navigation-bar {
+  position: sticky;
+  top: var(--main-page-padding);
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -15,8 +18,23 @@
 
   border: 3px solid black;
   border-radius: var(--border-radius);
-  background-color: white;
+  background-color: #6289ec;
+  z-index: 100;
+  
 }
+
+
+/* Code to make it so the nav bar is fixed when on desktop */
+/* @media (min-width: 1024px) and (max-width: 1440px)  {
+  .navigation-bar 
+  {
+    position:fixed
+
+  }
+  
+}  */
+  /* ------------------------------------------------------------ */
+
 
 .navigation-bar-button {
   display: flex;
@@ -29,7 +47,7 @@
   border-radius: 0.5rem;
 }
 .navigation-bar-button.selected {
-  background-color: #6289ec;
+  background-color: #374d85;
 }
 
 .navigation-bar-button > svg {
@@ -64,4 +82,27 @@
     height: 100%;
     aspect-ratio: 1/1;
   }
+}
+
+.profile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Adjust as needed */
+  height: 40px; /* Adjust as needed */
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover; /* Ensures the image fits properly inside the circle */
 }

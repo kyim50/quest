@@ -18,7 +18,7 @@ const removeRoute = (map) => {
   }
 };
 
-const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData }) => {
+const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUserData, isCreateQuestOpen, setIsCreateQuestOpen }) => {
   console.log('Quests component rendering');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -111,27 +111,6 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateQuest = () => {
-    if (!auth.currentUser) {
-      return;
-    }
-
-    const newQuest = {
-      uid: auth.currentUser.uid,
-      title,
-      description,
-      timeFrame,
-      createdAt: new Date(),
-      isPublic,
-      targetUser: isPublic ? null : selectedUser.id,
-      status: 'pending',
-      acceptedBy: isPublic ? [] : null,
-    };
-
-    setPendingQuest(newQuest);
-    setConfirmationDialogOpen(true);
-    setIsPopupOpen(false);
-  };
 
   const handleConfirmQuest = async () => {
     if (!auth.currentUser) {
@@ -751,7 +730,6 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
       <div className="drag-handle" {...bindDrag()} />
       <div className="quests-header">
         <h2>Quests</h2>
-        <button onClick={togglePopup}>+</button>
       </div>
 
       <div className="tabs">
@@ -776,80 +754,6 @@ const Quests = ({ currentUserIds, map, setLockedUserId, lockedUserId, lockedUser
       </div>
 
       {renderTabContent()}
-
-      {isPopupOpen && (
-        <div className="modal-overlay">
-          <div className="modal quest-popup">
-            <h3>Create a New Quest</h3>
-            <input
-              type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="Description"
-              value={description}
-              onChange={handleDescriptionChange}
-            />
-            <select
-              value={timeFrame}
-              onChange={(e) => setTimeFrame(e.target.value)}
-            >
-              <option value="">Select Time Frame</option>
-              <option value="5 mins">5 mins</option>
-              <option value="10 mins">10 mins</option>
-              <option value="15 mins">15 mins</option>
-              <option value="30 mins">30 mins</option>
-              <option value="1 hour">1 hour</option>
-            </select>
-            <div className="toggle-container">
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={isPublic}
-                  onChange={handleToggleChange}
-                />
-                <span className="slider"></span>
-              </label>
-              <span>{isPublic ? 'Public' : 'Private'}</span>
-            </div>
-            {!isPublic && (
-              <>
-                <input
-                  type="text"
-                  placeholder="Search user"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-                {searchTerm && filteredUsers.length > 0 && (
-                  <div className="user-search-results">
-                    {filteredUsers.map(user => (
-                      <div
-                        key={user.id}
-                        className="user-search-result"
-                        onClick={() => handleSelectUser(user)}
-                      >
-                        <img src={user.profilePhoto || '/default-profile.png'} alt="Profile" className="user-pfp" />
-                        {user.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {selectedUser && (
-                  <div className="selected-user">
-                    <p>Selected User: {selectedUser.name}</p>
-                  </div>
-                )}
-              </>
-            )}
-            <div className="modal-actions">
-              <button className="confirm-button" onClick={handleCreateQuest}>Prepare Quest</button>
-              <button className="cancel-button" onClick={togglePopup}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {confirmationDialogOpen && pendingQuest && (
         <div className="modal-overlay">

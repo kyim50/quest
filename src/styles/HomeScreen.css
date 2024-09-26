@@ -145,7 +145,7 @@ body.light-mode .nav-bar {
 }
 
 /* Top bar styles */
-.top-bar {
+.top-bar-old {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -160,18 +160,18 @@ body.light-mode .nav-bar {
   z-index: 1000;
 }
 
-body.light-mode .top-bar {
+body.light-mode .top-bar-old {
   background-color: #ffffff;
   border-bottom-color: #e0e0e0;
 }
 
-.top-bar-center {
+.top-bar-old-center {
   flex-grow: 1;
   display: flex;
   justify-content: center;
 }
 
-.top-bar-right {
+.top-bar-old-right {
   display: flex;
   gap: 15px;
 }
@@ -1222,22 +1222,22 @@ body.light-mode hr {
   transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-.top-bar-right {
+.top-bar-old-right {
   display: flex;
   align-items: center;
 }
 
-.top-bar-right .MuiIconButton-root {
+.top-bar-old-right .MuiIconButton-root {
   margin-left: 8px;
 }
 
-.top-bar-icon {
+.top-bar-old-icon {
   width: auto;
   height: 32px;
   filter: invert(1);
 }
 
-body.light-mode .top-bar-icon {
+body.light-mode .top-bar-old-icon {
   filter: none;
 }
 
@@ -1602,7 +1602,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
   overflow: hidden;
 }
 
-.full-screen-camera-active .top-bar,
+.full-screen-camera-active .top-bar-old,
 .full-screen-camera-active .friends-list2,
 .full-screen-camera-active .main-area {
   display: none;
@@ -1657,7 +1657,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     padding-bottom: 60px !important; /* Space for mobile nav bar */
   }
 
-  .top-bar {
+  .top-bar-old {
     padding: 10px !important;
     margin-left: 0;
     height: auto !important;
@@ -1725,12 +1725,12 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: inline-block !important;
   }
 
-  .top-bar-right {
+  .top-bar-old-right {
     display: flex !important;
     align-items: center !important;
   }
 
-  .top-bar-center {
+  .top-bar-old-center {
     display: none;
   }
 
@@ -1924,7 +1924,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     min-height: 44px;
   }
 
-  .top-bar-icon {
+  .top-bar-old-icon {
     height: 24px;
   }
 
@@ -1932,12 +1932,12 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: none;
   }
 
-  .top-bar .profile-photo-container {
+  .top-bar-old .profile-photo-container {
     width: 30px;
     height: 30px;
   }
 
-  .top-bar .profile-photo {
+  .top-bar-old .profile-photo {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -2111,7 +2111,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     flex-direction: column;
   }
 
-  .mobile-view .top-bar {
+  .mobile-view .top-bar-old {
     position: relative;
     z-index: 3;
     padding: 10px;
@@ -2131,11 +2131,11 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: none;
   }
 
-  .mobile-view .top-bar-center {
+  .mobile-view .top-bar-old-center {
     display: none;
   }
 
-  .mobile-view .top-bar-right {
+  .mobile-view .top-bar-old-right {
     margin-left: auto;
   }
 

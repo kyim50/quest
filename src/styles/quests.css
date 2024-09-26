@@ -51,6 +51,7 @@
 
 .quests-page {
   width: 100%;
+  min-width: 400px;
   height: 100%;
   background-color: var(--background-color);
   overflow-y: auto;
@@ -58,6 +59,7 @@
   color: var(--text-color);
   display: flex;
   flex-direction: column;
+  margin-left: .5rem;
 }
 
 
@@ -112,7 +114,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  background-color: var(--section-background);
+  border-radius: 10px;
+  overflow: hidden;
+  height:75px;
 }
 
 .tab-button {
@@ -129,7 +135,8 @@
 }
 
 .tab-button:hover {
-  background-color: var(--button-hover);
+  background-color: var(--hover-color);
+
 }
 
 .tab-button:nth-of-type(1) {

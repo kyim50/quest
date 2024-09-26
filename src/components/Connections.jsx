@@ -611,7 +611,7 @@ const Connections = ({
       >
         <div className="drag-handle" {...bindDrag()} />
         {notification && <div className="notification1">{notification}</div>}
-
+  
         {lockedUser ? (
           renderLockedUserProfile()
         ) : (
@@ -624,46 +624,38 @@ const Connections = ({
                 onChange={handleSearchChange}
               />
             </div>
-
-            <div className="tabs1">
+  
+            <div className="connectionstabs">
               <button
-                className={`tab-button1 ${
-                  activeTab === 'friends' ? 'active1' : ''
-                }`}
+                className={`tab-button-con ${activeTab === 'friends' ? 'active1 selected' : ''}`}
                 onClick={() => setActiveTab('friends')}
               >
                 Friends
               </button>
               <button
-                className={`tab-button1 ${
-                  activeTab === 'pending' ? 'active1' : ''
-                }`}
+                className={`tab-button-con ${activeTab === 'pending' ? 'active1 selected' : ''}`}
                 onClick={() => setActiveTab('pending')}
               >
                 Pending Requests
               </button>
               <button
-                className={`tab-button1 ${
-                  activeTab === 'people' ? 'active1' : ''
-                }`}
+                className={`tab-button-con ${activeTab === 'people' ? 'active1 selected' : ''}`}
                 onClick={() => setActiveTab('people')}
               >
                 People
               </button>
               <button
-                className={`tab-button1 ${
-                  activeTab === 'recentChats' ? 'active1' : ''
-                }`}
+                className={`tab-button-con ${activeTab === 'recentChats' ? 'active1 selected' : ''}`}
                 onClick={() => setActiveTab('recentChats')}
               >
                 Recent Chats
               </button>
             </div>
-
+  
             {renderTabContent()}
           </>
         )}
-
+  
         {selectedUser && (
           <div className="user-popup1">
             <button className="close-popup1" onClick={handleClosePopup}>
@@ -686,7 +678,7 @@ const Connections = ({
             </button>
           </div>
         )}
-
+  
         {chatUser && (
           <div className="chat-container1">
             <div className="chat-header1">
@@ -700,11 +692,7 @@ const Connections = ({
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`message1 ${
-                    msg.senderId === auth.currentUser.uid
-                      ? 'sent1'
-                      : 'received1'
-                  }`}
+                  className={`message1 ${msg.senderId === auth.currentUser.uid ? 'sent1' : 'received1'}`}
                 >
                   <div>{msg.content}</div>
                 </div>
@@ -733,6 +721,7 @@ const Connections = ({
       </div>
     </NavigationModalWrapper>
   );
+  
 };
 
 export default Connections;

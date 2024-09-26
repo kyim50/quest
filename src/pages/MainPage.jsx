@@ -85,7 +85,7 @@ function Filter() {
 
 function CreateQuestButton() {
   return (
-    <button className="create-button">
+    <button className="create-button" >
       <div className="icon-container">
         <CreateQuestIcon />
       </div>

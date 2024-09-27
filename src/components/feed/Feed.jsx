@@ -17,7 +17,7 @@ function Feed() {
 
   useEffect(() => {
     const questsRef = collection(db, 'quests');
-    const q = query(questsRef, orderBy('createdAt', 'desc'), limit(20)); // Order by createdAt in descending order
+    const q = query(questsRef, orderBy('createdAt', 'desc'), limit(20));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const fetchedQuests = querySnapshot.docs.map((doc) => ({
@@ -27,7 +27,7 @@ function Feed() {
       setQuests(fetchedQuests);
     });
 
-    return () => unsubscribe(); // Cleanup the listener on component unmount
+    return () => unsubscribe();
   }, []);
 
   const handleDelete = async (id) => {
@@ -39,30 +39,40 @@ function Feed() {
     }
   };
 
+  const dummyCards = [
+    { aspectRatio: 3 / 4 },
+    { aspectRatio: 9 / 16 },
+    { aspectRatio: 1 / 1 },
+    { aspectRatio: 3 / 4 },
+    { aspectRatio: 1 / 1 },
+    { aspectRatio: 9 / 16 },
+    { aspectRatio: 1 / 1 },
+    { aspectRatio: 1 / 1 },
+    { aspectRatio: 9 / 16 },
+    { aspectRatio: 3 / 4 },
+    { aspectRatio: 9 / 16 },
+  ];
+
+  const combinedCards = [...quests, ...dummyCards];
+  combinedCards.sort(() => Math.random() - 0.5); // Shuffle the array
+
   return (
     <div className="feed">
-      {/* {quests.map((quest) => (
-        <QuestCard
-          key={quest.id}
-          imageUrl={quest.imageUrl}
-          aspectRatio={quest.aspectRatio}
-          time={quest.time}
-          user={quest.user}
-          description={quest.description}
-          onClick={() => handleDelete(quest.id)}
-        />
-      ))} */}
-      <DummyCard aspectRatio={3 / 4} />
-      <DummyCard aspectRatio={9 / 16} />
-      <DummyCard aspectRatio={1 / 1} />
-      <DummyCard aspectRatio={3 / 4} />
-      <DummyCard aspectRatio={1 / 1} />
-      <DummyCard aspectRatio={9 / 16} />
-      <DummyCard aspectRatio={1 / 1} />
-      <DummyCard aspectRatio={1 / 1} />
-      <DummyCard aspectRatio={9 / 16} />
-      <DummyCard aspectRatio={3 / 4} />
-      <DummyCard aspectRatio={9 / 16} />
+      {combinedCards.map((card, index) => 
+        card.id ? (
+          <QuestCard
+            key={card.id}
+            imageUrl={card.imageUrl}
+            aspectRatio={card.aspectRatio}
+            time={card.time}
+            user={card.user}
+            description={card.description}
+            onClick={() => handleDelete(card.id)}
+          />
+        ) : (
+          <DummyCard key={`dummy-${index}`} aspectRatio={card.aspectRatio} />
+        )
+      )}
     </div>
   );
 }

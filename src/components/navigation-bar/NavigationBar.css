@@ -18,23 +18,9 @@
 
   border: 3px solid black;
   border-radius: var(--border-radius);
-  background-color: #6289ec;
+  background-color: white;
   z-index: 100;
-  
 }
-
-
-/* Code to make it so the nav bar is fixed when on desktop */
-/* @media (min-width: 1024px) and (max-width: 1440px)  {
-  .navigation-bar 
-  {
-    position:fixed
-
-  }
-  
-}  */
-  /* ------------------------------------------------------------ */
-
 
 .navigation-bar-button {
   display: flex;
@@ -47,7 +33,7 @@
   border-radius: 0.5rem;
 }
 .navigation-bar-button.selected {
-  background-color: #374d85;
+  background-color: #6289ec;
 }
 
 .navigation-bar-button > svg {
@@ -59,13 +45,19 @@
   width: 2rem;
   height: 2rem;
 
-  border: 4px solid black;
+  border: 3px solid black;
   border-radius: 50%;
+}
+.profile-icon:hover {
+  border: 3px solid #6289ec;
 }
 
 .navigation-bar-button:hover {
-  border: 4px solid #6289ec;
+  border: 3px solid #6289ec;
   border-radius: 0.5rem;
+}
+.navigation-bar-button#profile:hover {
+  border: none;
 }
 
 @media (max-width: 550px) {

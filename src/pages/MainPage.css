@@ -33,12 +33,17 @@
 }
 .middle-panel {
   width: 60%;
-  border: 1px solid pink;
+  /* border: 1px solid pink; */
 }
 .right-panel {
   width: 40%;
   max-width: 30rem;
   /* border: 1px solid pink; */
+}
+.right-panel-sticky {
+  position: sticky;
+  top: var(--main-page-padding);
+  width: 100%;
 }
 
 .actions-container {
@@ -142,6 +147,10 @@
   scale: 1.2;
 }
 @media (max-width: 1000px) {
+  .right-panel-sticky {
+    position: relative;
+    top: auto;
+  }
   .search,
   .filter-button,
   .create-button {

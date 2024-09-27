@@ -80,23 +80,25 @@ function MainPage() {
           <Feed />
         </div>
         <div className="right-panel" ref={topSectionRef}>
-          <Map />
-          <div className="button-section">
-            {isFirstBreak ? (
-              <>
-                <Search />
-                <CreateQuestButton onClick={handleCreateQuestClick} />
-                <Filter />
-              </>
-            ) : (
-              <>
-                <div className="actions-container">
-                  <Search />
-                  <Filter />
-                </div>
-                <CreateQuestButton onClick={handleCreateQuestClick} />
-              </>
-            )}
+          <div className="right-panel right-panel-sticky">
+              <Map />
+              <div className="button-section">
+                {isFirstBreak ? (
+                  <>
+                    <Search />
+                    <CreateQuestButton onClick={handleCreateQuestClick} />
+                    <Filter />
+                  </>
+                ) : (
+                  <>
+                    <div className="actions-container">
+                      <Search />
+                      <Filter />
+                    </div>
+                    <CreateQuestButton onClick={handleCreateQuestClick} />
+                  </>
+                )}
+              </div>
           </div>
         </div>
       </div>

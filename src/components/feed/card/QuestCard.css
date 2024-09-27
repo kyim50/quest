@@ -21,6 +21,12 @@
 .footer {
   padding: 1rem 0.75rem;
 
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.5),
+    transparent
+  );
 }
 
 .time {

@@ -47,6 +47,7 @@ function NavigationBar() {
     return (
       <Link
         className={`navigation-bar-button ${isSelected ? 'selected' : ''}`}
+        id={link}
         to={link}
         onClick={() => setCurrPage(link)}
       >

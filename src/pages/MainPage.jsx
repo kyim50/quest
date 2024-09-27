@@ -139,7 +139,7 @@ export function Filter({ small = false }) {
 
 export function CreateQuestButton({ small = false, onClick }) {
   return (
-    <button className={`create-button ${small && 'small'}`} onClick={onClick}>
+    <button className="create-button">
       <div className="icon-container">
         <CreateQuestIcon />
       </div>

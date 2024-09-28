@@ -19,6 +19,12 @@
   overflow: hidden;
 }
 
+@media (max-width: 650px) {
+  .navigation-modal-container {
+    width: 27rem;
+  }
+}
+
 @media (max-width: 550px) {
   .navigation-modal-container {
     position: fixed;

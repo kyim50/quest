@@ -388,6 +388,84 @@
     scrollbar-width: none;  /* Firefox */
 }
 
+/* Mobile styles */
+@media (max-width: 767px) {
+    .home-screen-container2 {
+        flex-direction: column;
+        padding-left: 0;
+    }
+
+    .profile-container {
+        width: 100%;
+        height: 50%;
+        position: fixed;
+        bottom: 60px;
+        left: 0;
+        right: 0;
+        top: auto;
+        border: none;
+        border-top: 1px solid var(--border-color);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .map-container2 {
+        height: calc(100vh - 60px);
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .profile-content {
+        padding: 20px 20px 80px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-photo-container {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+
+    .edit-profile-button,
+    .add-tag button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .tags-container {
+        justify-content: center;
+    }
+
+    .drag-handle {
+        width: 40px;
+        height: 5px;
+        background-color: var(--secondary-text-color);
+        border-radius: 2.5px;
+        margin: 10px auto;
+        cursor: grab;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    :root {
+        --profile-container-width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --profile-container-width: 100%;
+    }
+}
+
 /* Accessibility improvements */
 .edit-profile-button:focus,
 .add-tag button:focus,

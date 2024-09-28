@@ -19,7 +19,7 @@
   border: 3px solid black;
   border-radius: var(--border-radius);
   background-color: white;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .navigation-bar-button {

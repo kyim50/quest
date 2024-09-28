@@ -5,7 +5,11 @@ import UserProfile from '../UserProfile';
 import PhotoUploadPreview from '../PhotoUploadPreview';
 
 function NavigationModalWrapper({ children }) {
-  return <div className="navigation-modal-container">{children}</div>;
+  return (
+    <div className="navigation-modal-container">
+      <div className="navigation-modal">{children}</div>
+    </div>
+  );
 }
 
 export default NavigationModalWrapper;

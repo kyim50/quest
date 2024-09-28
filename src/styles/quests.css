@@ -59,7 +59,6 @@
   color: var(--text-color);
   display: flex;
   flex-direction: column;
-  margin-left: .5rem;
 }
 
 
@@ -485,7 +484,7 @@ input:checked + .slider:before {
 
 /* Mobile styles */
 @media (max-width: 767px) {
-  .quests-page {
+  /* .quests-page {
     position: fixed;
     bottom: 60px;
     left: 0;
@@ -500,7 +499,7 @@ input:checked + .slider:before {
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
     transform: none;
     touch-action: none; /* Prevent default touch actions */
-  }
+  } */
 
   .main-content2.quests-active .quests-page {
     transform: translateY(0);

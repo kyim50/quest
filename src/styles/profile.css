@@ -432,7 +432,7 @@
         padding-left: 0;
     }
 
-    .profile-container {
+    /* .profile-container {
         width: 100%;
         height: 50%;
         position: fixed;
@@ -443,7 +443,7 @@
         border: none;
         border-top: 1px solid var(--border-color);
         border-radius: 20px 20px 0 0;
-    }
+    } */
 
     .map-container2 {
         height: calc(100vh - 60px);

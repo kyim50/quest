@@ -217,7 +217,7 @@ input:checked + .slider:before {
 
 /* Mobile styles */
 @media (max-width: 767px) {
-  .privacy-container {
+  /* .privacy-container {
     position: fixed;
     bottom: 60px;
     left: 0;
@@ -232,7 +232,7 @@ input:checked + .slider:before {
     box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
     transform: none;
     touch-action: none; /* Prevent default touch actions */
-  }
+  } */
 
   .main-content2.privacy-active .privacy-container {
     transform: translateY(0);

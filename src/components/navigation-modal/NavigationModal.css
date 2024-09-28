@@ -5,9 +5,31 @@
   width: 30rem;
   height: 90%;
 
-  background-color: white;
+  z-index: 100;
+}
+
+.navigation-modal {
+  width: 100%;
+  height: 100%;
+
+  background-color: black;
   border: 3px solid black;
   border-radius: var(--border-radius);
 
-  z-index: 100;
+  overflow: hidden;
+}
+
+@media (max-width: 550px) {
+  .navigation-modal-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .navigation-modal {
+    width: auto;
+    margin: 0 var(--main-page-padding);
+    margin-top: 5rem;
+  }
 }

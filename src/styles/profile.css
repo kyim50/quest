@@ -212,18 +212,22 @@
 }
 
 .edit-profile-button,
+<<<<<<< HEAD
 .add-tag button {
+=======
+.add-tag-btn {
+    /* background-color: var(--input-background); */
+>>>>>>> 5f85a096aaa5e53b677260c15d9941c8f16b65d8
     color: var(--text-color);
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     border: none;
-    transition: background-color 0.3s, color 0.3s;
 }
 
 .edit-profile-button:hover,
-.add-tag button:hover {
+.add-tag-btn:hover {
     background-color: var(--hover-color);
 }
 
@@ -347,7 +351,6 @@
     background-color: #ff4d4d;
     display: flex;
     justify-content: center;
-    align-items: center;
     color: white;
     border: none;
     padding: 10px;
@@ -369,6 +372,8 @@
     color: white;
     font-size: 18px;
     font-weight: 600;
+    margin-top:auto;
+    margin-bottom:auto;
     margin-left: 10px;
     padding-top: 10px;
 }
@@ -475,13 +480,7 @@
     outline-offset: 2px;
 }
 
-/* Transitions for smoother interactions */
-.edit-profile-button,
-.add-tag button,
-.tag button,
-.logout-button {
-    transition: all 0.2s ease-in-out;
-}
+
 
 /* Ensure consistent font usage */
 body, input, textarea, button {
@@ -497,7 +496,7 @@ body, input, textarea, button {
 
 /* Improved button styles */
 .edit-profile-button,
-.add-tag button,
+.add-tag-btn,
 .logout-button {
     display: inline-flex;
     align-items: center;
@@ -508,7 +507,7 @@ body, input, textarea, button {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease; 
 }
 
 .edit-profile-button:hover,

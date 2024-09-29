@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { IconButton, TextField, Button } from '@mui/material';
 import { Camera } from 'react-camera-pro';
-import { ArrowBack, Refresh, Check } from '@mui/icons-material';
+import { ArrowBack, Refresh, Check, Crop } from '@mui/icons-material';
 import { useUser } from './UserProvider';
 import { useNavigate } from 'react-router-dom';
 import { storage, db, auth } from '../firebase';
@@ -14,7 +14,8 @@ const CameraOverlay = () => {
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [facingMode, setFacingMode] = useState('environment');
+  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
+  const [time, setTime] = useState('');
   const currentUser = useUser();
   const navigate = useNavigate();
   const cameraRef = useRef(null);
@@ -22,12 +23,56 @@ const CameraOverlay = () => {
   const handleCapture = useCallback(() => {
     if (cameraRef.current) {
       const imageSrc = cameraRef.current.takePhoto();
-      setCapturedImage(imageSrc);
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+
+        const highQualityImageSrc = canvas.toDataURL('image/png', 1);
+
+        setCapturedImage(highQualityImageSrc);
+        setTime(new Date().toLocaleTimeString());
+      };
+      img.src = imageSrc;
     }
   }, []);
 
   const handleAspectRatioChange = (ratio) => {
     setSelectedAspectRatio(ratio);
+    setIsCropFinalized(false);
+    updateCropArea(ratio);
+  };
+
+  const updateCropArea = (ratio) => {
+    if (imageRef.current) {
+      const imgRect = imageRef.current.getBoundingClientRect();
+      const [widthRatio, heightRatio] = ratio.split(':').map(Number);
+      let newWidth, newHeight;
+
+      if (imgRect.width / imgRect.height > widthRatio / heightRatio) {
+        // Image is wider than the desired ratio
+        newHeight = imgRect.height;
+        newWidth = (newHeight * widthRatio) / heightRatio;
+      } else {
+        // Image is taller than the desired ratio
+        newWidth = imgRect.width;
+        newHeight = (newWidth * heightRatio) / widthRatio;
+      }
+
+      // Ensure the crop area doesn't exceed the image boundaries
+      newWidth = Math.min(newWidth, imgRect.width);
+      newHeight = Math.min(newHeight, imgRect.height);
+
+      setCropSize({ width: newWidth, height: newHeight });
+      setCropPosition({
+        x: (imgRect.width - newWidth) / 2,
+        y: (imgRect.height - newHeight) / 2
+      });
+    }
   };
 
   const handleConfirm = async () => {
@@ -48,7 +93,6 @@ const CameraOverlay = () => {
       };
 
       await addDoc(collection(db, 'quests'), questData);
-      console.log('Quest uploaded successfully');
       navigate('/home/*');
     } catch (error) {
       console.error('Error uploading quest:', error);
@@ -57,17 +101,87 @@ const CameraOverlay = () => {
     }
   };
 
+  const cropImage = () => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = imageRef.current;
+      const crop = cropRef.current;
+
+      if (!img || !crop) {
+        console.error('Image or crop reference is missing');
+        resolve(null);
+        return;
+      }
+
+      const [widthRatio, heightRatio] = selectedAspectRatio.split(':').map(Number);
+      const cropWidth = crop.offsetWidth;
+      const cropHeight = crop.offsetHeight;
+
+      const scaleX = img.naturalWidth / img.width;
+      const scaleY = img.naturalHeight / img.height;
+
+      canvas.width = cropWidth * scaleX;
+      canvas.height = cropHeight * scaleY;
+
+      ctx.drawImage(
+        img,
+        cropPosition.x * scaleX,
+        cropPosition.y * scaleY,
+        cropWidth * scaleX,
+        cropHeight * scaleY,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error('Failed to create blob from canvas');
+          resolve(null);
+          return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg');
+    });
+  };
+
+  const handleCropMove = (e) => {
+    if (cropRef.current && imageRef.current) {
+      const rect = imageRef.current.getBoundingClientRect();
+      const cropRect = cropRef.current.getBoundingClientRect();
+      let newX = e.clientX - rect.left - cropRect.width / 2;
+      let newY = e.clientY - rect.top - cropRect.height / 2;
+
+      newX = Math.max(0, Math.min(newX, rect.width - cropRect.width));
+      newY = Math.max(0, Math.min(newY, rect.height - cropRect.height));
+
+      setCropPosition({ x: newX, y: newY });
+    }
+  };
+
   const handleBack = () => {
     if (capturedImage) {
       setCapturedImage(null);
+      setIsCropFinalized(false);
     } else {
       navigate('/home/*');
     }
   };
 
-  const toggleCamera = () => {
-    setFacingMode(prevMode => prevMode === 'user' ? 'environment' : 'user');
-  };
+  useEffect(() => {
+    if (imageRef.current && cropRef.current) {
+      const imgRect = imageRef.current.getBoundingClientRect();
+      const cropRect = cropRef.current.getBoundingClientRect();
+      setCropPosition({
+        x: (imgRect.width - cropRect.width) / 2,
+        y: (imgRect.height - cropRect.height) / 2
+      });
+    }
+  }, [selectedAspectRatio]);
 
   return (
     <div className="camera-overlay fullscreen">
@@ -96,7 +210,20 @@ const CameraOverlay = () => {
         </>
       ) : (
         <div className="image-preview-overlay">
-          <img src={capturedImage} alt="Captured" className="captured-image" style={{ aspectRatio: selectedAspectRatio }} />
+          <div className="image-preview" onMouseMove={handleCropMove}>
+            <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image" />
+            <div
+              ref={cropRef}
+              className="crop-outline"
+              style={{
+                aspectRatio: selectedAspectRatio,
+                left: `${cropPosition.x}px`,
+                top: `${cropPosition.y}px`
+              }}
+            >
+              <Crop className="crop-icon" />
+            </div>
+          </div>
           <div className="controls-container">
             <div className="aspect-ratio-selector">
               {['1:1', '4:5', '16:9'].map((ratio) => (
@@ -105,11 +232,22 @@ const CameraOverlay = () => {
                   variant={selectedAspectRatio === ratio ? "contained" : "outlined"}
                   onClick={() => handleAspectRatioChange(ratio)}
                   className="aspect-ratio-button"
+                  disabled={isCropFinalized}
                 >
                   {ratio}
                 </Button>
               ))}
             </div>
+            {isCropFinalized && (
+              <Button
+                variant="outlined"
+                onClick={handleResetCrop}
+                className="reset-crop-button"
+                startIcon={<Undo />}
+              >
+                Reset Crop
+              </Button>
+            )}
             <TextField
               fullWidth
               variant="outlined"
@@ -122,7 +260,7 @@ const CameraOverlay = () => {
               variant="contained"
               color="primary"
               onClick={handleConfirm}
-              disabled={isUploading}
+              disabled={isUploading || !isCropFinalized}
               className="confirm-button"
               startIcon={<Check />}
             >

@@ -226,7 +226,7 @@ const CameraOverlay = () => {
           </div>
           <div className="controls-container">
             <div className="aspect-ratio-selector">
-              {['1:1', '4:5', '16:9'].map((ratio) => (
+              {['1:1', '4:5', '9:16'].map((ratio) => (
                 <Button
                   key={ratio}
                   variant={selectedAspectRatio === ratio ? "contained" : "outlined"}

@@ -80,8 +80,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px; /* Adjust as needed */
-  height: 40px; /* Adjust as needed */
+
+  width: 2.5rem; /* Adjust as needed */
+  height: 2.5rem; /* Adjust as needed */
+
   border-radius: 50%;
   overflow: hidden;
 }

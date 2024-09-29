@@ -43,7 +43,10 @@ const CameraOverlay = ({
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, img.width, img.height);
+        
+        // Flip the image horizontally
+        ctx.scale(-1, 1);
+        ctx.drawImage(img, -img.width, 0, img.width, img.height);
 
         const highQualityImageSrc = canvas.toDataURL('image/png', 1);
 

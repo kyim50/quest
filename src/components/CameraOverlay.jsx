@@ -209,7 +209,7 @@ const CameraOverlay = ({
   }, [capturedImage, selectedAspectRatio, imageSize]);
 
   return (
-    <div className="camera-overlay fullscreen">
+    <div className="camera-overlay1 fullscreen1">
       {!capturedImage ? (
         <>
           <Camera
@@ -222,7 +222,7 @@ const CameraOverlay = ({
             videoResolution={cameraResolution}
           />
           <div className="camera-controls">
-            <IconButton onClick={handleBack} className="back-button">
+            <IconButton onClick={handleBack} className="back-button1">
               <ArrowBack />
             </IconButton>
             <IconButton onClick={handleCapture} className="capture-button">
@@ -234,15 +234,15 @@ const CameraOverlay = ({
           </div>
         </>
       ) : (
-        <div className="image-preview-overlay">
+        <div className="image-preview-overlay1">
           <div 
-            className="image-preview" 
+            className="image-preview1" 
             onMouseMove={handleCropMove}
           >
-            <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image" />
+            <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image1" />
             <div
               ref={cropRef}
-              className={`crop-outline ${isCropFinalized ? 'finalized' : ''}`}
+              className={`crop-outline1 ${isCropFinalized ? 'finalized' : ''}`}
               style={{
                 width: `${cropSize.width}px`,
                 height: `${cropSize.height}px`,
@@ -251,17 +251,17 @@ const CameraOverlay = ({
               }}
               onClick={handleCropClick}
             >
-              <Crop className="crop-icon" />
+              <Crop className="crop-icon1" />
             </div>
           </div>
-          <div className="controls-container">
-            <div className="aspect-ratio-selector">
+          <div className="controls-container1">
+            <div className="aspect-ratio-selector1">
               {['1:1', '4:5', '16:9'].map((ratio) => (
                 <Button
                   key={ratio}
                   variant={selectedAspectRatio === ratio ? "contained" : "outlined"}
                   onClick={() => handleAspectRatioChange(ratio)}
-                  className="aspect-ratio-button"
+                  className="aspect-ratio-button1"
                   disabled={isCropFinalized}
                 >
                   {ratio}

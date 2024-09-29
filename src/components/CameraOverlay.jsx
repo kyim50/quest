@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { IconButton, TextField, Button } from '@mui/material';
 import { Camera } from 'react-camera-pro';
-import { ArrowBack, Refresh, Check, Crop } from '@mui/icons-material';
+import { ArrowBack, Refresh, Check, Crop, Undo } from '@mui/icons-material';
 import { useUser } from './UserProvider';
 import { useNavigate } from 'react-router-dom';
 import { storage, db, auth } from '../firebase';
@@ -16,9 +16,14 @@ const CameraOverlay = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
   const [time, setTime] = useState('');
+  const [facingMode, setFacingMode] = useState('user');
+  const [isCropFinalized, setIsCropFinalized] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
   const currentUser = useUser();
   const navigate = useNavigate();
   const cameraRef = useRef(null);
+  const imageRef = useRef(null);
+  const cropRef = useRef(null);
 
   const handleCapture = useCallback(() => {
     if (cameraRef.current) {
@@ -172,6 +177,15 @@ const CameraOverlay = () => {
     }
   };
 
+  const toggleCamera = () => {
+    setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
+  };
+
+  const handleResetCrop = () => {
+    setIsCropFinalized(false);
+    updateCropArea(selectedAspectRatio);
+  };
+
   useEffect(() => {
     if (imageRef.current && cropRef.current) {
       const imgRect = imageRef.current.getBoundingClientRect();
@@ -185,6 +199,7 @@ const CameraOverlay = () => {
 
   return (
     <div className="camera-overlay1 fullscreen1">
+      {cameraError && <div className="camera-error">{cameraError}</div>}
       {!capturedImage ? (
         <>
           <Camera
@@ -195,6 +210,7 @@ const CameraOverlay = () => {
             videoSourceDeviceId={undefined}
             numberOfCamerasCallback={(i) => console.log(i)}
             videoResolution="highest"
+            onError={(error) => setCameraError('Could not start video source. Please check your camera permissions.')}
           />
           <div className="camera-controls">
             <IconButton onClick={handleBack} className="back-button1">
@@ -210,8 +226,8 @@ const CameraOverlay = () => {
         </>
       ) : (
         <div className="image-preview-overlay">
-          <div 
-            className="image-preview" 
+          <div
+            className="image-preview"
             onMouseMove={handleCropMove}
           >
             <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image" />
@@ -229,7 +245,7 @@ const CameraOverlay = () => {
           </div>
           <div className="controls-container">
             <div className="aspect-ratio-selector">
-              {['1:1', '4:5', '16:9'].map((ratio) => (
+              {['1:1', '4:5', '9:16'].map((ratio) => (
                 <Button
                   key={ratio}
                   variant={selectedAspectRatio === ratio ? "contained" : "outlined"}

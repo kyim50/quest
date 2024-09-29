@@ -291,15 +291,14 @@ const CameraOverlay = ({
               color="primary"
               onClick={handleConfirm}
               disabled={isUploading || !isCropFinalized}
-              className="confirm-button"
-              startIcon={<Check />}
+              className="confirm-btn"
             >
-              Confirm
+              Done
             </Button>
           </div>
-          <IconButton onClick={handleBack} className="back-button">
-            <ArrowBack />
-          </IconButton>
+          <Button onClick={handleBack} className="back-bttn">
+            Cancel
+          </Button>
         </div>
       )}
     </div>

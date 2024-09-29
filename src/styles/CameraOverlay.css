@@ -61,6 +61,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.crop-outline.finalized {
+  border-color: #4CAF50;
+  cursor: default;
 }
 
 .crop-icon {
@@ -83,6 +90,11 @@
   margin: 0 10px !important;
 }
 
+.reset-crop-button {
+  width: 100%;
+  margin-bottom: 20px !important;
+}
+
 .description-input {
   margin-bottom: 20px !important;
 }
@@ -93,8 +105,8 @@
 
 .back-button {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 20px;
+  left: 20px;
   color: white !important;
 }
 

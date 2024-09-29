@@ -184,7 +184,7 @@ const CameraOverlay = () => {
   }, [selectedAspectRatio]);
 
   return (
-    <div className="camera-overlay fullscreen">
+    <div className="camera-overlay1 fullscreen1">
       {!capturedImage ? (
         <>
           <Camera
@@ -197,7 +197,7 @@ const CameraOverlay = () => {
             videoResolution="highest"
           />
           <div className="camera-controls">
-            <IconButton onClick={handleBack} className="back-button">
+            <IconButton onClick={handleBack} className="back-button1">
               <ArrowBack />
             </IconButton>
             <IconButton onClick={handleCapture} className="capture-button">
@@ -210,28 +210,31 @@ const CameraOverlay = () => {
         </>
       ) : (
         <div className="image-preview-overlay">
-          <div className="image-preview" onMouseMove={handleCropMove}>
+          <div 
+            className="image-preview" 
+            onMouseMove={handleCropMove}
+          >
             <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image" />
             <div
               ref={cropRef}
-              className="crop-outline"
+              className={`crop-outline ${isCropFinalized ? 'finalized' : ''}`}
               style={{
                 aspectRatio: selectedAspectRatio,
                 left: `${cropPosition.x}px`,
                 top: `${cropPosition.y}px`
               }}
             >
-              <Crop className="crop-icon" />
+              <Crop className="crop-icon1" />
             </div>
           </div>
           <div className="controls-container">
             <div className="aspect-ratio-selector">
-              {['1:1', '4:5', '9:16'].map((ratio) => (
+              {['1:1', '4:5', '16:9'].map((ratio) => (
                 <Button
                   key={ratio}
                   variant={selectedAspectRatio === ratio ? "contained" : "outlined"}
                   onClick={() => handleAspectRatioChange(ratio)}
-                  className="aspect-ratio-button"
+                  className="aspect-ratio-button1"
                   disabled={isCropFinalized}
                 >
                   {ratio}

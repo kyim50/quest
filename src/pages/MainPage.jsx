@@ -13,7 +13,7 @@ import Quests from '../components/Quests';
 import Connections from '../components/Connections';
 import PrivacySection from '../components/PrivacySection';
 import TopBar from '../components/top-bar/TopBar';
-import CreateQuestModal from '../components/CreateQuestModal'; // New import
+import CreateQuestModal from '../components/CreateQuestModal';
 import CameraOverlay from '../components/CameraOverlay';
 
 import SearchIcon from '../assets/icons/search_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
@@ -126,6 +126,7 @@ export function Search({ small = false }) {
     </div>
   );
 }
+
 export function Filter({ small = false }) {
   const [filter, setFilter] = useState('Near You');
 
@@ -141,7 +142,7 @@ export function Filter({ small = false }) {
 
 export function CreateQuestButton({ small = false, onClick }) {
   return (
-    <button className="create-button">
+    <button className="create-button" onClick={onClick}>
       <div className="icon-container">
         <CreateQuestIcon />
       </div>

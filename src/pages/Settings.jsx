@@ -26,8 +26,27 @@ import DarkIcon from '../assets/icons/darktheme.svg?react';
 import LightIcon from '../assets/icons/lighttheme.svg?react';
 import PrivacySection from '../components/PrivacySection';
 
+import { toggleTheme, getCurrentTheme } from '../theme-toggle';
+
 function Settings() {
   const navigate = useNavigate();
+  const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
+
+  const handleThemeToggle = () => {
+    toggleTheme();
+    setCurrentTheme(getCurrentTheme());
+  };
+
+  useEffect(() => {
+    const handleThemeChange = (event) => {
+      setCurrentTheme(event.detail.isLightMode ? 'light' : 'dark');
+    };
+    window.addEventListener('themeChanged', handleThemeChange);
+    return () => {
+      window.removeEventListener('themeChanged', handleThemeChange);
+    };
+  }, []);
+
   return (
     <NavigationModalWrapper>
       <div className="settings-container">
@@ -41,12 +60,12 @@ function Settings() {
         </section>
         <section>
           <h3>Theme</h3>
-          <div className="setting-option">
+          <div className="setting-option" onClick={handleThemeToggle}>
             <div>
-              <p>Light</p>
+              <p>{currentTheme === 'light' ? 'Light' : 'Dark'}</p>
             </div>
             <div className="setting-icons">
-              <LightIcon />
+              {currentTheme === 'light' ? <LightIcon /> : <DarkIcon />}
             </div>
           </div>
         </section>
@@ -62,7 +81,7 @@ function PrivacySetings() {
     canSeeOtherMarkers: true,
     useCustomVisibilityList: false,
   });
-  const [locationPrivacyToggle, setLocationPrivacyToggle] = useState(0);
+  const [locationPrivacyToggle, setLocationPrivacyToggle] = useState(1);
   const [customList, setCustomList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -77,13 +96,9 @@ function PrivacySetings() {
   }, []);
 
   useEffect(() => {
-    setLocationPrivacyToggle(
-      (privacySettings.friendsCanSeeLocation ? 1 : 0 << 0) +
-        (privacySettings.quietMap ? 1 : 0 << 1)
-    );
-    console.debug('hello');
-    console.debug(locationPrivacyToggle);
-  }, []);
+    const newToggle = (privacySettings.friendsCanSeeLocation ? 1 : 0) + (privacySettings.quietMap ? 2 : 0);
+    setLocationPrivacyToggle(newToggle);
+  }, [privacySettings.friendsCanSeeLocation, privacySettings.quietMap]);
 
   const fetchPrivacySettings = async () => {
     try {
@@ -104,36 +119,29 @@ function PrivacySetings() {
     }
   };
 
-  function handleLocationSwitch() {
-    return () => {
-      setLocationPrivacyToggle((prevToggle) => prevToggle + 1);
+  const handleLocationSwitch = () => {
+    const newToggle = (locationPrivacyToggle + 1) % 4;
+    setLocationPrivacyToggle(newToggle);
 
-      console.debug('hello');
-      console.debug(locationPrivacyToggle);
-
-      switch (locationPrivacyToggle) {
-        case 0:
-          updatePrivacySetting('friendsCanSeeLocation', false);
-          updatePrivacySetting('quietMap', false);
-          break;
-        case 1:
-          updatePrivacySetting('friendsCanSeeLocation', true);
-          updatePrivacySetting('quietMap', false);
-          break;
-        case 2:
-          updatePrivacySetting('friendsCanSeeLocation', false);
-          updatePrivacySetting('quietMap', true);
-          break;
-        case 3:
-          updatePrivacySetting('friendsCanSeeLocation', true);
-          updatePrivacySetting('quietMap', true);
-          break;
-        default:
-          setLocationPrivacyToggle(0);
-          break;
-      }
-    };
-  }
+    switch (newToggle) {
+      case 0:
+        updatePrivacySetting('friendsCanSeeLocation', false);
+        updatePrivacySetting('quietMap', false);
+        break;
+      case 1:
+        updatePrivacySetting('friendsCanSeeLocation', true);
+        updatePrivacySetting('quietMap', false);
+        break;
+      case 2:
+        updatePrivacySetting('friendsCanSeeLocation', false);
+        updatePrivacySetting('quietMap', true);
+        break;
+      case 3:
+        updatePrivacySetting('friendsCanSeeLocation', true);
+        updatePrivacySetting('quietMap', true);
+        break;
+    }
+  };
 
   const updatePrivacySetting = async (setting, value) => {
     try {
@@ -206,55 +214,13 @@ function PrivacySetings() {
           <p>Location Visibility</p>
           <span>Only Friends can see my Location</span>
         </div>
-        <div className="setting-icons" onClick={handleLocationSwitch()}>
-          {!privacySettings.quietMap ? <PrivacyIcon /> : <PrivacyDisableIcon />}
-          {privacySettings.friendsCanSeeLocation &&
-            !privacySettings.quietMap && <FriendsIcon />}
+        <div className="setting-icons" onClick={handleLocationSwitch}>
+          {locationPrivacyToggle === 0 && <PrivacyIcon />}
+          {locationPrivacyToggle === 1 && <><PrivacyIcon /><FriendsIcon /></>}
+          {locationPrivacyToggle === 2 && <PrivacyDisableIcon />}
+          {locationPrivacyToggle === 3 && <><PrivacyDisableIcon /><FriendsIcon /></>}
         </div>
       </div>
-      {/* <div className="privacy-section">
-        <h3 className="section-title1">Location Visibility</h3>
-        <div className="privacy-option">
-          <label className="toggle-switch">
-            <input
-              type="checkbox"
-              checked={privacySettings.friendsCanSeeLocation}
-              onChange={(e) =>
-                updatePrivacySetting('friendsCanSeeLocation', e.target.checked)
-              }
-            />
-            <span className="slider round"></span>
-          </label>
-          <span>Friends can see my location in privacy mode</span>
-        </div>
-        <div className="privacy-option">
-          <label className="toggle-switch">
-            <input
-              type="checkbox"
-              checked={privacySettings.quietMap}
-              onChange={(e) =>
-                updatePrivacySetting('quietMap', e.target.checked)
-              }
-            />
-            <span className="slider round"></span>
-          </label>
-          <span>Quiet Map (Hide my location from everyone)</span>
-        </div>
-        <div className="privacy-option">
-          <label className="toggle-switch">
-            <input
-              type="checkbox"
-              checked={privacySettings.canSeeOtherMarkers}
-              onChange={(e) =>
-                updatePrivacySetting('canSeeOtherMarkers', e.target.checked)
-              }
-            />
-            <span className="slider round"></span>
-          </label>
-          <span>See other users' markers on the map</span>
-        </div>
-      </div> */}
-
       <div className="setting-option">
         <div>
           <p>Visibility List</p>

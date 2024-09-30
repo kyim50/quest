@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './MainPage.css';
 
 import { Routes, Route } from 'react-router-dom';
-import { useMediaQuery } from 'react-responsive';
+import { useMediaQuery } from '@mui/system';
 
 import NavigationBar from '../components/navigation-bar/NavigationBar';
 import NavigationModal from '../components/navigation-modal/NavigationModalWrapper';
@@ -22,8 +22,8 @@ import CreateQuestIcon from '../assets/icons/new_window_24dp_E8EAED_FILL1_wght40
 import Settings from './Settings';
 
 function MainPage() {
-  const isFirstBreak = useMediaQuery({ query: '(max-width: 800px)' });
-  const isMobileBreak = useMediaQuery({ query: '(max-width: 550px)' });
+  const isFirstBreak = useMediaQuery('(max-width:800px)');
+  const isMobileBreak = useMediaQuery('(max-width:550px)');
   const topSectionRef = useRef(null);
 
   const [showTopBar, setShowTopBar] = useState(false);

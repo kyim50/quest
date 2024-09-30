@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useNotification } from '../NotificationContext';
+import '../styles/CreateQuestModal.css';
 
 const CreateQuestModal = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('');
@@ -107,73 +108,102 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="modal-overlay">
-      <div className="modal quest-popup">
-        <h3>Create a New Quest</h3>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={handleDescriptionChange}
-        />
-        <select
-          value={timeFrame}
-          onChange={(e) => setTimeFrame(e.target.value)}
-        >
-          <option value="">Select Time Frame</option>
-          <option value="5 mins">5 mins</option>
-          <option value="10 mins">10 mins</option>
-          <option value="15 mins">15 mins</option>
-          <option value="30 mins">30 mins</option>
-          <option value="1 hour">1 hour</option>
-        </select>
-        <div className="toggle-container">
-          <label className="switch">
+      <div className="quest-popup">
+        <div className="modal-content">
+          <div className="modal-header">
+            <svg onClick={onClose} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+            <h2>Create a New Quest</h2>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="quest-title">Title</label>
             <input
-              type="checkbox"
-              checked={isPublic}
-              onChange={handleToggleChange}
-            />
-            <span className="slider"></span>
-          </label>
-          <span>{isPublic ? 'Public' : 'Private'}</span>
-        </div>
-        {!isPublic && (
-          <>
-            <input
+              id="quest-title"
               type="text"
-              placeholder="Search user"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Enter quest title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="profile-input"
             />
-            {searchTerm && filteredUsers.length > 0 && (
-              <div className="user-search-results">
-                {filteredUsers.map(user => (
-                  <div
-                    key={user.id}
-                    className="user-search-result"
-                    onClick={() => handleSelectUser(user)}
-                  >
-                    <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
-                    {user.name}
-                  </div>
-                ))}
-              </div>
-            )}
-            {selectedUser && (
-              <div className="selected-user">
-                <p>Selected User: {selectedUser.name}</p>
-              </div>
-            )}
-          </>
-        )}
-        <div className="modal-actions">
-          <button className="confirm-button" onClick={handleCreateQuest}>Create Quest</button>
-          <button className="cancel-button" onClick={onClose}>Cancel</button>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="quest-description">Description</label>
+            <textarea
+              id="quest-description"
+              placeholder="Enter quest description"
+              value={description}
+              onChange={handleDescriptionChange}
+              className="profile-bio-edit"
+            />
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="quest-timeframe">Time Frame</label>
+            <select
+              id="quest-timeframe"
+              value={timeFrame}
+              onChange={(e) => setTimeFrame(e.target.value)}
+              className="profile-input"
+            >
+              <option value="">Select Time Frame</option>
+              <option value="5 mins">5 mins</option>
+              <option value="10 mins">10 mins</option>
+              <option value="15 mins">15 mins</option>
+              <option value="30 mins">30 mins</option>
+              <option value="1 hour">1 hour</option>
+            </select>
+          </div>
+
+          <div className="toggle-container">
+            <p>Public Quest</p>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={handleToggleChange}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+
+          {!isPublic && (
+            <div className="user-search-container">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="user-search-input"
+              />
+              {searchTerm && filteredUsers.length > 0 && (
+                <div className="user-search-results">
+                  {filteredUsers.map(user => (
+                    <div
+                      key={user.id}
+                      className="user-search-result"
+                      onClick={() => handleSelectUser(user)}
+                    >
+                      <img src={user.profilePhotoUrl || '/default-profile.png'} alt="Profile" className="user-pfp" />
+                      {user.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedUser && (
+                <div className="selected-user">
+                  <p>Selected User: {selectedUser.name}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="modal-actions">
+            <button className="cancel-button" onClick={onClose}>Cancel</button>
+            <button className="create-quest-button" onClick={handleCreateQuest}>Create Quest</button>
+          </div>
         </div>
       </div>
     </div>

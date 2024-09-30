@@ -8,6 +8,9 @@
 .settings-container header h2 {
   margin: 0;
 }
+.settings-container section h3 {
+  margin-bottom: 0.8rem;
+}
 .settings-container header svg {
   margin-right: 4px;
   padding-left: 2px; /*fix alignment*/
@@ -35,7 +38,12 @@
   align-items: center;
   justify-content: space-between;
 
+  padding-left: 0.5rem;
   margin-bottom: 1rem;
+}
+.setting-option.nogap {
+  justify-content: flex-start;
+  gap: 1rem;
 }
 
 .setting-option p {
@@ -76,4 +84,27 @@
   border: none;
   background-color: rgba(98, 137, 236, 0.25);
   color: black;
+}
+
+.settings-container .logout-button {
+  display: flex;
+  align-items: center;
+
+  width: fit-content;
+  padding: 0rem 0.5rem;
+  border-radius: 3rem;
+  background-color: rgba(255, 0, 0, 0.5);
+
+  transition: ease-out background-color 150ms;
+
+  cursor: pointer;
+}
+.setting-option#logout {
+  color: rgba(255, 0, 0, 0.8);
+}
+.settings-container .logout-button:hover {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+.settings-container .logout-button svg {
+  fill: black;
 }

@@ -17,12 +17,13 @@ import {
   limit,
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import './connections.css';
-import { centerMapOnUser } from '././map/UserLocationService';
-import chatIcon from './chatbubble.png';
+import '../components/connections.css';
+import './Connections.css';
+import { centerMapOnUser } from '../components/map/UserLocationService';
+import chatIcon from '../components/chatbubble.png';
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from 'react-use-gesture';
-import NavigationModalWrapper from './navigation-modal/NavigationModalWrapper';
+import NavigationModalWrapper from '../components/navigation-modal/NavigationModalWrapper';
 
 const Connections = ({
   currentUserIds,
@@ -467,8 +468,31 @@ const Connections = ({
     switch (activeTab) {
       case 'friends':
         return (
-          <div className="friends-section">
-            <h2>Friends</h2>
+          <section className="friends-section">
+            {pendingRequests.length > 0 && <h2>Pending</h2>}
+            {pendingRequests.map((request) => (
+              <div key={request.id} className="pending-request">
+                <img src={request.senderPhoto} alt="User" />
+                <div>{request.senderName}</div>
+                <div className="button-group">
+                  <button
+                    className="accept-btn"
+                    onClick={() =>
+                      handleAcceptRequest(request.id, request.senderId)
+                    }
+                  >
+                    Accept
+                  </button>
+                  <button
+                    className="decline-btn"
+                    onClick={() => handleDeclineRequest(request.id)}
+                  >
+                    Decline
+                  </button>
+                </div>
+              </div>
+            ))}
+            <h2>All</h2>
             {friends.map((friend) => (
               <div
                 key={friend.id}
@@ -499,11 +523,11 @@ const Connections = ({
                 </div>
               </div>
             ))}
-          </div>
+          </section>
         );
       case 'pending':
         return (
-          <div className="pending-requests-section">
+          <section className="pending-requests-section">
             <h2>Pending Requests</h2>
             {pendingRequests.map((request) => (
               <div key={request.id} className="pending-request">
@@ -527,12 +551,12 @@ const Connections = ({
                 </div>
               </div>
             ))}
-          </div>
+          </section>
         );
       case 'people':
         return (
-          <div className="people-section">
-            <h2>People</h2>
+          <section className="people-section">
+            {/* <h2>People</h2> */}
             {filteredPeople.map((user) => (
               <div
                 key={user.id}
@@ -565,11 +589,11 @@ const Connections = ({
                 </div>
               </div>
             ))}
-          </div>
+          </section>
         );
       case 'recentChats':
         return (
-          <div className="recent-chats-section">
+          <section className="recent-chats-section">
             <h2>Recent Chats</h2>
             {chatHistory.map((user) => (
               <div
@@ -581,7 +605,7 @@ const Connections = ({
                 <div>{user.name}</div>
               </div>
             ))}
-          </div>
+          </section>
         );
       default:
         return null;
@@ -611,51 +635,58 @@ const Connections = ({
       >
         <div className="drag-handle" {...bindDrag()} />
         {notification && <div className="notification1">{notification}</div>}
-  
+
         {lockedUser ? (
           renderLockedUserProfile()
         ) : (
           <>
-            <div className="search-bar1">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-            </div>
-  
-            <div className="connectionstabs">
+            <div className="connections-tab">
               <button
-                className={`tab-button-con ${activeTab === 'friends' ? 'active1 selected' : ''}`}
+                className={`tab-button ${
+                  activeTab === 'friends' ? 'active1 selected' : ''
+                }`}
                 onClick={() => setActiveTab('friends')}
               >
                 Friends
               </button>
-              <button
-                className={`tab-button-con ${activeTab === 'pending' ? 'active1 selected' : ''}`}
+              {/* <button
+                className={`tab-button ${activeTab === 'pending' ? 'active1 selected' : ''}`}
                 onClick={() => setActiveTab('pending')}
               >
                 Pending Requests
-              </button>
+              </button> */}
               <button
-                className={`tab-button-con ${activeTab === 'people' ? 'active1 selected' : ''}`}
+                className={`tab-button ${
+                  activeTab === 'people' ? 'active1 selected' : ''
+                }`}
                 onClick={() => setActiveTab('people')}
               >
                 People
               </button>
               <button
-                className={`tab-button-con ${activeTab === 'recentChats' ? 'active1 selected' : ''}`}
+                className={`tab-button ${
+                  activeTab === 'recentChats' ? 'active1 selected' : ''
+                }`}
                 onClick={() => setActiveTab('recentChats')}
               >
-                Recent Chats
+                Chat
               </button>
             </div>
-  
+
+            {activeTab === 'people' && (
+              <div className="search-bar1">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+            )}
             {renderTabContent()}
           </>
         )}
-  
+
         {selectedUser && (
           <div className="user-popup1">
             <button className="close-popup1" onClick={handleClosePopup}>
@@ -678,7 +709,7 @@ const Connections = ({
             </button>
           </div>
         )}
-  
+
         {chatUser && (
           <div className="chat-container1">
             <div className="chat-header1">
@@ -692,7 +723,11 @@ const Connections = ({
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`message1 ${msg.senderId === auth.currentUser.uid ? 'sent1' : 'received1'}`}
+                  className={`message1 ${
+                    msg.senderId === auth.currentUser.uid
+                      ? 'sent1'
+                      : 'received1'
+                  }`}
                 >
                   <div>{msg.content}</div>
                 </div>
@@ -721,7 +756,6 @@ const Connections = ({
       </div>
     </NavigationModalWrapper>
   );
-  
 };
 
 export default Connections;

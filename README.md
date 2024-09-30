@@ -1,14 +1,16 @@
 # TODO
 
 ## UI
-- Fix page modal for mobile.
-- Make quest modal.
-- Create settings menu.
-- Add light/dark mode variants and add to settings.
-- Add fullscreen mode to maps
 - Restyle old page modals.
+- Make quest modal.
+- Add fullscreen mode to maps
 - Create modal for search and filter.
 - style the image preview which appears after you take a picture 
+- Add light/dark mode variants and add to settings.
+
+ Fix page modal for mobile.
+
+ Create settings menu.
 
 ## Front-End Logic
 

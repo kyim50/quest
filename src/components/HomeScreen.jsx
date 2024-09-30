@@ -13,7 +13,7 @@ import MapComponent from '././map/MapComponent';
 import NavigationBar from './NavigationBar';
 import UserProfile from '../pages/UserProfile';
 import QuestsComponent from './QuestsComponent';
-import Connections from './Connections';
+import Connections from '../pages/Connections';
 import PrivacySection from './PrivacySection';
 import PhotoUploadPreview from './PhotoUploadPreview';
 import { toggleTheme } from '../theme-toggle';

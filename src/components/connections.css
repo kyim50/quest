@@ -283,8 +283,8 @@
 
 .search-bar1 input:focus {
   outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  /* border-color: var(--accent-color); */
+  /* box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2); */
 }
 
 .chat-container1 {

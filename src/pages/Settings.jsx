@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Settings.css';
 
@@ -24,11 +24,15 @@ import CheckIcon from '../assets/icons/check_24dp_E8EAED_FILL0_wght500_GRAD0_ops
 import UncheckIcon from '../assets/icons/cancel.svg?react';
 import DarkIcon from '../assets/icons/darktheme.svg?react';
 import LightIcon from '../assets/icons/lighttheme.svg?react';
+import LogoutIcon from '../assets/icons/logout.svg?react';
 import PrivacySection from '../components/PrivacySection';
 
 import { toggleTheme, getCurrentTheme } from '../theme-toggle';
+import { handleLogout } from '../components/UserAuthService';
+import { useNotification } from '../NotificationContext';
 
 function Settings() {
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
   const [currentTheme, setCurrentTheme] = useState(getCurrentTheme());
 
@@ -47,6 +51,17 @@ function Settings() {
     };
   }, []);
 
+  const handleLogoutClick = useCallback(async () => {
+    try {
+      await handleLogout();
+      showNotification('Logged out successfully');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      showNotification('Logout failed. Please try again.');
+    }
+  }, [showNotification, navigate]);
+
   return (
     <NavigationModalWrapper>
       <div className="settings-container">
@@ -62,10 +77,19 @@ function Settings() {
           <h3>Theme</h3>
           <div className="setting-option" onClick={handleThemeToggle}>
             <div>
-              <p>{currentTheme === 'light' ? 'Light' : 'Dark'}</p>
+              <p>{currentTheme === 'light' ? 'Light Mode' : 'Dark Mode'}</p>
             </div>
             <div className="setting-icons">
               {currentTheme === 'light' ? <LightIcon /> : <DarkIcon />}
+            </div>
+          </div>
+        </section>
+        <section>
+          <h3>Account</h3>
+          <div className="setting-option nogap" id="logout">
+            Logout
+            <div className="logout-button" onClick={handleLogoutClick}>
+              <LogoutIcon />
             </div>
           </div>
         </section>
@@ -96,7 +120,9 @@ function PrivacySetings() {
   }, []);
 
   useEffect(() => {
-    const newToggle = (privacySettings.friendsCanSeeLocation ? 1 : 0) + (privacySettings.quietMap ? 2 : 0);
+    const newToggle =
+      (privacySettings.friendsCanSeeLocation ? 1 : 0) +
+      (privacySettings.quietMap ? 2 : 0);
     setLocationPrivacyToggle(newToggle);
   }, [privacySettings.friendsCanSeeLocation, privacySettings.quietMap]);
 
@@ -216,9 +242,19 @@ function PrivacySetings() {
         </div>
         <div className="setting-icons" onClick={handleLocationSwitch}>
           {locationPrivacyToggle === 0 && <PrivacyIcon />}
-          {locationPrivacyToggle === 1 && <><PrivacyIcon /><FriendsIcon /></>}
+          {locationPrivacyToggle === 1 && (
+            <>
+              <PrivacyIcon />
+              <FriendsIcon />
+            </>
+          )}
           {locationPrivacyToggle === 2 && <PrivacyDisableIcon />}
-          {locationPrivacyToggle === 3 && <><PrivacyDisableIcon /><FriendsIcon /></>}
+          {locationPrivacyToggle === 3 && (
+            <>
+              <PrivacyDisableIcon />
+              <FriendsIcon />
+            </>
+          )}
         </div>
       </div>
       <div className="setting-option">

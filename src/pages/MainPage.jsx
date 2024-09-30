@@ -10,7 +10,7 @@ import Feed from '../components/feed/Feed';
 import Map from '../components/map/Map';
 import UserProfile from './UserProfile';
 import Quests from '../components/Quests';
-import Connections from '../components/Connections';
+import Connections from './Connections';
 import PrivacySection from '../components/PrivacySection';
 import TopBar from '../components/top-bar/TopBar';
 import CreateQuestModal from '../components/CreateQuestModal';
@@ -32,7 +32,7 @@ function MainPage() {
   const [showCamera, setShowCamera] = React.useState(false);
 
   const handleCameraToggle = () => {
-    setShowCamera(prev => !prev);
+    setShowCamera((prev) => !prev);
   };
 
   useEffect(() => {
@@ -83,24 +83,24 @@ function MainPage() {
         </div>
         <div className="right-panel" ref={topSectionRef}>
           <div className="right-panel right-panel-sticky">
-              <Map />
-              <div className="button-section">
-                {isFirstBreak ? (
-                  <>
+            <Map />
+            <div className="button-section">
+              {isFirstBreak ? (
+                <>
+                  <Search />
+                  <CreateQuestButton onClick={handleCreateQuestClick} />
+                  <Filter />
+                </>
+              ) : (
+                <>
+                  <div className="actions-container">
                     <Search />
-                    <CreateQuestButton onClick={handleCreateQuestClick} />
                     <Filter />
-                  </>
-                ) : (
-                  <>
-                    <div className="actions-container">
-                      <Search />
-                      <Filter />
-                    </div>
-                    <CreateQuestButton onClick={handleCreateQuestClick} />
-                  </>
-                )}
-              </div>
+                  </div>
+                  <CreateQuestButton onClick={handleCreateQuestClick} />
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

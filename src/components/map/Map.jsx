@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Map.css';
 import MapComponent from '././MapComponent';
+import BackIcon from '../../assets/icons/back-icon.svg?react';
 
 function Map({ small = false }) {
   const [address, setAddress] = useState('Loading address...');
@@ -19,6 +20,9 @@ function Map({ small = false }) {
       className={`map-container ${small ? 'small' : ''} ${
         isFullScreen ? 'full-screen' : ''
       }`}
+      onClick={() => {
+        !isFullScreen && setIsFullScreen(true);
+      }}
     >
       <MapComponent
         address={address}
@@ -30,6 +34,16 @@ function Map({ small = false }) {
         showAddressBar={false}
         isFullScreen={isFullScreen}
       />
+
+      {isFullScreen && (
+        <button
+          className="full-screen-toggle"
+          onClick={() => setIsFullScreen(false)}
+          aria-label={isFullScreen ? 'Exit full screen' : 'Enter full screen'}
+        >
+          <BackIcon />
+        </button>
+      )}
     </div>
   );
 }

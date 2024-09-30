@@ -30,7 +30,11 @@
 }
 
 .settings-container section {
-  padding-left: 8px;
+  margin: 0 8px;
+}
+.settings-container section:not(:nth-child(2)) {
+  padding-top: 1rem;
+  border-top: 2px solid #6289ec80;
 }
 
 .setting-option {

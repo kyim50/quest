@@ -1985,19 +1985,19 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
 /* Adjust font sizes for better readability on mobile */
 @media (max-width: 768px) {
   body {
-    font-size: 14px;
+    /* font-size: 14px; */
   }
 
   h1 {
-    font-size: 24px;
+    /* font-size: 24px; */
   }
 
   h2 {
-    font-size: 20px;
+    /* font-size: 20px; */
   }
 
   h3 {
-    font-size: 18px;
+    /* font-size: 18px; */
   }
 }
 

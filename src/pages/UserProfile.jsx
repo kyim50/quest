@@ -6,9 +6,10 @@ import {
   fetchUserData,
   db,
 } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../NotificationContext';
-import { useUserStatus } from './UserStatusContext';
-import { Privacy } from './Privacy';
+import { useUserStatus } from '../components/UserStatusContext';
+import { Privacy } from '../components/Privacy';
 import {
   collection,
   query,
@@ -20,7 +21,12 @@ import {
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from 'react-use-gesture';
 import '../styles/profile.css';
-import NavigationModalWrapper from './navigation-modal/NavigationModalWrapper';
+import './UserProfile.css';
+import NavigationModalWrapper from '../components/navigation-modal/NavigationModalWrapper';
+
+import SettingIcon from '../assets/icons/settings_24dp_E8EAED_FILL0_wght700_GRAD0_opsz24.svg?react';
+import EditIcon from '../assets/icons/edit_24dp_E8EAED_FILL0_wght700_GRAD0_opsz24.svg?react';
+import SaveIcon from '../assets/icons/check_24dp_E8EAED_FILL0_wght500_GRAD0_opsz24.svg?react';
 
 const UserProfile = ({ handleLogout, isNavExpanded }) => {
   const [profilePhoto, setProfilePhoto] = useState('placeholder.jpg');
@@ -37,6 +43,7 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
   const fileInputRef = useRef(null);
   const { showNotification } = useNotification();
   const { userStatus } = useUserStatus();
+  const navigate = useNavigate();
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [containerHeight, setContainerHeight] = useState(
@@ -261,6 +268,142 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
     config: { tension: 300, friction: 30 },
   });
 
+  if (true)
+    return (
+      <NavigationModalWrapper>
+        <div className="prof-container">
+          <header>
+            <div className="prof">
+              <div className="prof-picture">
+                <img src={profilePhoto} alt="ProfilePicture" />
+              </div>
+              <div
+                className="prof-name-container"
+                style={isEditing ? { gap: '4px' } : {}}
+              >
+                {isEditing ? (
+                  <>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="prof-input"
+                      placeholder="Name"
+                    />
+                    <div>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="prof-input"
+                        placeholder="Username"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="prof-name">{name}</p>
+                    <p className="prof-username">@{username}</p>
+                  </>
+                )}
+              </div>
+              <div className="prof-header-buttons">
+                {isEditing ? (
+                  <SaveIcon onClick={handleSaveProfile} />
+                ) : (
+                  <EditIcon onClick={() => setIsEditing(true)} />
+                )}
+                <SettingIcon onClick={() => navigate('/home/settings')} />
+              </div>
+            </div>
+            <div className="prof-bio">
+              <h3>Bio</h3>
+              {isEditing ? (
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="prof-bio-edit"
+                  placeholder="Bio"
+                  maxLength={150}
+                />
+              ) : (
+                <p>{bio}</p>
+              )}
+            </div>
+          </header>
+
+          <div className="prof-body">
+            <div className="profile-section">
+              <h3 className="section-title">Tags</h3>
+              <div className="tags-container">
+                {tags.map((tag) => (
+                  <div key={tag} className="tag">
+                    <img
+                      src={
+                        predefinedTags.find((t) => t.value === tag)?.img ||
+                        '/other.png'
+                      }
+                      alt={tag}
+                      className="tag-icon"
+                    />
+                    <button onClick={() => handleRemoveTag(tag)}>x</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="profile-section">
+              <h3 className="section-title">Active Quests</h3>
+              {activeQuest ? (
+                <div className="quest-item">
+                  <p>"{activeQuest.title}" with</p>
+                  {activeQuest.partnerName && (
+                    <div className="quest-partner">
+                      <img
+                        src={activeQuest.partnerPhoto || 'placeholder.jpg'}
+                        alt={activeQuest.partnerName}
+                        className="partner-photo"
+                      />
+                      <p>
+                        {activeQuest.partnerName} @{activeQuest.partnerUsername}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="section-empty-msg">
+                  No quests ongoing. Ready to start a new adventure?
+                </p>
+              )}
+            </div>
+
+            <div className="profile-section">
+              <h3 className="section-title">Recent Quests</h3>
+              {recentQuests.length > 0 ? (
+                recentQuests.map((quest) => (
+                  <div key={quest.id} className="quest-item">
+                    <p>{quest.title}</p>
+                    {quest.targetUser && (
+                      <p>
+                        with{' '}
+                        {typeof quest.targetUser === 'string'
+                          ? quest.targetUser
+                          : quest.targetUser.name || 'Unknown User'}
+                      </p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="section-empty-msg">
+                  No recent quests. Time to explore!
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </NavigationModalWrapper>
+    );
+
   return (
     <NavigationModalWrapper>
       <div
@@ -359,73 +502,6 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="profile-section">
-            <h3 className="section-title">Tags</h3>
-            <div className="tags-container">
-              {tags.map((tag) => (
-                <div key={tag} className="tag">
-                  <img
-                    src={
-                      predefinedTags.find((t) => t.value === tag)?.img ||
-                      '/other.png'
-                    }
-                    alt={tag}
-                    className="tag-icon"
-                  />
-                  <button onClick={() => handleRemoveTag(tag)}>x</button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="profile-section">
-            <h3 className="section-title">Active Quests</h3>
-            {activeQuest ? (
-              <div className="quest-item">
-                <p>"{activeQuest.title}" with</p>
-                {activeQuest.partnerName && (
-                  <div className="quest-partner">
-                    <img
-                      src={activeQuest.partnerPhoto || 'placeholder.jpg'}
-                      alt={activeQuest.partnerName}
-                      className="partner-photo"
-                    />
-                    <p>
-                      {activeQuest.partnerName} @{activeQuest.partnerUsername}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="no-quests">
-                <p>No quests ongoing. Ready to start a new adventure?</p>
-              </div>
-            )}
-          </div>
-
-          <div className="profile-section">
-            <h3 className="section-title">Recent Quests</h3>
-            {recentQuests.length > 0 ? (
-              recentQuests.map((quest) => (
-                <div key={quest.id} className="quest-item">
-                  <p>{quest.title}</p>
-                  {quest.targetUser && (
-                    <p>
-                      with{' '}
-                      {typeof quest.targetUser === 'string'
-                        ? quest.targetUser
-                        : quest.targetUser.name || 'Unknown User'}
-                    </p>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="no-quests">
-                <p>No recent quests. Time to explore!</p>
-              </div>
-            )}
           </div>
 
           <button className="logout-button" onClick={handleLogout}>

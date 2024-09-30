@@ -11,7 +11,7 @@ import { useNotification } from '../NotificationContext';
 import { checkAuthStatus, handleLogout } from './UserAuthService';
 import MapComponent from '././map/MapComponent';
 import NavigationBar from './NavigationBar';
-import UserProfile from './UserProfile';
+import UserProfile from '../pages/UserProfile';
 import QuestsComponent from './QuestsComponent';
 import Connections from './Connections';
 import PrivacySection from './PrivacySection';

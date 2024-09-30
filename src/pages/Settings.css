@@ -1,0 +1,79 @@
+.settings-container {
+}
+.settings-container header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.settings-container header h2 {
+  margin: 0;
+}
+.settings-container header svg {
+  margin-right: 4px;
+  padding-left: 2px; /*fix alignment*/
+  width: 2.25rem;
+  height: 2.25rem;
+
+  fill: #6289ec;
+
+  border-radius: 50%;
+
+  transform: rotate(180deg);
+  cursor: pointer;
+}
+
+.settings-container header svg:hover {
+  background-color: rgba(98, 137, 236, 0.25);
+}
+
+.settings-container section {
+  padding-left: 8px;
+}
+
+.setting-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 1rem;
+}
+
+.setting-option p {
+  margin: 0;
+  font-weight: 500;
+
+  line-height: normal;
+}
+.setting-option span {
+  margin: 0;
+  padding-left: 0.5rem;
+
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+}
+.setting-option svg {
+  padding: 8px 0;
+  width: 2rem;
+  height: 2.4rem;
+
+  fill: #6289ec;
+
+  cursor: pointer;
+}
+.setting-icons {
+  display: flex;
+  align-items: center;
+  padding: 0 0.6rem;
+  border-radius: 2rem;
+
+  background-color: rgba(98, 137, 236, 0.25);
+}
+
+.search-user input {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  border: none;
+  background-color: rgba(98, 137, 236, 0.25);
+  color: black;
+}

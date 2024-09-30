@@ -25,12 +25,12 @@
     --background-color: black;
     --text-color: var(--dark-text);
     --secondary-text-color: var(--dark-secondary-text);
-    --section-background: var(--dark-section-background);
-    --input-background: var(--dark-input-background);
-    --hover-color: var(--dark-hover);
-    --border-color: var(--dark-border);
-    --tag-background: var(--dark-tag-background);
-    --quest-background: var(--dark-quest-background);
+    --section-background: var(--light-section-background);
+    --input-background: var(--light-input-background);
+    --hover-color: var(--light-hover);
+    --border-color: var(--light-border);
+    --tag-background: var(--light-tag-background);
+    --quest-background: var(--light-quest-background);
 
     /* Layout variables */
     --nav-bar-width-collapsed: 60px;
@@ -767,7 +767,7 @@ ol {
 .profile-section:hover,
 .quest-item:hover,
 .tag:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 
 /* Improve visibility of form validation messages */

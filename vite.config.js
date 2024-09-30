@@ -4,10 +4,19 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    // Remove any aliasing that points to index.js or similar
     alias: {
-      // Example of an alias that might need removing
-      // 'react-responsive': path.resolve(__dirname, 'node_modules/react-responsive'),
+      // Add any necessary aliases here if needed
+      // For example, if you had any specific aliases you used before
+    },
+  },
+  base: '/', // Set base to root since there's no subpath
+  build: {
+    outDir: 'dist', // Ensure the output directory is correct
+    rollupOptions: {
+      output: {
+        // This can help avoid issues with chunking
+        manualChunks: undefined,
+      },
     },
   },
 });

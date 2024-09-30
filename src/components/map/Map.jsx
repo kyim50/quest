@@ -15,7 +15,11 @@ function Map({ small = false }) {
   };
 
   return (
-    <div className={`map-container ${small ? 'small' : ''} ${isFullScreen ? 'full-screen' : ''}`}>
+    <div
+      className={`map-container ${small ? 'small' : ''} ${
+        isFullScreen ? 'full-screen' : ''
+      }`}
+    >
       <MapComponent
         address={address}
         setAddress={setAddress}
@@ -26,15 +30,6 @@ function Map({ small = false }) {
         showAddressBar={false}
         isFullScreen={isFullScreen}
       />
-      
-{/* Button to toggle full screen for map */}
-      <button
-        className="full-screen-toggle"
-        onClick={toggleFullScreen}
-        aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
-      >
-        {isFullScreen ? '←' : '⤢'}
-      </button>
     </div>
   );
 }

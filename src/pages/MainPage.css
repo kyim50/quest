@@ -251,6 +251,7 @@
 
   width: 4rem;
   min-width: 4rem;
+  max-width: 4rem;
   height: 100%;
 }
 .create-button.small {

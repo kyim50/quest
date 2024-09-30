@@ -491,7 +491,7 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
               {isEditing ? 'Save Profile' : 'Edit Profile'}
             </button>
             <div className="add-tag">
-              <button onClick={toggleTagOptions}>Add Tags</button>
+              <button className= "add-tag-btn" onClick={toggleTagOptions}>Add Tags</button>
               {showTagOptions && (
                 <div className="tag-options">
                   {predefinedTags.map(({ img, value }) => (

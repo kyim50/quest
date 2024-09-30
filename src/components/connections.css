@@ -56,17 +56,6 @@
   touch-action: none; /* Prevent default touch actions */
 }
 
-.connections-container2.nav-collapsed {
-  left: calc(var(--nav-bar-width-collapsed) + 10px);
-  width: var(--connections-container-width);
-}
-
-.connections-container2.nav-expanded {
-  left: calc(var(--nav-bar-width-expanded) + 10px);
-  width: calc(var(--profile-container-width) + var(--nav-bar-width-expanded) - var(--nav-bar-width-collapsed));
-}
-
-
 .drag-handle {
   display: none;
 }
@@ -130,7 +119,7 @@
   filter: brightness(0) invert(1);
 }
 
-.light-mode .chat-btn1 img, 
+.light-mode .chat-btn1 img,
 .light-mode .chat-btn2 img {
   filter: none;
 }
@@ -416,7 +405,6 @@
   background-color: var(--accent-hover-color);
 }
 
-
 /* Connections tab group (parent) */
 .connectionstabs {
   display: flex;
@@ -428,7 +416,6 @@
   overflow: hidden;
   height:75px;
 }
-
 
 /* Tab button itself  */
 .tab-button-con {
@@ -444,7 +431,6 @@
   height:100%;
   width:100%;
 }
-
 
 /* Tab button hover and active styling */
 .tab-button-con:hover{
@@ -602,82 +588,6 @@
 
 .light-mode .sendchatimg {
   filter: none;
-}
-
-/* Desktop styles */
-@media (min-width: 768px) {
-  .connections-container1 {
-    position: fixed;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 50%;
-    min-height: 100px;
-    max-height: calc(100% - 120px);
-    border-radius: 20px 20px 0 0;
-    overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    transform: none;
-    touch-action: none; /* Prevent default touch actions */
-  }
-
-  .connections-content{
-    touch-action: pan-y; /* Prevent default touch actions */
-  }
-  
-  .connections-container1.user-locked1 {
-    height: calc(100% - 60px);
-    border-radius: 0;
-  }
-
-  .profile-container4 {
-    padding: 20px;
-  }
-
-  .add-friend-btn1,
-  .chat-btn1,
-  .unlock-btn1 {
-    font-size: 16px;
-  }
-
-  .friend-item1 img,
-  .people-item img,
-  .pending-request img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .view-profile-btn1,
-  .remove-friend-btn1,
-  .accept-btn,
-  .decline-btn {
-    font-size: 14px;
-    padding: 0px 16px;
-  }
-
-  .search-bar1 input {
-    font-size: 16px;
-  }
-
-  .chat-container1 {
-    width: 350px;
-    height: 500px;
-    bottom: 20px;
-    right: 20px;
-    left: auto;
-    border-radius: 16px;
-  }
-
-  .chat-header1 {
-    padding: 15px;
-  }
-
-  .tab-button {
-    font-size: 14px;
-    padding: 12px;
-  }
 }
 
 /* Animations */

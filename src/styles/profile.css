@@ -33,8 +33,6 @@
     --quest-background: var(--light-quest-background);
 
     /* Layout variables */
-    --nav-bar-width-collapsed: 60px;
-    --nav-bar-width-expanded: 200px;
     --profile-container-width: 425px;
 }
 
@@ -51,46 +49,11 @@
     --quest-background: var(--light-quest-background);
 }
 
-/* Main layout styles */
-.home-screen-container2 {
-    display: flex;
-    min-height: 100vh;
-    padding-left: var(--nav-bar-width-collapsed);
-    transition: padding-left 0.3s ease;
-}
-
-.home-screen-container2.nav-expanded {
-    padding-left: var(--nav-bar-width-expanded);
-}
-
 .profile-container {
     width: 100%;
     height: 100%;
     background-color: var(--background-color);
     overflow-y: scroll;
-}  
-
-/* Updated styles */
-.profile-container.nav-collapsed {
-    left: calc(var(--nav-bar-width-collapsed) + 10px);
-    width: var(--profile-container-width);
-}
-
-.profile-container.nav-expanded {
-    left: calc(var(--nav-bar-width-expanded) + 10px);
-    width: calc(var(--profile-container-width) + var(--nav-bar-width-expanded) - var(--nav-bar-width-collapsed));
-}
-
-/* Adjust the map container to account for the profile container's new width */
-.map-container2 {
-    flex-grow: 1;
-    margin-left: calc(var(--nav-bar-width-collapsed) + var(--profile-container-width) - 70px);
-    height: 100vh;
-    transition: margin-left 0.3s ease;
-}
-
-.nav-expanded .map-container2 {
-    margin-left: calc(var(--nav-bar-width-expanded) + var(--profile-container-width) + 20px);
 }
 
 /* Profile content styles */
@@ -249,19 +212,22 @@
 }
 
 .edit-profile-button,
+<<<<<<< HEAD
 .add-tag button {
+=======
+.add-tag-btn {
     /* background-color: var(--input-background); */
+>>>>>>> 5f85a096aaa5e53b677260c15d9941c8f16b65d8
     color: var(--text-color);
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     border: none;
-    transition: background-color 0.3s, color 0.3s;
 }
 
 .edit-profile-button:hover,
-.add-tag button:hover {
+.add-tag-btn:hover {
     background-color: var(--hover-color);
 }
 
@@ -385,7 +351,6 @@
     background-color: #ff4d4d;
     display: flex;
     justify-content: center;
-    align-items: center;
     color: white;
     border: none;
     padding: 10px;
@@ -407,7 +372,10 @@
     color: white;
     font-size: 18px;
     font-weight: 600;
+    margin-top:auto;
+    margin-bottom:auto;
     margin-left: 10px;
+    padding-top: 10px;
 }
 
 .logout-button:hover {
@@ -512,13 +480,7 @@
     outline-offset: 2px;
 }
 
-/* Transitions for smoother interactions */
-.edit-profile-button,
-.add-tag button,
-.tag button,
-.logout-button {
-    transition: all 0.2s ease-in-out;
-}
+
 
 /* Ensure consistent font usage */
 body, input, textarea, button {
@@ -532,40 +494,9 @@ body, input, textarea, button {
     scroll-behavior: smooth;
 }
 
-/* Improved mobile drag handle */
-@media (max-width: 767px) {
-    .drag-handle {
-        width: 40px;
-        height: 5px;
-        background-color: var(--secondary-text-color);
-        border-radius: 2.5px;
-        margin: 10px auto;
-        cursor: grab;
-        position: relative;
-    }
-
-    .drag-handle::before,
-    .drag-handle::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-color: var(--secondary-text-color);
-        border-radius: 2.5px;
-    }
-
-    .drag-handle::before {
-        top: -8px;
-    }
-
-    .drag-handle::after {
-        bottom: -8px;
-    }
-}
-
 /* Improved button styles */
 .edit-profile-button,
-.add-tag button,
+.add-tag-btn,
 .logout-button {
     display: inline-flex;
     align-items: center;
@@ -576,7 +507,7 @@ body, input, textarea, button {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease; 
 }
 
 .edit-profile-button:hover,
@@ -793,59 +724,6 @@ hr {
     transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-/* Adjustments for high contrast mode */
-@media (forced-colors: active) {
-    .profile-container,
-    .profile-section,
-    .quest-item,
-    .tag {
-        border: 1px solid CanvasText;
-    }
-}
-
-/* Reduce motion for users who prefer it */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-}
-
-/* Print styles */
-@media print {
-    .profile-container {
-        position: static;
-        overflow: visible;
-        height: auto;
-    }
-
-    .edit-profile-button,
-    .add-tag button,
-    .logout-button {
-        display: none;
-    }
-}
-
-/* Ensure proper contrast and readability for all text elements */
-.profile-name,
-.profile-username,
-.profile-bio,
-.section-title,
-.quest-item p,
-.tag,
-.no-quests {
-    color: var(--text-color);
-}
-
-.profile-status,
-.secondary-text {
-    color: var(--secondary-text-color);
-}
-
 /* Improve spacing and layout for better readability */
 .profile-section + .profile-section {
     margin-top: 2rem;
@@ -855,42 +733,31 @@ hr {
     margin-top: 1rem;
 }
 
-/* Enhance visual hierarchy */
-.profile-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
 
-.profile-username {
-    font-size: 1rem;
-    font-weight: 400;
-}
-
-.section-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-/* Improve responsiveness of the layout */
-@media (max-width: 480px) {
-    .profile-header {
-        flex-direction: column;
-        align-items: center;
+/* Mobile responsiveness for profile container */
+@media (max-width: 767px) {
+    .profile-container {
+      position: fixed;
+      bottom: 60px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 50%;
+      max-height: calc(100% - 120px);
+      border-radius: 20px 20px 0 0;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
     }
 
-    .profile-photo-container {
-        margin-right: 0;
-        margin-bottom: 1rem;
+    .profile-container.active {
+      transform: translateY(0);
     }
 
-    .profile-actions {
-        flex-direction: column;
+    .profile-content {
+      padding: 20px;
     }
 
-    .edit-profile-button,
-    .add-tag button {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
 }

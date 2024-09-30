@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { IconButton, TextField, Button } from '@mui/material';
 import { Camera } from 'react-camera-pro';
-import { ArrowBack, Refresh, Check, Crop } from '@mui/icons-material';
+import { ArrowBack, Refresh, Check, Crop, Undo } from '@mui/icons-material';
 import { useUser } from './UserProvider';
 import { useNavigate } from 'react-router-dom';
 import { storage, db, auth } from '../firebase';
@@ -9,29 +9,21 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection } from 'firebase/firestore';
 import '../styles/CameraOverlay.css';
 
-const CameraOverlay = ({
-  facingMode,
-  toggleCamera,
-  cameraResolution
-}) => {
+const CameraOverlay = () => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
   const [time, setTime] = useState('');
+  const [facingMode, setFacingMode] = useState('user');
+  const [isCropFinalized, setIsCropFinalized] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
   const currentUser = useUser();
   const navigate = useNavigate();
   const cameraRef = useRef(null);
   const imageRef = useRef(null);
   const cropRef = useRef(null);
-
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
 
   const handleCapture = useCallback(() => {
     if (cameraRef.current) {
@@ -56,33 +48,56 @@ const CameraOverlay = ({
 
   const handleAspectRatioChange = (ratio) => {
     setSelectedAspectRatio(ratio);
+    setIsCropFinalized(false);
+    updateCropArea(ratio);
+  };
+
+  const updateCropArea = (ratio) => {
+    if (imageRef.current) {
+      const imgRect = imageRef.current.getBoundingClientRect();
+      const [widthRatio, heightRatio] = ratio.split(':').map(Number);
+      let newWidth, newHeight;
+
+      if (imgRect.width / imgRect.height > widthRatio / heightRatio) {
+        // Image is wider than the desired ratio
+        newHeight = imgRect.height;
+        newWidth = (newHeight * widthRatio) / heightRatio;
+      } else {
+        // Image is taller than the desired ratio
+        newWidth = imgRect.width;
+        newHeight = (newWidth * heightRatio) / widthRatio;
+      }
+
+      // Ensure the crop area doesn't exceed the image boundaries
+      newWidth = Math.min(newWidth, imgRect.width);
+      newHeight = Math.min(newHeight, imgRect.height);
+
+      setCropSize({ width: newWidth, height: newHeight });
+      setCropPosition({
+        x: (imgRect.width - newWidth) / 2,
+        y: (imgRect.height - newHeight) / 2
+      });
+    }
   };
 
   const handleConfirm = async () => {
     setIsUploading(true);
     try {
-      const croppedImage = await cropImage();
-      if (!croppedImage) {
-        throw new Error('Failed to crop image');
-      }
       const storageRef = ref(storage, `quest_images/${Date.now()}_${auth.currentUser.uid}.jpg`);
-      await uploadString(storageRef, croppedImage, 'data_url');
+      await uploadString(storageRef, capturedImage, 'data_url');
       const imageUrl = await getDownloadURL(storageRef);
 
       const questData = {
         imageUrl,
-        aspectRatio: selectedAspectRatio || '1:1', // Default to '1:1' if undefined
-        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }), // Ensure time is a valid date string without seconds
+        aspectRatio: selectedAspectRatio,
+        time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }),
         user: currentUser?.name || 'Anonymous',
         description,
-        createdAt: new Date().toISOString(), // Store createdAt as a valid date string
+        createdAt: new Date().toISOString(),
         userId: auth.currentUser.uid
       };
 
-      console.log('Quest data:', questData); // Log quest data to check the format
-
       await addDoc(collection(db, 'quests'), questData);
-      console.log('Quest uploaded successfully');
       navigate('/home/*');
     } catch (error) {
       console.error('Error uploading quest:', error);
@@ -156,9 +171,19 @@ const CameraOverlay = ({
   const handleBack = () => {
     if (capturedImage) {
       setCapturedImage(null);
+      setIsCropFinalized(false);
     } else {
       navigate('/home/*');
     }
+  };
+
+  const toggleCamera = () => {
+    setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
+  };
+
+  const handleResetCrop = () => {
+    setIsCropFinalized(false);
+    updateCropArea(selectedAspectRatio);
   };
 
   useEffect(() => {
@@ -173,7 +198,8 @@ const CameraOverlay = ({
   }, [selectedAspectRatio]);
 
   return (
-    <div className="camera-overlay fullscreen">
+    <div className="camera-overlay1 fullscreen1">
+      {cameraError && <div className="camera-error">{cameraError}</div>}
       {!capturedImage ? (
         <>
           <Camera
@@ -183,10 +209,11 @@ const CameraOverlay = ({
             errorMessages={{}}
             videoSourceDeviceId={undefined}
             numberOfCamerasCallback={(i) => console.log(i)}
-            videoResolution={cameraResolution}
+            videoResolution="highest"
+            onError={(error) => setCameraError('Could not start video source. Please check your camera permissions.')}
           />
           <div className="camera-controls">
-            <IconButton onClick={handleBack} className="back-button">
+            <IconButton onClick={handleBack} className="back-button1">
               <ArrowBack />
             </IconButton>
             <IconButton onClick={handleCapture} className="capture-button">
@@ -199,33 +226,47 @@ const CameraOverlay = ({
         </>
       ) : (
         <div className="image-preview-overlay">
-          <div className="image-preview" onMouseMove={handleCropMove}>
+          <div
+            className="image-preview"
+            onMouseMove={handleCropMove}
+          >
             <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image" />
             <div
               ref={cropRef}
-              className="crop-outline"
+              className={`crop-outline ${isCropFinalized ? 'finalized' : ''}`}
               style={{
                 aspectRatio: selectedAspectRatio,
                 left: `${cropPosition.x}px`,
                 top: `${cropPosition.y}px`
               }}
             >
-              <Crop className="crop-icon" />
+              <Crop className="crop-icon1" />
             </div>
           </div>
           <div className="controls-container">
             <div className="aspect-ratio-selector">
-              {['1:1', '4:5', '16:9'].map((ratio) => (
+              {['1:1', '4:5', '9:16'].map((ratio) => (
                 <Button
                   key={ratio}
                   variant={selectedAspectRatio === ratio ? "contained" : "outlined"}
                   onClick={() => handleAspectRatioChange(ratio)}
-                  className="aspect-ratio-button"
+                  className="aspect-ratio-button1"
+                  disabled={isCropFinalized}
                 >
                   {ratio}
                 </Button>
               ))}
             </div>
+            {isCropFinalized && (
+              <Button
+                variant="outlined"
+                onClick={handleResetCrop}
+                className="reset-crop-button"
+                startIcon={<Undo />}
+              >
+                Reset Crop
+              </Button>
+            )}
             <TextField
               fullWidth
               variant="outlined"
@@ -238,16 +279,15 @@ const CameraOverlay = ({
               variant="contained"
               color="primary"
               onClick={handleConfirm}
-              disabled={isUploading}
-              className="confirm-button"
-              startIcon={<Check />}
+              disabled={isUploading || !isCropFinalized}
+              className="confirm-btn"
             >
-              Confirm
+              Done
             </Button>
           </div>
-          <IconButton onClick={handleBack} className="back-button">
-            <ArrowBack />
-          </IconButton>
+          <Button onClick={handleBack} className="back-bttn">
+            Cancel
+          </Button>
         </div>
       )}
     </div>

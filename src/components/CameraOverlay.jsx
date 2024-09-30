@@ -215,12 +215,22 @@ const CameraOverlay = () => {
       right: 0,
       bottom: 0,
       zIndex: 10001,
+      border: 'solid 50px white',
+      borderRadius: '50px'
     }}>
       {cameraError && <div style={{ color: 'red' }}>{cameraError}</div>}
       {!capturedImage ? (
         <>
+        <div style={{
+          borderRadius: '25px', 
+          overflow: '', 
+          border: 'solid 10px blue',
+          width: '105%',   
+          height: '100%',  
+          display: 'inline-block',
+          position: 'absolute'}}>
           <Camera
-            ref={cameraRef}
+            ref={cameraRef} 
             facingMode={facingMode}
             aspectRatio="cover"
             errorMessages={{}}
@@ -229,13 +239,14 @@ const CameraOverlay = () => {
             videoResolution="highest"
             onError={(error) => setCameraError('Could not start video source. Please check your camera permissions.')}
           />
+          </div>
           <div style={{
             position: 'absolute',
             bottom: '40px',
             left: 0,
             right: 0,
             display: 'flex',
-            justifyContent: 'space-around',
+            justifyContent: 'center',
             alignItems: 'center',
           }}>
             <IconButton onClick={handleBack} style={{ color: '#fff' }}>
@@ -249,6 +260,8 @@ const CameraOverlay = () => {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
+              marginRight: '30px',
+              marginLeft: '30px'
             }}>
               <div style={{
                 width: '60px',

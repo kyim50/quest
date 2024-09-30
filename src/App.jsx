@@ -10,6 +10,7 @@ import { initializeTheme } from "./theme-toggle";
 import { UserStatusProvider } from "./components/UserStatusContext";
 import MainPage from "./pages/MainPage";
 import { UserProvider } from "./components/UserProvider"; // Import the UserProvider
+import './index.css'
 
 function App() {
   useEffect(() => {

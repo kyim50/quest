@@ -5,6 +5,7 @@
   margin-bottom: 1rem;
   width: 100%;
   aspect-ratio: 3/4;
+
   background-color: white;
   border-radius: var(--border-radius);
   background-size: cover;

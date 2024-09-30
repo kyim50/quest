@@ -14,7 +14,7 @@ body {
 
 /* Logo Styles */
 .logo {
-    position: absolute;
+    position:static;
     display: block;
     height: 60px;
     top: 5%;
@@ -23,9 +23,9 @@ body {
 
 /* Button Styles */
 .login-button {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
     background-color: rgb(10, 145, 255);
     color: white;
     border: none;
@@ -54,6 +54,11 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 100px 0;
+}
+
+.landing-page{
+    background-color: #1e1d1b;
+    padding:10px
 }
 
 .headline {

@@ -285,6 +285,7 @@ const CameraOverlay = () => {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
+              transform: 'scalex(-1)',
             }} />
             <div
               ref={cropRef}
@@ -329,10 +330,12 @@ const CameraOverlay = () => {
                     padding: '10px',
                     borderRadius: '20px',
                     fontWeight: 'bold',
+                    height: '70px',
+                    width: '70px',
                     textTransform: 'none',
                     backgroundColor: selectedAspectRatio === ratio ? '#3797EF' : 'transparent',
                     color: selectedAspectRatio === ratio ? '#fff' : '#3797EF',
-                    border: selectedAspectRatio === ratio ? 'none' : '1px solid #3797EF',
+                    border: selectedAspectRatio === ratio ? 'none' : '2px solid #333333',
                   }}
                   disabled={isCropFinalized}
                 >

@@ -274,7 +274,22 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
         <div className="prof-container">
           <header>
             <div className="prof">
-              <div className="prof-picture">
+              <div
+                className="prof-picture"
+                onClick={() => isEditing && handleProfilePhotoClick()}
+                style={isEditing ? { cursor: 'pointer' } : {}}
+              >
+                {isEditing && (
+                  <>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handlePhotoChange}
+                      style={{ display: 'none' }}
+                    />
+                    <EditIcon />
+                  </>
+                )}
                 <img src={profilePhoto} alt="ProfilePicture" />
               </div>
               <div
@@ -491,7 +506,9 @@ const UserProfile = ({ handleLogout, isNavExpanded }) => {
               {isEditing ? 'Save Profile' : 'Edit Profile'}
             </button>
             <div className="add-tag">
-              <button className= "add-tag-btn" onClick={toggleTagOptions}>Add Tags</button>
+              <button className="add-tag-btn" onClick={toggleTagOptions}>
+                Add Tags
+              </button>
               {showTagOptions && (
                 <div className="tag-options">
                   {predefinedTags.map(({ img, value }) => (

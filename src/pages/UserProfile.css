@@ -40,6 +40,9 @@
 }
 
 .prof-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-shrink: 0;
 
   margin-right: 1rem;
@@ -57,6 +60,9 @@
   height: 100%;
 
   object-fit: cover;
+}
+.prof-picture svg {
+  position: absolute;
 }
 
 .prof-header-buttons {
@@ -91,7 +97,7 @@
   color: black;
 }
 .prof-container h2 {
-  margin:  0 8px;
+  margin: 0 8px;
   color: black;
 }
 .prof-bio p {
@@ -126,6 +132,6 @@
   background-color: transparent;
 }
 .section-empty-msg {
-    color: #6289ec;
-    font-weight: 500;
+  color: #6289ec;
+  font-weight: 500;
 }

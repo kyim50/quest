@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/034fcd43-e683-4940-9a60-70e3572bc7d9/resourceGroups/quest_group/providers/Microsoft.Web/sites/quest",
+    "appService.deploySubpath": "."
+}

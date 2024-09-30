@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { storage, db, auth } from '../firebase';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection } from 'firebase/firestore';
-import '../styles/CameraOverlay.css';
 
 const CameraOverlay = () => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -15,10 +14,12 @@ const CameraOverlay = () => {
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
+  const [cropSize, setCropSize] = useState({ width: 0, height: 0 });
   const [time, setTime] = useState('');
   const [facingMode, setFacingMode] = useState('user');
   const [isCropFinalized, setIsCropFinalized] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [isAspectRatioSelected, setIsAspectRatioSelected] = useState(false);
   const currentUser = useUser();
   const navigate = useNavigate();
   const cameraRef = useRef(null);
@@ -48,6 +49,7 @@ const CameraOverlay = () => {
 
   const handleAspectRatioChange = (ratio) => {
     setSelectedAspectRatio(ratio);
+    setIsAspectRatioSelected(true);
     setIsCropFinalized(false);
     updateCropArea(ratio);
   };
@@ -59,16 +61,13 @@ const CameraOverlay = () => {
       let newWidth, newHeight;
 
       if (imgRect.width / imgRect.height > widthRatio / heightRatio) {
-        // Image is wider than the desired ratio
         newHeight = imgRect.height;
         newWidth = (newHeight * widthRatio) / heightRatio;
       } else {
-        // Image is taller than the desired ratio
         newWidth = imgRect.width;
         newHeight = (newWidth * heightRatio) / widthRatio;
       }
 
-      // Ensure the crop area doesn't exceed the image boundaries
       newWidth = Math.min(newWidth, imgRect.width);
       newHeight = Math.min(newHeight, imgRect.height);
 
@@ -83,8 +82,9 @@ const CameraOverlay = () => {
   const handleConfirm = async () => {
     setIsUploading(true);
     try {
+      const croppedImage = await cropImage();
       const storageRef = ref(storage, `quest_images/${Date.now()}_${auth.currentUser.uid}.jpg`);
-      await uploadString(storageRef, capturedImage, 'data_url');
+      await uploadString(storageRef, croppedImage, 'data_url');
       const imageUrl = await getDownloadURL(storageRef);
 
       const questData = {
@@ -98,7 +98,7 @@ const CameraOverlay = () => {
       };
 
       await addDoc(collection(db, 'quests'), questData);
-      navigate('/home/*');
+      navigate('/home');
     } catch (error) {
       console.error('Error uploading quest:', error);
     } finally {
@@ -119,22 +119,18 @@ const CameraOverlay = () => {
         return;
       }
 
-      const [widthRatio, heightRatio] = selectedAspectRatio.split(':').map(Number);
-      const cropWidth = crop.offsetWidth;
-      const cropHeight = crop.offsetHeight;
-
       const scaleX = img.naturalWidth / img.width;
       const scaleY = img.naturalHeight / img.height;
 
-      canvas.width = cropWidth * scaleX;
-      canvas.height = cropHeight * scaleY;
+      canvas.width = cropSize.width * scaleX;
+      canvas.height = cropSize.height * scaleY;
 
       ctx.drawImage(
         img,
         cropPosition.x * scaleX,
         cropPosition.y * scaleY,
-        cropWidth * scaleX,
-        cropHeight * scaleY,
+        cropSize.width * scaleX,
+        cropSize.height * scaleY,
         0,
         0,
         canvas.width,
@@ -172,8 +168,9 @@ const CameraOverlay = () => {
     if (capturedImage) {
       setCapturedImage(null);
       setIsCropFinalized(false);
+      setIsAspectRatioSelected(false);
     } else {
-      navigate('/home/*');
+      navigate('/home');
     }
   };
 
@@ -181,8 +178,14 @@ const CameraOverlay = () => {
     setFacingMode((prevMode) => (prevMode === 'user' ? 'environment' : 'user'));
   };
 
+  const handleFinalizeCrop = () => {
+    setIsCropFinalized(true);
+    setIsAspectRatioSelected(false);
+  };
+
   const handleResetCrop = () => {
     setIsCropFinalized(false);
+    setIsAspectRatioSelected(true);
     updateCropArea(selectedAspectRatio);
   };
 
@@ -198,8 +201,22 @@ const CameraOverlay = () => {
   }, [selectedAspectRatio]);
 
   return (
-    <div className="camera-overlay1 fullscreen1">
-      {cameraError && <div className="camera-error">{cameraError}</div>}
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      width: '100vw',
+      backgroundColor: '#000',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 10001,
+    }}>
+      {cameraError && <div style={{ color: 'red' }}>{cameraError}</div>}
       {!capturedImage ? (
         <>
           <Camera
@@ -212,56 +229,145 @@ const CameraOverlay = () => {
             videoResolution="highest"
             onError={(error) => setCameraError('Could not start video source. Please check your camera permissions.')}
           />
-          <div className="camera-controls">
-            <IconButton onClick={handleBack} className="back-button1">
+          <div style={{
+            position: 'absolute',
+            bottom: '40px',
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}>
+            <IconButton onClick={handleBack} style={{ color: '#fff' }}>
               <ArrowBack />
             </IconButton>
-            <IconButton onClick={handleCapture} className="capture-button">
-              <div className="capture-button-inner" />
+            <IconButton onClick={handleCapture} style={{
+              width: '70px',
+              height: '70px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                backgroundColor: '#fff',
+              }} />
             </IconButton>
-            <IconButton onClick={toggleCamera} className="flip-button">
+            <IconButton onClick={toggleCamera} style={{ color: '#fff' }}>
               <Refresh />
             </IconButton>
           </div>
         </>
       ) : (
-        <div className="image-preview-overlay">
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '100%',
+          width: '100%',
+          backgroundColor: '#000',
+        }}>
           <div
-            className="image-preview"
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: 'calc(100% - 200px)',
+              overflow: 'hidden',
+            }}
             onMouseMove={handleCropMove}
           >
-            <img ref={imageRef} src={capturedImage} alt="Captured" className="captured-image" />
+            <img ref={imageRef} src={capturedImage} alt="Captured" style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }} />
             <div
               ref={cropRef}
-              className={`crop-outline ${isCropFinalized ? 'finalized' : ''}`}
               style={{
-                aspectRatio: selectedAspectRatio,
+                position: 'absolute',
+                border: '2px solid #fff',
+                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
                 left: `${cropPosition.x}px`,
-                top: `${cropPosition.y}px`
+                top: `${cropPosition.y}px`,
+                width: `${cropSize.width}px`,
+                height: `${cropSize.height}px`,
               }}
             >
-              <Crop className="crop-icon1" />
+              <Crop style={{
+                position: 'absolute',
+                top: '10px',
+                left: '10px',
+                color: '#fff',
+                fontSize: '24px',
+              }} />
             </div>
           </div>
-          <div className="controls-container">
-            <div className="aspect-ratio-selector">
+          <div style={{
+            width: '100%',
+            padding: '20px',
+            backgroundColor: '#fff',
+            borderTopLeftRadius: '20px',
+            borderTopRightRadius: '20px',
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              marginBottom: '20px',
+            }}>
               {['1:1', '4:5', '9:16'].map((ratio) => (
                 <Button
                   key={ratio}
-                  variant={selectedAspectRatio === ratio ? "contained" : "outlined"}
                   onClick={() => handleAspectRatioChange(ratio)}
-                  className="aspect-ratio-button1"
+                  style={{
+                    flex: 1,
+                    margin: '0 5px',
+                    padding: '10px',
+                    borderRadius: '20px',
+                    fontWeight: 'bold',
+                    textTransform: 'none',
+                    backgroundColor: selectedAspectRatio === ratio ? '#3797EF' : 'transparent',
+                    color: selectedAspectRatio === ratio ? '#fff' : '#3797EF',
+                    border: selectedAspectRatio === ratio ? 'none' : '1px solid #3797EF',
+                  }}
                   disabled={isCropFinalized}
                 >
                   {ratio}
                 </Button>
               ))}
             </div>
+            {isAspectRatioSelected && !isCropFinalized && (
+              <Button
+                variant="contained"
+                onClick={handleFinalizeCrop}
+                style={{
+                  width: '100%',
+                  marginBottom: '20px',
+                  borderRadius: '20px',
+                  backgroundColor: '#3797EF',
+                  color: '#fff',
+                  fontWeight: 'bold',
+                  textTransform: 'none',
+                }}
+              >
+                Finalize Crop
+              </Button>
+            )}
             {isCropFinalized && (
               <Button
                 variant="outlined"
                 onClick={handleResetCrop}
-                className="reset-crop-button"
+                style={{
+                  width: '100%',
+                  marginBottom: '20px',
+                  borderRadius: '20px',
+                  color: '#3797EF',
+                  borderColor: '#3797EF',
+                }}
                 startIcon={<Undo />}
               >
                 Reset Crop
@@ -273,19 +379,40 @@ const CameraOverlay = () => {
               placeholder="Add a description..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="description-input"
+              style={{
+                marginBottom: '20px',
+              }}
+              InputProps={{
+                style: {
+                  borderRadius: '20px',
+                },
+              }}
             />
             <Button
               variant="contained"
               color="primary"
               onClick={handleConfirm}
               disabled={isUploading || !isCropFinalized}
-              className="confirm-btn"
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '20px',
+                backgroundColor: '#3797EF',
+                color: '#fff',
+                fontWeight: 'bold',
+                textTransform: 'none',
+              }}
             >
               Done
             </Button>
           </div>
-          <Button onClick={handleBack} className="back-bttn">
+          <Button onClick={handleBack} style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            color: '#fff',
+            fontWeight: 'bold',
+          }}>
             Cancel
           </Button>
         </div>

@@ -1,0 +1,27 @@
+.quests-page {
+  padding: 0;
+  min-width: 0;
+  background-color: transparent;
+}
+.quests-header {
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.quests-page h1 {
+  text-align: center;
+  font-size: 2rem;
+  line-height: normal;
+  color: #6289ec;
+}
+
+.quests-column {
+  background-color: white;
+  color: black;
+}
+.quests-column h2 {
+  font-size: 1.2rem;
+  color: black;
+}

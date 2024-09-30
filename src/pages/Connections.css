@@ -7,7 +7,22 @@
 .connections-container2 h2 {
   font-size: 1.2rem;
 }
-.connections-tab {
+.connections-header {
+  display: flex;
+
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+
+  justify-content: center;
+  width: 100%;
+}
+.connections-header h1 {
+  text-align: center;
+  font-size: 2rem;
+  line-height: normal;
+  color: #6289ec;
+}
+.tab-container {
   display: flex;
   justify-content: space-evenly;
   /* flex-wrap: wrap; */
@@ -15,7 +30,7 @@
 
   margin-bottom: 0.8rem;
 }
-.connections-tab button {
+.tab-container button {
   max-width: 7rem;
   padding: 0.5rem 1rem;
 
@@ -28,11 +43,11 @@
 
   transition: border 80ms, ease-in background-color 100ms;
 }
-.connections-tab button.selected {
+.tab-container button.selected {
   background-color: #6289ec;
   border: 2px solid black;
 }
-.connections-tab button:hover:not(.selected) {
+.tab-container button:hover:not(.selected) {
   background-color: transparent;
   border: 2px solid black;
 }

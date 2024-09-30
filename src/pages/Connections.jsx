@@ -633,6 +633,9 @@ const Connections = ({
         className={`connections-container2 ${lockedUser ? 'user-locked1' : ''}`}
         style={springProps}
       >
+        <div className="connections-header">
+          <h1>Connections</h1>
+        </div>
         <div className="drag-handle" {...bindDrag()} />
         {notification && <div className="notification1">{notification}</div>}
 
@@ -640,7 +643,7 @@ const Connections = ({
           renderLockedUserProfile()
         ) : (
           <>
-            <div className="connections-tab">
+            <div className="tab-container">
               <button
                 className={`tab-button ${
                   activeTab === 'friends' ? 'active1 selected' : ''

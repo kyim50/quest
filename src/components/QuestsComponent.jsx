@@ -1,5 +1,5 @@
 import React from 'react';
-import Quests from './Quests';
+import Quests from '../pages/Quests';
 import NavigationModalWrapper from './navigation-modal/NavigationModalWrapper';
 
 const QuestsComponent = ({ isOpen, quests, currentUserIds, map }) => {

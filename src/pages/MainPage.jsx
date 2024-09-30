@@ -9,7 +9,7 @@ import NavigationModal from '../components/navigation-modal/NavigationModalWrapp
 import Feed from '../components/feed/Feed';
 import Map from '../components/map/Map';
 import UserProfile from './UserProfile';
-import Quests from '../components/Quests';
+import Quests from '../pages/Quests';
 import Connections from './Connections';
 import PrivacySection from '../components/PrivacySection';
 import TopBar from '../components/top-bar/TopBar';

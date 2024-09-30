@@ -19,13 +19,14 @@ import {
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import '../styles/quests.css';
-import { centerMapOnUser } from '././map/UserLocationService';
+import './Quests.css'
+import { centerMapOnUser } from '../components/map/UserLocationService';
 import addFriendIcon from '../assets/addfriend.png';
 import mapboxgl from 'mapbox-gl';
 import { useNotification } from '../NotificationContext';
 import { useSpring, animated } from 'react-spring';
 import { useDrag } from 'react-use-gesture';
-import NavigationModalWrapper from './navigation-modal/NavigationModalWrapper';
+import NavigationModalWrapper from '../components/navigation-modal/NavigationModalWrapper';
 
 const removeRoute = (map) => {
   if (map.getLayer('route')) {
@@ -706,7 +707,7 @@ const Quests = ({
       case 'public':
         return (
           <div className="quests-column">
-            <h3>Public Quests</h3>
+            {/* <h2>Public Quests</h2> */}
             {filteredQuests.filter(
               (quest) =>
                 quest.isPublic &&
@@ -805,7 +806,7 @@ const Quests = ({
       case 'received':
         return (
           <div className="quests-column">
-            <h3>Received Quests</h3>
+            {/* <h3>Received Quests</h3> */}
             {quests.filter(
               (quest) =>
                 quest.targetUser === auth.currentUser?.uid && !quest.isPublic
@@ -899,7 +900,7 @@ const Quests = ({
       case 'sent':
         return (
           <div className="quests-column">
-            <h3>Sent Quests</h3>
+            {/* <h3>Sent Quests</h3> */}
             {quests.filter(
               (quest) => quest.uid === auth.currentUser?.uid && !quest.isPublic
             ).length > 0 ? (
@@ -1006,27 +1007,27 @@ const Quests = ({
       <div className="quests-page">
         <div className="drag-handle" {...bindDrag()} />
         <div className="quests-header">
-          <h2>Quests</h2>
+          <h1>Quests</h1>
         </div>
 
-        <div className="tabs">
+        <div className="tab-container">
           <button
-            className={`tab-button ${activeTab === 'public' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'public' ? 'selected' : ''}`}
             onClick={() => setActiveTab('public')}
           >
-            Public Quests
+            Public
           </button>
           <button
-            className={`tab-button ${activeTab === 'received' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'received' ? 'selected' : ''}`}
             onClick={() => setActiveTab('received')}
           >
-            Received Quests
+            Received
           </button>
           <button
-            className={`tab-button ${activeTab === 'sent' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'sent' ? 'selected' : ''}`}
             onClick={() => setActiveTab('sent')}
           >
-            Sent Quests
+            Sent
           </button>
         </div>
 

@@ -1,23 +1,42 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import svgr from 'vite-plugin-svgr';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import svgr from "vite-plugin-svgr"
 
 export default defineConfig({
-  plugins: [react(), svgr()],
-  resolve: {
-    alias: {
-      // Add any necessary aliases here if needed
-      // For example, if you had any specific aliases you used before
-    },
-  },
-  base: '/', // Set base to root since there's no subpath
+  plugins: [
+    react(),
+    svgr({
+      // Enable SVGR in production mode and ensure correct handling
+      svgo: true, // Use SVGO to optimize SVGs
+      svgoConfig: {
+        plugins: [
+          { removeViewBox: false }, // Keep the viewBox attribute to prevent scaling issues
+          { removeDimensions: true }, // Let CSS control the dimensions
+        ],
+      },
+    }),
+  ],
   build: {
-    outDir: 'dist', // Ensure the output directory is correct
+    outDir: 'dist',
+    target: 'es2015', // Ensures compatibility with modern browsers, adjust if targeting older browsers
     rollupOptions: {
       output: {
-        // This can help avoid issues with chunking
-        manualChunks: undefined,
+        assetFileNames: (assetInfo) => {
+          // Ensure proper handling of asset filenames (images, sprites, etc.)
+          if (/\.svg$/.test(assetInfo.name)) {
+            return 'assets/images/[name]-[hash][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
       },
+    },
+    cssCodeSplit: true, // Ensure CSS is code-split and optimized
+    sourcemap: true, // Enable source maps for better debugging in production
+    minify: 'esbuild', // Use esbuild for fast and effective minification
+  },
+  server: {
+    watch: {
+      usePolling: true, // Useful if running in Docker or virtualized environments
     },
   },
 });

@@ -77,4 +77,6 @@ function QuestCard({ id, imageUrl, aspectRatio, time, user, description, comment
   );
 }
 
+
+
 export default QuestCard;

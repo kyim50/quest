@@ -1,6 +1,7 @@
+// Feed.jsx
 import React, { useState, useEffect } from 'react';
 import './Feed.css';
-import QuestCard, { DummyCard } from './card/QuestCard';
+import QuestCard from './card/QuestCard';
 import { db } from '../../firebase';
 import {
   collection,
@@ -9,7 +10,8 @@ import {
   limit,
   onSnapshot,
   doc,
-  deleteDoc,
+  updateDoc,
+  arrayUnion,
 } from 'firebase/firestore';
 
 function Feed() {
@@ -23,6 +25,7 @@ function Feed() {
       const fetchedQuests = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
+        comments: doc.data().comments || [],
       }));
       setQuests(fetchedQuests);
     });
@@ -30,27 +33,35 @@ function Feed() {
     return () => unsubscribe();
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleAddComment = async (questId, commentText) => {
     try {
-      await deleteDoc(doc(db, 'quests', id));
-      setQuests(quests.filter((quest) => quest.id !== id));
+      const questRef = doc(db, 'quests', questId);
+      const newComment = {
+        userName: 'Current User', // Replace with actual user data
+        userPhoto: 'https://example.com/user-photo.jpg', // Replace with actual user photo
+        text: commentText,
+        createdAt: new Date(),
+      };
+      await updateDoc(questRef, {
+        comments: arrayUnion(newComment),
+      });
     } catch (error) {
-      console.error('Error deleting quest:', error);
+      console.error('Error adding comment:', error);
     }
   };
 
   const dummyCards = [
-    { aspectRatio: 3 / 4 },
-    { aspectRatio: 9 / 16 },
-    { aspectRatio: 1 / 1 },
-    { aspectRatio: 3 / 4 },
-    { aspectRatio: 1 / 1 },
-    { aspectRatio: 9 / 16 },
-    { aspectRatio: 1 / 1 },
-    { aspectRatio: 1 / 1 },
-    { aspectRatio: 9 / 16 },
-    { aspectRatio: 3 / 4 },
-    { aspectRatio: 9 / 16 },
+    { aspectRatio: '3:4' },
+    { aspectRatio: '9:16' },
+    { aspectRatio: '1:1' },
+    { aspectRatio: '3:4' },
+    { aspectRatio: '1:1' },
+    { aspectRatio: '9:16' },
+    { aspectRatio: '1:1' },
+    { aspectRatio: '1:1' },
+    { aspectRatio: '9:16' },
+    { aspectRatio: '3:4' },
+    { aspectRatio: '9:16' },
   ];
 
   const combinedCards = [...quests, ...dummyCards];
@@ -62,15 +73,26 @@ function Feed() {
         card.id ? (
           <QuestCard
             key={card.id}
+            id={card.id}
             imageUrl={card.imageUrl}
             aspectRatio={card.aspectRatio}
             time={card.time}
             user={card.user}
             description={card.description}
-            onClick={() => handleDelete(card.id)}
+            comments={card.comments}
+            onAddComment={handleAddComment}
           />
         ) : (
-          <DummyCard key={`dummy-${index}`} aspectRatio={card.aspectRatio} />
+          <QuestCard
+            key={`dummy-${index}`}
+            imageUrl="https://media.tenor.com/o_5RQarGvJ0AAAAM/kiss.gif"
+            aspectRatio={card.aspectRatio}
+            time="8:08 PM"
+            user="Kiity :3"
+            description="I am cat and i love yuu"
+            comments={[]}
+            onAddComment={() => {}}
+          />
         )
       )}
     </div>

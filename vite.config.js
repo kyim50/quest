@@ -10,7 +10,7 @@ export default defineConfig({
       // For example, if you had any specific aliases you used before
     },
   },
-  base: '/', // Set base to root since there's no subpath
+  base: './', // Set base to root since there's no subpath
   build: {
     outDir: 'dist', // Ensure the output directory is correct
     rollupOptions: {

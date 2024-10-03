@@ -14,6 +14,9 @@
 
 ## Front-End Logic
 
+- Fix the map where when you go in fullscreen and then exit it, the map ends up displaced and the styling changes. 
+- Also make it so that when you scroll down on smaller screen the minimzed map button also minimizes the marker and it dosent make you go on the map box website but rather goes straight to the full screen map.
+
 ## Back-End
 - migrate the database to postgres and microsoft azure
 - make it so the hosting is on azure services

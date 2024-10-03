@@ -225,8 +225,8 @@ const CameraOverlay = () => {
           borderRadius: '25px', 
           overflow: '', 
           border: 'solid 10px blue',
-          width: '105%',   
-          height: '100%',  
+          width: '100%',   /* Ensure container takes up full width */
+          height: '100%',  /* Adjust height as necessary or set a specific value */
           display: 'inline-block',
           position: 'absolute'}}>
           <Camera

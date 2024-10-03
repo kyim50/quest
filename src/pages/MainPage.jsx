@@ -14,11 +14,11 @@ import Connections from './Connections';
 import PrivacySection from '../components/PrivacySection';
 import TopBar from '../components/top-bar/TopBar';
 import CreateQuestModal from '../components/CreateQuestModal';
-import CameraOverlay from '../components/CameraOverlay';
+import CameraOverlay from '../pages/CameraOverlay';
 
 import SearchIcon from '../assets/icons/search_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
 import DropDownIcon from '../assets/icons/arrow_drop_down_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
-import CreateQuestIcon from '../assets/icons/new_window_24dp_E8EAED_FILL1_wght400_GRAD0_opsz24.svg?react';
+import CreateQuestIcon from '../assets/icons/not_listed_location_24dp_E8EAED_FILL0_wght400_GRAD0_opsz24.svg?react';
 import Settings from './Settings';
 
 function MainPage() {

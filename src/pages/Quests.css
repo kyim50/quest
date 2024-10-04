@@ -25,3 +25,30 @@
   font-size: 1.2rem;
   color: black;
 }
+
+.select-button{
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+.confirm-button{
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: cornflowerblue;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+}
+
+.confirm-button:hover{
+  background-color: rgb(77, 132, 234);
+}

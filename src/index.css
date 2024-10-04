@@ -10,9 +10,11 @@ body {
   /* background-color: rgb(28, 28, 30); */
 }
 
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}
+
 code {
   /* font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace; */
 }
-
-

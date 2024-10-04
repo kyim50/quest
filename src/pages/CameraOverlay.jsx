@@ -14,6 +14,7 @@ import BackIcon from '../assets/icons/arrow_circle.svg?react';
 import CheckIcon from '../assets/icons/check.svg?react';
 import RetryIcon from '../assets/icons/restart.svg?react';
 import FlipCameraIcon from '../assets/icons/camera-flip.svg?react';
+import NavigationModalWrapper from '../components/navigation-modal/NavigationModalWrapper';
 
 const CameraOverlay = () => {
   const [capturedImage, setCapturedImage] = useState(null);
@@ -216,34 +217,155 @@ const CameraOverlay = () => {
 
   if (true)
     return (
-      <div className="camera-preview-container">
-        <div className="camera-preview">
-          <Camera
-            ref={cameraRef}
-            facingMode={facingMode}
-            aspectRatio="cover"
-            errorMessages={{}}
-            videoSourceDeviceId={undefined}
-            numberOfCamerasCallback={(i) => console.log(i)}
-            videoResolution="highest"
-            onError={(error) =>
-              setCameraError(
-                'Could not start video source. Please check your camera permissions.'
-              )
-            }
-          />
-        </div>
-        <div className="camera-button-container">
-          <div className="sub-camera-button-container">
-            <button id="back" onClick={handleBack}>
-              <BackIcon />
-            </button>
-            <button id="shutter" onClick={handleCapture}/>
-          </div>
-          <button id="placeholder"/>
-          <button id="flip-camera" onClick={toggleCamera}>
-            <FlipCameraIcon />
-          </button>
+      <div className="camera-preview-bg">
+        <div className="camera-preview-container">
+          {!capturedImage ? (
+            <>
+              <div className="camera-preview">
+                <Camera
+                  ref={cameraRef}
+                  facingMode={facingMode}
+                  aspectRatio="cover"
+                  errorMessages={{}}
+                  videoSourceDeviceId={undefined}
+                  numberOfCamerasCallback={(i) => console.log(i)}
+                  videoResolution="highest"
+                  onError={(error) =>
+                    setCameraError(
+                      'Could not start video source. Please check your camera permissions.'
+                    )
+                  }
+                />
+              </div>
+              <div className="camera-button-container">
+                <div className="sub-camera-button-container">
+                  <button id="back" onClick={handleBack}>
+                    <BackIcon />
+                  </button>
+                  <button id="shutter" onClick={handleCapture} />
+                </div>
+                <button id="placeholder" />
+                <button id="flip-camera" onClick={toggleCamera}>
+                  <FlipCameraIcon />
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="camera-image-container"
+                onMouseMove={handleCropMove}
+              >
+                <div
+                  ref={cropRef}
+                  style={{
+                    display: `${isCropFinalized ? 'none' : "block"}`,
+                    position: 'absolute',
+                    border: '2px solid #fff',
+                    //   boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+                    marginLeft: `${cropPosition.x}px`,
+                    //   top: `${cropPosition.y}px`,
+                    width: `${cropSize.width}px`,
+                    height: `${cropSize.height}px`,
+                  }}
+                >
+                  <Crop
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      left: '10px',
+                      color: '#fff',
+                      fontSize: '24px',
+                    }}
+                  />
+                </div>
+                <img
+                  ref={imageRef}
+                  //   src={capturedImage}
+                  src={capturedImage}
+                  alt="Captured"
+                  className="camera-img"
+                />
+              </div>
+              {!isCropFinalized ? (
+                <>
+                  <div className="ratio-container">
+                    <h2>Pick a Size for the Quest Grid</h2>
+                    <div className="ratio-button-container">
+                      {['1:1', '4:5', '9:16'].map((ratio) => (
+                        <button
+                          key={ratio}
+                          onClick={() => handleAspectRatioChange(ratio)}
+                          className={`ratio-button ${
+                            selectedAspectRatio === ratio && 'selected'
+                          }`}
+                          disabled={isCropFinalized}
+                        >
+                          {ratio}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="camera-button-container shot">
+                    <div className="sub-camera-button-container">
+                      <button id="back" onClick={handleBack}>
+                        <BackIcon />
+                      </button>
+                      {isAspectRatioSelected && !isCropFinalized ? (
+                        <button
+                          className="shot"
+                          id="shutter"
+                          onClick={handleFinalizeCrop}
+                        >
+                          <CheckIcon />
+                        </button>
+                      ) : (
+                        <button className="shot disabled" id="shutter">
+                          <CheckIcon />
+                        </button>
+                      )}
+                    </div>
+                    <button id="placeholder" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="ratio-container">
+                    <h2>Give it a Description</h2>
+                    <input
+                      fullWidth
+                      variant="outlined"
+                      placeholder="Write Something"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="description-input"
+                    />
+                  </div>
+                  <div className="camera-button-container shot">
+                    <div className="sub-camera-button-container">
+                      <button id="back" onClick={handleResetCrop}>
+                        <BackIcon />
+                      </button>
+                      {isUploading || !isCropFinalized ? (
+                        <button className="shot disabled" id="shutter">
+                          <CheckIcon />
+                        </button>
+                      ) : (
+                        <button
+                          className="shot"
+                          id="shutter"
+                          onClick={handleConfirm}
+                        >
+                          <CheckIcon />
+                        </button>
+                      )}
+                    </div>
+                    <button id="placeholder" />
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
       </div>
     );

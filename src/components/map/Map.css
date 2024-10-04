@@ -4,7 +4,7 @@
   border-radius: var(--border-radius);
   overflow: hidden;
   position: relative;
-  transition: all 0.3s ease-in-out;
+  /* transition: all 0.3s ease-in-out; */
 }
 
 .map-container.small {
@@ -15,10 +15,10 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   z-index: 9999;
-  aspect-ratio: auto;
+  /* aspect-ratio: auto; */
   border-radius: 0;
 }
 
@@ -69,6 +69,6 @@
 
 @media (max-width: 800px) {
   .map-container:not(.full-screen) {
-      width: 100%;
+    width: 50%;
   }
 }

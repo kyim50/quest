@@ -214,7 +214,7 @@ const CameraOverlay = () => {
     }
   }, [selectedAspectRatio]);
 
-  if (true)
+  if (false)
     return (
       <div className="camera-preview-container">
         <div className="camera-preview">

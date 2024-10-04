@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useNotification } from '../NotificationContext';
-import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/CreateQuestModal.css';
 
 const CreateQuestModal = ({ isOpen, onClose }) => {
@@ -14,15 +13,9 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [showCamera, setShowCamera] = useState(false);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [aspectRatio, setAspectRatio] = useState(null);
 
   const { showNotification } = useNotification();
 
-  const location = useLocation();
-  const navigate = useNavigate();
-  
   useEffect(() => {
     const fetchUsers = async () => {
       const usersCollection = collection(db, 'users');
@@ -51,8 +44,8 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    if (!title || !description || !timeFrame || !capturedImage) {
-      showNotification('Please fill in all fields and capture an image.', 'error');
+    if (!title || !description || !timeFrame) {
+      showNotification('Please fill in all fields.', 'error');
       return;
     }
 
@@ -72,14 +65,6 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
         targetUser: isPublic ? null : selectedUser.id,
         status: 'pending',
         acceptedBy: isPublic ? [] : null,
-        imageUrl: capturedImage,
-        aspectRatio,
-        time: new Date().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true,
-        }),
-        user: auth.currentUser.displayName || 'Anonymous',
       };
 
       await addDoc(collection(db, 'quests'), newQuest);
@@ -91,13 +76,6 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
       showNotification('Failed to create quest.', 'error');
     }
   };
-
-  useEffect(() => {
-    if (location.state?.capturedImage && location.state?.aspectRatio) {
-      setCapturedImage(location.state.capturedImage);
-      setAspectRatio(location.state.aspectRatio);
-    }
-  }, [location]);
 
   const handleToggleChange = () => {
     setIsPublic(!isPublic);
@@ -124,31 +102,9 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
     setIsPublic(false);
     setSearchTerm('');
     setSelectedUser(null);
-    setCapturedImage(null);
-    setAspectRatio(null);
-  };
-
-  const handleCameraClick = () => {
-    navigate('camera', { state: { returnTo: '/create-quest' } });
   };
 
   if (!isOpen) return null;
-
-  const handleCameraClose = () => {
-    setShowCamera(false);
-  };
-
-  const handleImageCapture = (image, selectedAspectRatio) => {
-    setCapturedImage(image);
-    setAspectRatio(selectedAspectRatio);
-    setShowCamera(false);
-  };
-
-  if (!isOpen) return null;
-
-  if (showCamera) {
-    return <CameraOverlay onClose={handleCameraClose} onCapture={handleImageCapture} />;
-  }
 
   return (
     <div className="modal-overlay">
@@ -241,19 +197,6 @@ const CreateQuestModal = ({ isOpen, onClose }) => {
                   <p>Selected User: {selectedUser.name}</p>
                 </div>
               )}
-            </div>
-          )}
-
-          <div className="camera-button-container">
-            <button onClick={handleCameraClick} className="camera-button">
-              Take Photo
-            </button>
-          </div>
-
-          {capturedImage && (
-            <div className="captured-image-container">
-              <img src={capturedImage} alt="Captured" className="captured-image" />
-              <p>Aspect Ratio: {aspectRatio}</p>
             </div>
           )}
 

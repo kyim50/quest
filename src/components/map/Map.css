@@ -1,9 +1,14 @@
 .map-container {
   width: 100%;
   aspect-ratio: 1/1;
-
   border-radius: var(--border-radius);
   overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.map-container.small {
+  width: 50%;
 }
 
 .map-container.full-screen {
@@ -63,10 +68,7 @@
 }
 
 @media (max-width: 800px) {
-  .map-container {
-    width: 50%;
-  }
-  .map-container.full-screen {
-    width: 100%;
+  .map-container:not(.full-screen) {
+      width: 100%;
   }
 }

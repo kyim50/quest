@@ -1,10 +1,25 @@
-// QuestCard.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './QuestCard.css';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../firebase';
 
 function QuestCard({ id, imageUrl, aspectRatio, time, user, description, comments, onAddComment }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [questData, setQuestData] = useState(null);
+
+  useEffect(() => {
+    const fetchQuestData = async () => {
+      if (id) {
+        const questDoc = await getDoc(doc(db, 'quests', id));
+        if (questDoc.exists()) {
+          setQuestData({ id: questDoc.id, ...questDoc.data() });
+        }
+      }
+    };
+
+    fetchQuestData();
+  }, [id]);
 
   const handleCardClick = () => {
     setIsExpanded(!isExpanded);
@@ -22,12 +37,11 @@ function QuestCard({ id, imageUrl, aspectRatio, time, user, description, comment
     }
   };
 
-  const [widthRatio, heightRatio] = aspectRatio ? aspectRatio.split(':').map(Number) : [1, 1];
-  let aspectRatioValue = widthRatio / heightRatio;
+  // Use questData if available, otherwise fall back to props
+  const displayData = questData || { imageUrl, aspectRatio, time, user, description, comments };
 
-  if (aspectRatio === '16:9') {
-    aspectRatioValue = 9 / 16;
-  }
+  const [widthRatio, heightRatio] = displayData.aspectRatio ? displayData.aspectRatio.split(':').map(Number) : [1, 1];
+  const aspectRatioValue = widthRatio / heightRatio;
 
   return (
     <div className={`quest-card ${isExpanded ? 'expanded' : ''}`} onClick={handleCardClick}>
@@ -35,23 +49,23 @@ function QuestCard({ id, imageUrl, aspectRatio, time, user, description, comment
         <div
           className="quest-card-content"
           style={{
-            backgroundImage: `url(${imageUrl})`,
+            backgroundImage: `url(${displayData.imageUrl})`,
             aspectRatio: aspectRatioValue,
           }}
         >
           <div className="header">
-            <div className="time">{time}</div>
+            <div className="time">{displayData.time}</div>
           </div>
           <div className="footer">
-            <p className="user">{user}</p>
-            <p className="description">{description}</p>
+            <p className="user">{displayData.user}</p>
+            <p className="description">{displayData.description}</p>
           </div>
         </div>
         {isExpanded && (
           <div className="comments-section" onClick={handleCommentClick}>
             <h3>Comments</h3>
             <div className="comments-list">
-              {comments.map((comment, index) => (
+              {displayData.comments && displayData.comments.map((comment, index) => (
                 <div key={index} className="comment">
                   <img src={comment.userPhoto} alt={comment.userName} className="user-photo" />
                   <div className="comment-content">
@@ -76,7 +90,5 @@ function QuestCard({ id, imageUrl, aspectRatio, time, user, description, comment
     </div>
   );
 }
-
-
 
 export default QuestCard;

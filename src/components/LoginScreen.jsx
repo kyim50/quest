@@ -17,8 +17,8 @@ const LoginScreen = () => {
   };
 
   const validationSchema = Yup.object({
-    email: Yup.string().email('Invalid email address').required('Enter username or password'),
-    password: Yup.string().required('Enter username or password')
+    email: Yup.string().email('Invalid email address').required('Required'),
+    password: Yup.string().required('Required')
   });
 
   const onSubmit = (values, { setSubmitting }) => {

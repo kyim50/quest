@@ -2,19 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TextField, Button, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import { styled } from '@mui/system';
 
-const PreviewOverlay = styled('div')({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  backdropFilter: 'blur(5px)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  zIndex: 2000,
-});
+
 
 const PreviewContainer = styled('div')({
   backgroundColor: '#000000',
@@ -48,7 +36,6 @@ const CardOutline = styled('div')({
   position: 'absolute',
   border: '2px solid white',
   boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-  cursor: 'move',
 });
 
 const ControlsContainer = styled('div')({
@@ -191,7 +178,6 @@ const PhotoUploadPreview = ({ photoPreview, onUpload, onCancel }) => {
   };
 
   return (
-    <PreviewOverlay>
       <PreviewContainer>
         <FullImageContainer ref={containerRef}>
           <FullImage ref={imageRef} src={photoPreview} alt="Preview" />
@@ -228,7 +214,6 @@ const PhotoUploadPreview = ({ photoPreview, onUpload, onCancel }) => {
           </ButtonGroup>
         </ControlsContainer>
       </PreviewContainer>
-    </PreviewOverlay>
   );
 };
 

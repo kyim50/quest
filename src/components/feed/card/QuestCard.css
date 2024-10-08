@@ -1,0 +1,171 @@
+.quest-card {
+  display: inline-flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
+  background-color: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quest-card.expanded {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: default;
+}
+
+.quest-card-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.expanded .quest-card-inner {
+  flex-direction: row;
+  max-width: 90%;
+  max-height: 90%;
+  background-color: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.quest-card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+}
+
+.expanded .quest-card-content {
+  width: 50%;
+  min-width: 300px;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer {
+  padding: 1rem 0.75rem;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.5),
+    transparent
+  );
+}
+
+.time {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 5.5rem;
+  height: 2rem;
+  margin: 0.5rem;
+  background-color: #6289ec;
+  border-radius: 0.5rem;
+  border: 1px solid black;
+}
+
+.user {
+  margin: 0;
+  color: rgb(228, 228, 228);
+}
+
+.description {
+  margin: 0;
+  width: 100%;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.comments-section {
+  padding: 1rem;
+  background-color: white;
+  color: black;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.comments-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.user-photo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-user {
+  font-weight: bold;
+  margin: 0;
+}
+
+.comment-text {
+  margin: 0;
+}
+
+.add-comment {
+  display: flex;
+}
+
+.add-comment input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+}
+
+.add-comment button {
+  padding: 0.5rem 1rem;
+  background-color: #6289ec;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .expanded .quest-card-inner {
+    flex-direction: column;
+  }
+
+  .expanded .quest-card-content {
+    width: 100%;
+    height: 50%;
+  }
+
+  .comments-section {
+    height: 50%;
+  }
+}

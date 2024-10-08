@@ -1,0 +1,10 @@
+.feed {
+  column-count: 2;
+  column-gap: 0.75rem;
+}
+
+@media (min-width: 1240px) {
+  .feed {
+    column-count: 3;
+  }
+}

@@ -19,20 +19,22 @@ import {
   query,
   where,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  addDoc,
+  orderBy,
+  limit // Import limit here
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 // Your web app's Firebase configuration
- const firebaseConfig = {
-  apiKey: "AIzaSyC2wTEeSiz_09FzWarn52vwzSlzfHXjATE",
-  authDomain: "quests-b5b92.firebaseapp.com",
-  databaseURL: "https://quests-b5b92-default-rtdb.firebaseio.com",
-  projectId: "quests-b5b92",
-  storageBucket: "quests-b5b92.appspot.com",
-  messagingSenderId: "388972050284",
-  appId: "1:388972050284:web:38dfdb79a67edcf0756549",
-  measurementId: "G-Y1P89CPKCY"
+const firebaseConfig = {
+  apiKey: "AIzaSyBcfSX72wkSxZ7cPGaWrkJ7OreAjYmuCOo",
+  authDomain: "quests-backup.firebaseapp.com",
+  projectId: "quests-backup",
+  storageBucket: "quests-backup.appspot.com",
+  messagingSenderId: "512930742831",
+  appId: "1:512930742831:web:cd58945dd92b3a4e6e3cda",
+  measurementId: "G-EB4H740XB0"
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -42,7 +44,6 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Sign up with email and password
 // Sign up with email and password
 export const signUpWithEmailAndPassword = async (email, password, name) => {
   try {
@@ -68,11 +69,9 @@ export const signUpWithEmailAndPassword = async (email, password, name) => {
   }
 };
 
-
 // Create a Google Auth provider instance
 export const googleProvider = new GoogleAuthProvider();
 
-// Function to sign up with Google
 // Function to sign up with Google
 export const signUpWithGoogle = async () => {
   try {
@@ -103,7 +102,6 @@ export const signUpWithGoogle = async () => {
   }
 };
 
-
 // Sign in with Google
 export const signInWithGoogle = async () => {
   try {
@@ -121,7 +119,6 @@ export const signInWithGoogle = async () => {
   }
 };
 
-// Sign in with email and password
 // Sign in with email and password
 export const signInWithEmailAndPassword = async (email, password) => {
   try {
@@ -142,7 +139,6 @@ export const signInWithEmailAndPassword = async (email, password) => {
     console.error('Error signing in:', error);
   }
 };
-
 
 // Function to upload a file to Firebase Storage and get the download URL
 export const uploadImage = async (file) => {
@@ -172,9 +168,6 @@ export const uploadImage = async (file) => {
   });
 };
 
-
-// Function to update user profile in Firestore
-// Function to update user profile in Firestore
 // Function to update user profile in Firestore
 export const updateUserProfile = async (userId, profileData) => {
   try {
@@ -185,8 +178,6 @@ export const updateUserProfile = async (userId, profileData) => {
     console.error('Error updating user profile:', error);
   }
 };
-
-
 
 // Function to get the default profile photo URL
 export const getDefaultProfilePhotoURL = async () => {
@@ -211,7 +202,6 @@ export const updateUserLocation = async (userId, location) => {
 };
 
 // Function to get a user's profile and location
-// Function to fetch a user's profile and location
 export const getUserProfile = async (userId) => {
   try {
     const docSnap = await getDoc(doc(db, 'users', userId));
@@ -241,7 +231,6 @@ export const fetchUserLocations = async () => {
   const snapshot = await getDocs(query);
   // Process snapshot data...
 };
-
 
 // Function to fetch all user locations
 export const fetchAllUserLocations = async () => {
@@ -392,6 +381,6 @@ const generateUniqueId = () => {
 };
 
 // Ensure setPersistence and browserLocalPersistence are exported
-export { setPersistence, browserLocalPersistence, getDocs, updateDoc, doc, };
+export { setPersistence, browserLocalPersistence, getDocs, updateDoc, doc, addDoc, collection, limit, orderBy, query };
 
 export default app;

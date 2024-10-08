@@ -1,0 +1,184 @@
+.camera-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 50rem;
+}
+
+.camera-preview-bg {
+  display: flex;
+  justify-content: center;
+
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  padding: 1rem;
+  padding-bottom: 15vw;
+
+  background-color: white;
+  z-index: 1000;
+}
+
+.camera-preview {
+  width: 100%;
+  height: 100%;
+
+  border-radius: var(--border-radius);
+  background-color: black;
+
+  overflow: hidden;
+}
+
+.camera-button-container {
+  display: flex;
+  gap: 1rem;
+
+  position: absolute;
+  bottom: 0.8rem;
+}
+.sub-camera-button-container {
+  display: flex;
+  gap: 1rem;
+
+  padding: 4px;
+
+  border-radius: 10rem;
+  background-color: white;
+}
+
+.camera-button-container button {
+  width: 20vw;
+  height: 20vw;
+  max-width: 6rem;
+  max-height: 6rem;
+
+  background-color: white;
+  border-radius: 50%;
+  border: none;
+
+  cursor: pointer;
+  transition: background-color 200ms;
+}
+.camera-button-container button svg {
+  width: 100%;
+  height: 100%;
+
+  fill: black;
+}
+button#flip-camera {
+  position: absolute;
+  margin-left: 50vw;
+  padding: 0.6rem;
+  background-color: rgb(255, 255, 255);
+}
+button#flip-camera svg {
+  padding: 0.6rem;
+  transition: background-color 200ms;
+  border-radius: 50%;
+}
+button#flip-camera:hover svg {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+button#back {
+  padding: 5px;
+}
+button#back:hover,
+button#back:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+button#shutter {
+  border: 7px solid black;
+  background-color: #6289ec;
+  transition: filter 150ms;
+}
+button#shutter:hover,
+button#shutter:active {
+  filter: brightness(0.8);
+}
+button#placeholder {
+  opacity: 0;
+}
+
+.camera-image-container {
+  display: flex;
+  justify-content: center;
+  height: 60%;
+
+  overflow: hidden;
+  background-color: transparent;
+}
+.camera-img {
+  width: auto;
+  height: 100%;
+
+  object-fit: contain;
+  border-radius: var(--border-radius);
+}
+.camera-button-container.shot {
+}
+.camera-button-container.shot #shutter {
+  padding: 0.5rem;
+  border: none;
+}
+.camera-button-container.shot #shutter.disabled {
+  opacity: 0.5;
+}
+
+.ratio-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+}
+.ratio-container h2 {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.ratio-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+
+  padding-bottom: 1.5rem;
+}
+.ratio-button {
+  width: 7rem;
+  height: 6rem;
+
+  font-size: 1.2rem;
+  font-weight: 600;
+
+  background-color: white;
+  border-radius: var(--border-radius);
+  border: 4px solid black;
+
+  transition: background 150ms;
+  cursor: pointer;
+}
+.ratio-button:hover {
+  background-color: rgba(96, 136, 235, 0.4);
+}
+.ratio-button.selected {
+  background-color: #6289ec;
+}
+
+.description-input {
+  width: 100%;
+  max-width: 30rem;
+  height: 4rem;
+
+  text-wrap: wrap;
+
+  padding: 1rem;
+
+  border-radius: var(--border-radius);
+  border: 3px solid black;
+  outline: none;
+}

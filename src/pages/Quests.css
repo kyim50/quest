@@ -1,0 +1,54 @@
+.quests-page {
+  padding: 0;
+  min-width: 0;
+  background-color: transparent;
+}
+.quests-header {
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.quests-page h1 {
+  text-align: center;
+  font-size: 2rem;
+  line-height: normal;
+  color: #6289ec;
+}
+
+.quests-column {
+  background-color: white;
+  color: black;
+}
+.quests-column h2 {
+  font-size: 1.2rem;
+  color: black;
+}
+
+.select-button{
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+.confirm-button{
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: cornflowerblue;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+}
+
+.confirm-button:hover{
+  background-color: rgb(77, 132, 234);
+}

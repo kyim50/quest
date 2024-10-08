@@ -4,7 +4,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  background-color: rgb(33, 33, 33);
   color: #ffffff;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -136,9 +135,7 @@ body.light-mode .nav-bar {
   z-index: 900;
 }
 
-.nav-bar:hover ~ .main-content2 {
-  padding-left: 120px;
-}
+
 
 .home-content {
   display: flex;
@@ -148,7 +145,7 @@ body.light-mode .nav-bar {
 }
 
 /* Top bar styles */
-.top-bar {
+.top-bar-old {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -157,24 +154,24 @@ body.light-mode .nav-bar {
   background-color: rgb(18, 18, 20);
   transition: background-color 0.3s, border-color 0.3s;
   position: sticky;
-  margin-left: 20px;
   margin-right: 400px;
+  left:0;
   top: 0;
   z-index: 1000;
 }
 
-body.light-mode .top-bar {
+body.light-mode .top-bar-old {
   background-color: #ffffff;
   border-bottom-color: #e0e0e0;
 }
 
-.top-bar-center {
+.top-bar-old-center {
   flex-grow: 1;
   display: flex;
   justify-content: center;
 }
 
-.top-bar-right {
+.top-bar-old-right {
   display: flex;
   gap: 15px;
 }
@@ -435,7 +432,7 @@ body.light-mode .camera-placeholder span {
     width: 200px; /* Expanded width */
   }
 
-  .nav-bar:hover + .main-content2 .profile-container {
+  .nav-bar:hover + .main-content2 .profile-container, .nav-bar:hover + .main-content2 .connections-container2, .nav-bar:hover + .main-content2 .quests-page, .nav-bar:hover + .main-content2 .privacy-container{
     left: 215px; /* Slightly more than the expanded navbar width */
   }
 
@@ -445,7 +442,7 @@ body.light-mode .camera-placeholder span {
   }
 
   .nav-bar:hover ~ .main-content2 {
-    margin-left: 200px; /* Same as expanded navbar width */
+    margin-left: 200px; /*Makes the main feed move when hovered*/
   }
 }
 
@@ -1133,8 +1130,8 @@ h3,
 h4,
 h5,
 h6 {
-  margin-top: 0;
-  margin-bottom: 1rem;
+  /* margin-top: 0;
+  margin-bottom: 1rem; */
 }
 
 /* Improve table readability */
@@ -1225,22 +1222,22 @@ body.light-mode hr {
   transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-.top-bar-right {
+.top-bar-old-right {
   display: flex;
   align-items: center;
 }
 
-.top-bar-right .MuiIconButton-root {
+.top-bar-old-right .MuiIconButton-root {
   margin-left: 8px;
 }
 
-.top-bar-icon {
+.top-bar-old-icon {
   width: auto;
   height: 32px;
   filter: invert(1);
 }
 
-body.light-mode .top-bar-icon {
+body.light-mode .top-bar-old-icon {
   filter: none;
 }
 
@@ -1605,7 +1602,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
   overflow: hidden;
 }
 
-.full-screen-camera-active .top-bar,
+.full-screen-camera-active .top-bar-old,
 .full-screen-camera-active .friends-list2,
 .full-screen-camera-active .main-area {
   display: none;
@@ -1660,7 +1657,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     padding-bottom: 60px !important; /* Space for mobile nav bar */
   }
 
-  .top-bar {
+  .top-bar-old {
     padding: 10px !important;
     margin-left: 0;
     height: auto !important;
@@ -1728,12 +1725,12 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: inline-block !important;
   }
 
-  .top-bar-right {
+  .top-bar-old-right {
     display: flex !important;
     align-items: center !important;
   }
 
-  .top-bar-center {
+  .top-bar-old-center {
     display: none;
   }
 
@@ -1927,7 +1924,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     min-height: 44px;
   }
 
-  .top-bar-icon {
+  .top-bar-old-icon {
     height: 24px;
   }
 
@@ -1935,12 +1932,12 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: none;
   }
 
-  .top-bar .profile-photo-container {
+  .top-bar-old .profile-photo-container {
     width: 30px;
     height: 30px;
   }
 
-  .top-bar .profile-photo {
+  .top-bar-old .profile-photo {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1988,19 +1985,19 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
 /* Adjust font sizes for better readability on mobile */
 @media (max-width: 768px) {
   body {
-    font-size: 14px;
+    /* font-size: 14px; */
   }
 
   h1 {
-    font-size: 24px;
+    /* font-size: 24px; */
   }
 
   h2 {
-    font-size: 20px;
+    /* font-size: 20px; */
   }
 
   h3 {
-    font-size: 18px;
+    /* font-size: 18px; */
   }
 }
 
@@ -2114,7 +2111,7 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     flex-direction: column;
   }
 
-  .mobile-view .top-bar {
+  .mobile-view .top-bar-old {
     position: relative;
     z-index: 3;
     padding: 10px;
@@ -2134,11 +2131,11 @@ body.light-mode .preview-controls .MuiButton-outlined:hover {
     display: none;
   }
 
-  .mobile-view .top-bar-center {
+  .mobile-view .top-bar-old-center {
     display: none;
   }
 
-  .mobile-view .top-bar-right {
+  .mobile-view .top-bar-old-right {
     margin-left: auto;
   }
 

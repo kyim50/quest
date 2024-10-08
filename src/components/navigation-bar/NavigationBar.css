@@ -1,0 +1,102 @@
+.navigation-bar > * {
+  transition: none;
+}
+
+.navigation-bar {
+  position: sticky;
+  top: var(--main-page-padding);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+  padding: 0.5rem;
+
+  width: 5rem;
+
+  border: 3px solid black;
+  border-radius: var(--border-radius);
+  background-color: white;
+  z-index: 1000;
+}
+
+.navigation-bar-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  aspect-ratio: 1/1;
+
+  border-radius: 0.5rem;
+}
+.navigation-bar-button.selected {
+  background-color: #6289ec;
+}
+
+.navigation-bar-button > svg {
+  fill: black;
+  width: 2rem;
+  height: 2rem;
+}
+.profile-icon {
+  width: 2rem;
+  height: 2rem;
+
+  border: 3px solid black;
+  border-radius: 50%;
+}
+.profile-icon:hover {
+  border: 3px solid #6289ec;
+}
+
+.navigation-bar-button:hover {
+  border: 3px solid #6289ec;
+  border-radius: 0.5rem;
+}
+.navigation-bar-button#profile:hover {
+  border: none;
+}
+
+@media (max-width: 550px) {
+  .navigation-bar {
+    flex-direction: row;
+    margin: 0 auto;
+
+    height: 4rem;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+  }
+
+  .navigation-bar-button {
+    height: 100%;
+    aspect-ratio: 1/1;
+  }
+}
+
+.profile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 2.5rem; /* Adjust as needed */
+  height: 2.5rem; /* Adjust as needed */
+
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover; /* Ensures the image fits properly inside the circle */
+}

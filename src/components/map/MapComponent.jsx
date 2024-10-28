@@ -5,7 +5,7 @@ import QuestsComponent from '../QuestsComponent';
 import { getCurrentTheme, initializeTheme } from '../../theme-toggle';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lpbTUwIiwiYSI6ImNsempkdjZibDAzM2MybXE4bDJmcnZ6ZGsifQ.-ie6lQO1TWYrL8c6h2W41g';
+const MAPBOX_TOKEN = '';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const darkMapStyle = 'mapbox://styles/kyim50/clzniqnmq009s01qgee0a13s0'; // Your current dark style
